@@ -8,6 +8,7 @@
     --gold:#f4c531;
     --violet:#6728f5;
     --green:#7BFFBA;
+    --bgGreen:#222B26;
   }
   
   *{ box-sizing:border-box }
@@ -219,7 +220,7 @@
 .physchart__head{
   display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;
 }
-.physchart__title{ margin:0; font-size:24px; color:var(--brand); font-weight:800; }
+.physchart__title{ margin:0; font-size:24px; color:var(--green); font-weight:800; }
 
 .physchart__ranges{ display:flex; gap:8px; }
 .pill{
@@ -229,18 +230,61 @@
 }
 .pill.is-active{ background:#19191f; border-color:#2f2f37; color:#fff; }
 
-.physchart__tabs{
-  display:flex; gap:8px; background:#111116; border:1px solid var(--border);
-  border-radius:999px; padding:6px; margin-bottom:12px;
+/* Shared segmented tabs: equal width, wrap when needed */
+.physchart__tabs,
+.skillchart__tabs{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* equal slots */
+  gap: 8px;
+  background:#111116;
+  border:1px solid var(--border);
+  border-radius:14px;             /* softer than 999px so it looks good on 2 rows */
+  padding:6px;
+  margin-bottom:12px;
 }
-.tab{
-  padding:8px 14px; border-radius:999px; border:1px solid transparent;
-  color:#c9cad1; background:transparent; cursor:pointer; font-weight:700;
+
+/* Tab button base */
+.tab, .stab{
+  width: 100%;                    /* fill the grid slot */
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #c9cad1;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;            /* keep label on one line */
+  overflow: hidden;               /* prevent spill */
+  text-overflow: ellipsis;        /* ... if label is too long */
 }
+
+/* Active states (keep your themes) */
 .tab.is-active{
-  background:#132116; color:#dff6c0; border-color:#26371a;
-  box-shadow:0 0 0 1px #2c3f1d inset;
+  background:var(--bgGreen);
+  color:var(--green);
+  border-color:var(--green);
+  /* box-shadow:0 0 0 1px #2c3f1d inset; */
 }
+
+.stab.is-active{
+  background:#1b1430;
+  color:#e7dbff;
+  border-color:#2a1f4a;
+  /* box-shadow:0 0 0 1px #2a1f4a inset; */
+}
+
+/* Responsive: allow smaller minimums on narrow screens */
+@media (max-width: 720px){
+  .physchart__tabs,
+  .skillchart__tabs{
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
 
 .physchart__grid{
   display:grid; grid-template-columns: 1fr 280px; gap:16px;
@@ -253,13 +297,13 @@
   background:#0f0f12; border:1px solid var(--border); border-radius:12px; padding:8px 12px;
 }
 .physchart__side .sidecard{
-  border:1px solid #2e4c34; border-radius:12px; padding:14px;
+  border:1px solid var(--green); border-radius:12px; padding:14px;
   background:linear-gradient(180deg, rgba(49,77,56,0.12), rgba(49,77,56,0.04));
 }
 .sidecard__title{ font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
-.sidecard__value{ font-size:28px; font-weight:800; color:#94C94A; }
+.sidecard__value{ font-size:28px; font-weight:800; color:var(--green); }
 
-.spark{ color:#94C94A; }
+.spark{ color:var(--green); }
 
 .physchart__bottom{
   margin-top:16px; 
@@ -274,8 +318,8 @@
 }
 .mcard{
   position:relative;
-  background:#0f0f12; 
-  border:1px solid var(--border);
+  background:var(--bgGreen); 
+  border:0.1px solid var(--green);
   border-radius:12px; 
   padding:16px;
   
@@ -343,7 +387,7 @@
   color:#e7dbff; 
 }
 
-.skillchart__tabs{
+/* .skillchart__tabs{
   display:flex; 
   gap:8px; 
   background:#111116; 
@@ -351,7 +395,7 @@
   border-radius:999px; 
   padding:6px; 
   margin-bottom:12px;
-}
+} */
 .stab{
   padding:8px 14px; 
   border-radius:999px; 

@@ -246,7 +246,7 @@ const PhysicalPerformance: React.FC = () => {
     <div className="physical-performance">
       <div className="section-header">
         <h2 className="section-title physical-performance-title">
-          Physical &nbsp;<span className="notification-badge2">5</span>
+          Physical &nbsp;<span className="notification-badge-green">5</span>
         </h2>
         <div className="performance-filter"></div>
       </div>
@@ -278,8 +278,8 @@ const SkillDevelopment: React.FC = () => {
   return (
     <div className="skill-development">
       <div className="section-header">
-        <h2 className="section-title skill-development-title">
-          Skills &nbsp;<span className="notification-badge">5</span>
+        <h2 className="skill-performance-title">
+          Skills &nbsp;<span className="notification-badge-purple">5</span>
         </h2>
         <div className="performance-filter"></div>
       </div>
@@ -389,7 +389,7 @@ const SkillDevelopment: React.FC = () => {
         </div>
   
         {/* Tabs */}
-        <div className="physchart__tabs">
+        <div className="physchart__tabs ">
           {(["fiveTenFive", "broadJump", "tAgility"] as const).map((k) => (
             <button
               key={k}
@@ -408,8 +408,8 @@ const SkillDevelopment: React.FC = () => {
               <AreaChart data={displayData} margin={{ top: 16, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="pcGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#94C94A" stopOpacity={0.6} />
-                    <stop offset="100%" stopColor="#94C94A" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#7BFFBA" stopOpacity={0.6} />
+                    <stop offset="100%" stopColor="#7BFFBA" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="week" tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
@@ -419,7 +419,7 @@ const SkillDevelopment: React.FC = () => {
                     background: "#151519",
                     border: "1px solid #24242a",
                     borderRadius: 10,
-                    color: "#e8e8ea",
+                    color: "#7BFFBA",
                   }}
                   formatter={(v: number) => [`${v.toFixed(2)} ${unit}`, metricLabel[metric]]}
                   labelStyle={{ color: "#9a9aa3" }}
@@ -427,7 +427,7 @@ const SkillDevelopment: React.FC = () => {
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="#94C94A"
+                  stroke="#7BFFBA"
                   strokeWidth={3}
                   fill="url(#pcGrad)"
                   dot={false}

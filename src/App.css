@@ -52,7 +52,7 @@ body {
 
 /* Old navigation styles removed - using new shell styles below */
 
-.notification-badge2 {
+.notification-badge-green {
   background-color: #7BFFBA;
   color: #000;
   font-size: 12px;
@@ -63,9 +63,9 @@ body {
   text-align: center;
 }
 
-.notification-badge2 {
-  background-color: #7BFFBA;
-  color: #000;
+.notification-badge-purple {
+  background-color: #6728f5;
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
   padding: 2px 8px;
