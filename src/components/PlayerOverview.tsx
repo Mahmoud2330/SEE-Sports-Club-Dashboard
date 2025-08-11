@@ -238,7 +238,7 @@ const PlayerOverview: React.FC = () => {
         {/* Left Column: Player Card */}
         <div className="player-card-column">
           <div className="player-card-section">
-            <h2 className="section-title">Player Card <span className="active-dot"><span className="live-dot"></span> Active</span></h2>
+            <h2 className="section-title1">Player Card <span className="active-dot"><span className="live-dot"></span> Active</span></h2>
             <div className="player-card-container">
               {/* Unified Background Container */}
               <div className="player-card-background">
