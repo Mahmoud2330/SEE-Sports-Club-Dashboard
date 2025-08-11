@@ -177,7 +177,7 @@ const PerformanceChart: React.FC = () => {
         <div className="physical-assessment-section">
           <div className="assessment-header">
             <div className="assessment-title-section">
-              <h3 className="assessment-title">Physical Assessment</h3>
+              <h3 className="assessment-title1">Physical Assessment</h3>
               <p className="assessment-description">
                 Track progress across physical assessment performance indicators.
               </p>

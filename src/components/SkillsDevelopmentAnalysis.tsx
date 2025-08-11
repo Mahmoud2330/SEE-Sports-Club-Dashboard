@@ -85,7 +85,7 @@ const SkillsDevelopmentAnalysis: React.FC = () => {
   return (
     <div className="skills-development-analysis">
       <div className="section-header">
-        <h2 className="section-title">Skills Development Analysis</h2>
+        <h2 className="section-title">Skills Progress</h2>
         <div className="analysis-filter">
           <Filter size={16} />
           <span>Skills Analysis Period</span>
