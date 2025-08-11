@@ -2,7 +2,11 @@ import React, {  useState, useId, useMemo  } from 'react';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area } from 'recharts';
 import { Filter, TrendingUp, Heart, Zap, Clock, Activity, TrendingDown } from 'lucide-react';
 
-const PerformanceChart: React.FC = () => {
+interface PerformanceChartProps {
+  playerName?: string;
+}
+
+const PerformanceChart: React.FC<PerformanceChartProps> = ({ playerName = 'Ahmed Mohamed' }) => {
   const [selectedMetric, setSelectedMetric] = useState('Vertical Jump');
 
   // unique, safe id for the gradient (no spaces, no collisions)
@@ -13,42 +17,42 @@ const PerformanceChart: React.FC = () => {
     { 
       name: 'Vertical Jump', 
       icon: <TrendingUp size={16} />,
-      color: '#00ff88',
-      areaColor: '#00ff88',
-      teamColor: '#6200ea',
-      iconBgColor: '#283630'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#7bffba1a'
     },
     { 
       name: 'Broad Jump', 
       icon: <Heart size={16} />,
-      color: '#6200ea',
-      areaColor: '#6200ea',
-      teamColor: '#6200ea',
-      iconBgColor: '#241735'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#7bffba1a'
     },
     { 
       name: '10m Run', 
       icon: <Zap size={16} />,
-      color: '#ffa500',
-      areaColor: '#ffa500',
-      teamColor: '#6200ea',
-      iconBgColor: '#403a2a'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#7bffba1a'
     },
     { 
       name: '5-10-5', 
       icon: <Clock size={16} />,
-      color: '#e53834',
-      areaColor: '#e53834',
-      teamColor: '#6200ea',
-      iconBgColor: '#35201e'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#7bffba1a'
     },
     { 
       name: 'T-Agility', 
       icon: <Activity size={16} />,
-      color: '#9d27b0',
-      areaColor: '#352a40',
-      teamColor: '#6200ea',
-      iconBgColor: '#2c1d2e'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#7bffba1a'
     },
   ];
 
@@ -228,7 +232,7 @@ const PerformanceChart: React.FC = () => {
           <div className="chart-legend">
             <div className="legend-item">
               <div className="legend-color ahmed" style={{ backgroundColor: getCurrentMetricColors().color }}></div>
-              <span>Ahmed Mohamed</span>
+              <span>{playerName}</span>
             </div>
             <div className="legend-item">
               <div className="legend-color team" style={{ backgroundColor: getCurrentMetricColors().teamColor }}></div>

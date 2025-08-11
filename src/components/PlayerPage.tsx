@@ -31,10 +31,10 @@ const PlayerPage: React.FC = () => {
         <SkillDevelopment />
         
         {/* Performance Chart */}
-        <PerformanceChart />
+        <PerformanceChart playerName="Ahmed Mohamed" />
         
         {/* Skill Chart */}
-        <SkillChart />
+        <SkillChart playerName="Ahmed Mohamed" />
     
         {/* Video Analysis */}
         <VideoAnalysis />

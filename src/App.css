@@ -36,8 +36,8 @@ body {
   --db-text:#d4d4d4;
   --db-text-muted:#9e9e9e;
 
-  --db-primary:#7501ff;
-  --db-primary-10:#7501ff1a; /* ~10% */
+  --db-primary:#6728f5;
+  --db-primary-10:#6728f51a; /* ~10% */
   --db-success:#7BFFBA;
   --db-success-10:#7bffba1a;
   --db-danger:#ff6b6b;
@@ -90,7 +90,7 @@ body {
 .user-avatar {
   width: 30px !important;
   height: 30px !important;
-  background-color: #7501ff !important;
+  background-color: #6728f5 !important;
   border-radius: 50% !important;
   display: flex !important;
   align-items: center !important;
@@ -479,7 +479,7 @@ body {
 }
 
 .progress-fill.team-average {
-  background-color: #8b5cf6;
+  background-color: #6728f5;
 }
 
 .progress-fill.league-average {
@@ -538,11 +538,18 @@ body {
   color: var(--db-success) !important;
 }
 
+.section-video-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #fff !important;
+}
+
 .section-title-dash {
   width: 24px;
   height: 4px;
   border-radius: 2px;
-  margin-bottom: 13px;
+  margin-bottom: 0px;
 }
 
 .section-title-dash.physical-dash {
@@ -550,7 +557,7 @@ body {
 }
 
 .section-title-dash.skills-dash {
-  background-color: #7501ff;
+  background-color: #6728f5;
 }
 
 .video-grid {
@@ -715,7 +722,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #7501ff;
+  background-color: #6728f5;
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -794,7 +801,7 @@ body {
 }
 
 .period-btn.active {
-  background-color: #6200ea;
+  background-color: #6728f5;
   border: none !important;
   color: #fff;
 }
@@ -826,7 +833,7 @@ body {
   justify-content: center;
   margin-top: -36px;
   margin-bottom: 10px;
-  color: #7501ff;
+  color: #6728f5;
   font-size: 11px;
   font-weight: 500;
   background-color: var(--db-hover);
@@ -840,7 +847,7 @@ body {
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
-  border-top: 2px solid #7501ff;
+  border-top: 2px solid #6728f5;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-right: 7px;
@@ -863,7 +870,7 @@ body {
 }
 
 .custom-btn:hover, .reset-btn:hover {
-  border-color: #7501ff;
+  border-color: #6728f5;
   color: #fff;
 }
 
@@ -1268,7 +1275,7 @@ body {
 }
 
 .physical-progress-title {
-  color: #7501ff !important;
+  color: #6728f5 !important;
   font-weight: 700;
 }
 
@@ -1378,7 +1385,7 @@ body {
 }
 
 .progress-fill {
-  stroke: #7501ff;
+  stroke: #6728f5;
   transition: stroke-dashoffset 0.5s ease;
 }
 
@@ -1388,7 +1395,7 @@ body {
 }
 
 .progress-fill-last-best {
-  stroke: #7501ff;
+  stroke: #6728f5;
   transition: stroke-dashoffset 0.5s ease;
 }
 
@@ -1431,7 +1438,7 @@ body {
 }
 
 .detail-dot {
-  color: #7501ff;
+  color: #6728f5;
   font-weight: bold;
 }
 
@@ -1463,7 +1470,7 @@ body {
 }
 
 .consistency-dot {
-  color: #7501ff;
+  color: #6728f5;
 }
 
 .period-info {
@@ -1510,7 +1517,7 @@ body {
 .skills-vertical-line {
   width: 4px;
   height: 40px;
-  background-color: #7501ff;
+  background-color: #6728f5;
   border-radius: 2px;
   flex-shrink: 0;
 }
@@ -1599,7 +1606,7 @@ body {
 }
 
 .skill-detail-dot.last-best {
-  color: #7501ff;
+  color: #6728f5;
 }
 
 .improvement-indicator {
@@ -1771,7 +1778,7 @@ body {
   background-color: #1b1b1b;
   border: 1px solid #333;
   border-radius: 8px;
-  border-color: #7501ff;
+  border-color: #6728f5;
   min-width: 18.5%;
   height: 120px;
   flex-shrink: 0;
@@ -1884,7 +1891,7 @@ body {
 .top-header__logo{
   width: 32px; height: 32px;
   border-radius: 8px;
-  background:#7501ff;
+  background:#6728f5;
   color:#fff;
   display:flex; align-items:center; justify-content:center;
   font-weight:700;
@@ -2200,7 +2207,7 @@ body {
 .shell:not(.is-collapsed) .collapse-fab:hover{
   background:#1a1a1a;
   border-color:#5b38b6;
-  color:#7501ff;               /* purple on hover only */
+  color:#6728f5;               /* purple on hover only */
 }
 
 /* make sure the svg actually renders at a visible size */
@@ -2321,12 +2328,12 @@ body {
   color: var(--db-text);
 }
 .pill--primary{
-  background: color-mix(in oklab, var(--db-primary) 20%, transparent);
+  background: color-mix(in oklab, var(--db-primary) 20%, transparent) !important;
   color: #fff;
   border-color: color-mix(in oklab, var(--db-primary) 35%, var(--db-border));
 }
 .pill--active{
-  background: color-mix(in oklab, var(--db-primary) 20%, transparent);
+  background: color-mix(in oklab, var(--db-primary) 20%, transparent) !important;
   color:#fff;
   border-color: rgba(255,255,255,.28);
 }

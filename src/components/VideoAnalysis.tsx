@@ -50,7 +50,7 @@ const VideoSection: React.FC<{
   return (
     <div className="video-section">
       <div className="section-title-container">
-        <h3 className="section-title">{title}</h3>
+        <h3 className="section-video-title">{title}</h3>
         <div className={`section-title-dash ${sectionType === 'physical' ? 'physical-dash' : 'skills-dash'}`}></div>
       </div>
       <div className="video-grid">

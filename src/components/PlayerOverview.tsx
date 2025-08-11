@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Share2, Filter, ChevronRight, User, TrendingUp } from 'lucide-react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PlayerCard from './PlayerCard';
 import SkillsDevelopmentAnalysis from './SkillsDevelopmentAnalysis';
 import PhysicalPerformance from './PhysicalPerformance';
@@ -10,6 +11,9 @@ import CustomDatePicker from './CustomDatePicker';
 const PlayerOverview: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState('3 Months');
   const [activeTest, setActiveTest] = useState('Vertical Jump');
+  const navigate = useNavigate();
+  const { id: playerId } = useParams<{ id: string }>();
+  const location = useLocation();
   
   // Loading state for period changes
   const [isUpdating, setIsUpdating] = useState(false);
@@ -24,7 +28,32 @@ const PlayerOverview: React.FC = () => {
 
   const periods = ['Last Month', '3 Months', '6 Months', 'This Year'];
   const physicalTests = ['Vertical Jump', 'Broad Jump', '10m Run', '5-10-5', 'T-Agility'];
-  const breadcrumbs = ['Club', 'Teams', 'Team A', 'Hassan Rashid'];
+  
+  // Dynamic player and team data - in a real app, this would come from an API or context
+  const playerData = {
+    id: playerId || '1',
+    name: 'Ahmed Mohamed',
+    team: 'Team A',
+    teamId: 'team-a'
+  };
+  
+  // Dynamic breadcrumbs based on current player and team
+  const breadcrumbs = [
+    { name: 'Club', path: '/dashboard' },
+    { name: 'Teams', path: '/teams' },
+    { name: playerData.team, path: `/teams/${playerData.teamId}` },
+    { name: playerData.name, path: `/players/${playerData.id}` }
+  ];
+
+  const handleBreadcrumbClick = (crumb: { name: string; path: string }, index: number) => {
+    // Don't navigate if it's the current page (last breadcrumb)
+    if (index === breadcrumbs.length - 1) {
+      return;
+    }
+    
+    // Navigate to the appropriate page
+    navigate(crumb.path);
+  };
 
   // Comprehensive data for each physical test
   const physicalTestData = {
@@ -88,11 +117,6 @@ const PlayerOverview: React.FC = () => {
       improvement: 'Improving',
       summary: 'Agility improved by 2.6%'
     }
-  };
-
-  const handleBreadcrumbClick = (crumb: string, index: number) => {
-    // TODO: Add navigation logic here when you're ready
-    console.log(`Clicked: ${crumb} at index ${index}`);
   };
 
   const handlePeriodChange = (period: string) => {
@@ -180,7 +204,7 @@ const PlayerOverview: React.FC = () => {
                 onClick={() => handleBreadcrumbClick(crumb, index)}
                 className={index === breadcrumbs.length - 1 ? 'active' : ''}
               >
-                {crumb}
+                {crumb.name}
               </button>
               {index < breadcrumbs.length - 1 && (
                 <ChevronRight size={16} className="chevron" />
@@ -193,7 +217,7 @@ const PlayerOverview: React.FC = () => {
       {/* Player Header */}
       <div className="player-header">
         <div className="player-info">
-          <h1 className="player-name">Ahmed Mohamed</h1>
+          <h1 className="player-name">{playerData.name}</h1>
           <p className="player-description">
             Detailed player profile with performance metrics, statistics, and development progress.
           </p>
@@ -251,8 +275,8 @@ const PlayerOverview: React.FC = () => {
                 <div className="player-card-footer">
                   <div className="player-info-footer">
                     <div className="left-info">
-                      <div className="player-name-card">Ahmed Mohamed</div>
-                      <div className="team-name-card">Team A</div>
+                      <div className="player-name-card">{playerData.name}</div>
+                      <div className="team-name-card">{playerData.team}</div>
                     </div>
                     <div className="live-status">
                       <span className="live-dot" />

@@ -2,7 +2,11 @@ import React, { useState, useId, useMemo } from 'react';
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area } from 'recharts';
 import { Filter, TrendingUp, Heart, Zap, Clock, Activity, TrendingDown } from 'lucide-react';
 
-const SkillChart: React.FC = () => {
+interface SkillChartProps {
+  playerName?: string;
+}
+
+const SkillChart: React.FC<SkillChartProps> = ({ playerName = 'Ahmed Mohamed' }) => {
   const [selectedSkill, setSelectedSkill] = useState('Ball Control');
 
   // unique, safe id for the gradient (no spaces, no collisions)
@@ -13,42 +17,42 @@ const SkillChart: React.FC = () => {
     { 
       name: 'Ball Control', 
       icon: <TrendingUp size={16} />,
-      color: '#00ff88',
-      areaColor: '#00ff88',
-      teamColor: '#6200ea',
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
       iconBgColor: '#283630'
     },
     { 
       name: 'Passing', 
       icon: <Heart size={16} />,
-      color: '#6200ea',
-      areaColor: '#6200ea',
-      teamColor: '#6200ea',
-      iconBgColor: '#241735'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#283630'
     },
     { 
       name: 'Shooting', 
       icon: <Zap size={16} />,
-      color: '#ffa500',
-      areaColor: '#ffa500',
-      teamColor: '#6200ea',
-      iconBgColor: '#403a2a'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#283630'
     },
     { 
       name: 'Dribbling', 
       icon: <Clock size={16} />,
-      color: '#e53834',
-      areaColor: '#e53834',
-      teamColor: '#6200ea',
-      iconBgColor: '#35201e'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#283630'
     },
     { 
       name: 'Defending', 
       icon: <Activity size={16} />,
-      color: '#9d27b0',
-      areaColor: '#352a40',
-      teamColor: '#6200ea',
-      iconBgColor: '#2c1d2e'
+      color: '#7BFFBA',
+      areaColor: '#7BFFBA',
+      teamColor: '#6728f5',
+      iconBgColor: '#283630'
     },
   ];
 
