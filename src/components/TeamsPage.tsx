@@ -25,6 +25,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  ReferenceLine,
 } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -345,6 +346,52 @@ const SkillDevelopment: React.FC = () => {
     );
     const [range, setRange] = useState<"3m" | "6m" | "all">("6m");
   
+
+    // inside PhysicalChartCard component (top, after state)
+    const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+    // active dot w/ ring
+    const PcActiveDot = (props: any) => {
+      const { cx, cy } = props;
+      return (
+        <g>
+          <circle cx={cx} cy={cy} r={6} fill="#7BFFBA" />
+          <circle cx={cx} cy={cy} r={6} fill="none" stroke="#000" strokeWidth={3} />
+        </g>
+      );
+    };
+
+    // tooltip styled like the PNG
+    const PcTooltip = ({ active, label, payload }: any) => {
+      if (!active || !payload?.length) return null;
+      const v = payload[0].value as number;
+      const good =
+        metric === "broadJump" ? v >= avg : v <= avg; // jump: higher better, time: lower better
+      return (
+        <div className="pc-tooltip">
+          <div className="pc-t__row pc-t__head">
+            <span className="pc-dot" />
+            <span className="pc-t__week">{label}</span>
+          </div>
+
+          <div className="pc-t__metric">{metricLabel[metric]}</div>
+
+          <div className="pc-t__value">
+            {v.toFixed(2)} <span className="pc-unit">{unit}</span>
+          </div>
+
+          <div className="pc-t__row">
+            <span className="pc-t__label">Performance</span>
+            <span className={`pc-chip ${good ? "pc-chip--good" : "pc-chip--bad"}`}>
+              {good ? "Good" : "Below Avg"}
+            </span>
+          </div>
+        </div>
+      );
+    };
+
+
+
     const full = seriesMap[metric];
   
     const displayData = useMemo(() => {
@@ -401,40 +448,58 @@ const SkillDevelopment: React.FC = () => {
           ))}
         </div>
   
+
+  
         <div className="physchart__grid">
           {/* Chart */}
           <div className="physchart__canvas">
-            <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={displayData} margin={{ top: 16, right: 8, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="pcGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7BFFBA" stopOpacity={0.6} />
-                    <stop offset="100%" stopColor="#7BFFBA" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="week" tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    background: "#151519",
-                    border: "1px solid #24242a",
-                    borderRadius: 10,
-                    color: "#7BFFBA",
-                  }}
-                  formatter={(v: number) => [`${v.toFixed(2)} ${unit}`, metricLabel[metric]]}
-                  labelStyle={{ color: "#9a9aa3" }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="value"
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart
+              data={displayData}
+              margin={{ top: 16, right: 8, left: 0, bottom: 0 }}
+              onMouseMove={(state: any) => setActiveIdx(state?.activeTooltipIndex ?? null)}
+              onMouseLeave={() => setActiveIdx(null)}
+            >
+              <defs>
+                <linearGradient id="pcGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#7BFFBA" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#7BFFBA" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
+              {/* vertical dashed cursor */}
+              {activeIdx !== null && displayData[activeIdx] && (
+                <ReferenceLine
+                  x={displayData[activeIdx].week}
                   stroke="#7BFFBA"
-                  strokeWidth={3}
-                  fill="url(#pcGrad)"
-                  dot={false}
-                  activeDot={{ r: 4 }}
+                  strokeDasharray="4 8"
+                  strokeOpacity={0.6}
                 />
-              </AreaChart>
-            </ResponsiveContainer>
+              )}
+
+              <XAxis dataKey="week" tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
+
+              <Tooltip content={<PcTooltip />} />
+
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="#7BFFBA"
+                strokeWidth={3}
+                fill="url(#pcGrad)"
+                dot={false}
+                activeDot={<PcActiveDot />}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+
+            <div className="pc-overlay">
+              <div className="pc-badge">
+                <span className="pc-bullet" /> Live Data
+              </div>
+              <div className="pc-avg">Avg: {avg.toFixed(2)} {unit}</div>
+            </div>
           </div>
   
           {/* Side stat */}

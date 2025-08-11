@@ -554,3 +554,65 @@
 .cnotes__text{
   color:#d7d7dd; line-height:1.6;
 }
+
+
+/* --- Physical chart: upgraded canvas --- */
+.physchart__canvas{
+  position: relative;                     /* allow overlay */
+  background:#0f1412;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:8px 12px;
+  box-shadow: inset 0 0 0 1px rgba(123,255,186,0.04);
+}
+
+/* top-right overlay badges */
+.pc-overlay{
+  position:absolute; top:8px; right:12px;
+  display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+  pointer-events:none;                   /* let mouse events hit the chart */
+}
+.pc-badge{
+  pointer-events:auto;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:10px;
+  background:#101512; border:1px solid #1f2c24; color:#d7f8e7;
+  font-weight:700; font-size:12px;
+}
+.pc-bullet{ width:8px; height:8px; border-radius:999px; background:#7BFFBA; display:inline-block; }
+.pc-avg{
+  pointer-events:auto;
+  padding:6px 10px; border-radius:10px;
+  background:#121418; border:1px solid var(--border);
+  color:#cfd2d8; font-size:12px; font-weight:600;
+}
+
+/* tooltip card */
+.pc-tooltip{
+  background:#121416;
+  border:1px solid #222a25;
+  border-radius:14px;
+  padding:12px;
+  color:#e8e8ea;
+  min-width:180px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+}
+.pc-t__row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.pc-t__head{ margin-bottom:6px; opacity:.9; }
+.pc-dot{ width:10px; height:10px; border-radius:999px; background:#7BFFBA; display:inline-block; }
+.pc-t__week{ font-weight:800; color:#e8e8ea; }
+.pc-t__metric{ color:#b5c7bd; margin-bottom:6px; }
+.pc-t__value{ font-size:28px; font-weight:900; color:#7BFFBA; line-height:1.1; }
+.pc-unit{ font-size:14px; font-weight:700; color:#a6b5ad; margin-left:4px; }
+.pc-t__label{ color:#b9b9c1; }
+.pc-chip{
+  padding:4px 8px; border-radius:999px; font-size:12px; font-weight:800;
+  border:1px solid transparent;
+}
+.pc-chip--good{ background:#0f2019; border-color:#1f3b2f; color:#7BFFBA; }
+.pc-chip--bad{ background:#291515; border-color:#4a2323; color:#ff6a6a; }
+
+/* make ReferenceLine dashed stroke look crisp over dark bg */
+.recharts-reference-line-line{
+  filter: drop-shadow(0 0 0.5px rgba(123,255,186,.5));
+}
