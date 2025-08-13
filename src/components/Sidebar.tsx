@@ -10,12 +10,19 @@ import {
   HelpCircle,
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const cx = (...c: (string | false)[]) => c.filter(Boolean).join(" ");
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isMobile?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isMobile = false, isOpen = false, onClose }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [expanding, setExpanding] = useState(false); // temp class for fade-in
   const t = useRef<number | null>(null);
@@ -40,24 +47,39 @@ const Sidebar: React.FC = () => {
       className={cx(
         "sidebar shell",
         collapsed && "is-collapsed",
-        expanding && "is-expanding"
+        expanding && "is-expanding",
+        isMobile && "is-mobile",
+        isMobile && isOpen && "is-mobile-open"
       )}
       role="navigation"
       aria-label="Main navigation"
     >
-      {/* Collapse FAB — sits on the right edge */}
-      <button
-        className="collapse-fab"
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        aria-expanded={!collapsed}
-        onClick={toggle}
-      >
-        {collapsed ? (
-          <ChevronRight className="chev" size={14} />
-        ) : (
-          <ChevronLeft className="chev" size={14} />
-        )}
-      </button>
+      {/* Mobile close button */}
+      {isMobile && (
+        <button
+          className="mobile-close-btn"
+          onClick={onClose}
+          aria-label="Close navigation menu"
+        >
+          <X size={20} />
+        </button>
+      )}
+
+      {/* Collapse FAB — sits on the right edge (only on desktop) */}
+      {!isMobile && (
+        <button
+          className="collapse-fab"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          onClick={toggle}
+        >
+          {collapsed ? (
+            <ChevronRight className="chev" size={14} />
+          ) : (
+            <ChevronLeft className="chev" size={14} />
+          )}
+        </button>
+      )}
 
       {/* Brand */}
       <div className="brand">
@@ -80,6 +102,7 @@ const Sidebar: React.FC = () => {
           <NavLink
             to="/dashboard"
             className={({ isActive }) => cx("row", isActive && "row--active")}
+            onClick={() => isMobile && onClose?.()}
           >
             <LayoutDashboard className="row-ico" size={18} />
             <div className="row-text">
@@ -91,6 +114,7 @@ const Sidebar: React.FC = () => {
           <NavLink
             to="/teams"
             className={({ isActive }) => cx("row", isActive && "row--active")}
+            onClick={() => isMobile && onClose?.()}
           >
             <Users className="row-ico" size={18} />
             <div className="row-text">
@@ -103,6 +127,7 @@ const Sidebar: React.FC = () => {
           <NavLink
             to="/players"
             className={({ isActive }) => cx("row", isActive && "row--active")}
+            onClick={() => isMobile && onClose?.()}
           >
             <UserIcon className="row-ico" size={18} />
             <div className="row-text">
@@ -119,6 +144,7 @@ const Sidebar: React.FC = () => {
           <NavLink
             to="/settings"
             className={({ isActive }) => cx("row", isActive && "row--active")}
+            onClick={() => isMobile && onClose?.()}
           >
             <Settings className="row-ico" size={18} />
             <div className="row-text">
@@ -130,6 +156,7 @@ const Sidebar: React.FC = () => {
           <NavLink
             to="/help"
             className={({ isActive }) => cx("row", isActive && "row--active")}
+            onClick={() => isMobile && onClose?.()}
           >
             <HelpCircle className="row-ico" size={18} />
             <div className="row-text">
@@ -152,7 +179,11 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        <button className="logout-row" aria-label="Log out">
+        <button 
+          className="logout-row" 
+          aria-label="Log out"
+          onClick={() => isMobile && onClose?.()}
+        >
           <LogOut className="row-ico" size={18} />
           <span className="logout-text">Log Out</span>
         </button>
