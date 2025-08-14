@@ -1,3 +1,169 @@
+/* ============================
+   RESPONSIVE PATCH (all devices)
+   ============================ */
+
+/* 1) Global container & headings */
+@media (max-width: 1280px){
+  .teams-page, .teamspg { padding: 16px; }
+  .teams-page__inner, .teamspg__inner { max-width: 1040px; }
+}
+@media (max-width: 1024px){
+  .pgtitle{ font-size: 32px; }
+}
+@media (max-width: 480px){
+  .pgtitle{ font-size: 28px; }
+  .pgsubtitle{ font-size: 13px; }
+}
+
+/* 2) Back link becomes full-width on mobile */
+@media (max-width: 640px){
+  .linkback{
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+}
+
+/* 3) Card header/actions stack */
+@media (max-width: 1024px){
+  .card__head{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .card__actions{
+    display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center; justify-content: space-between;
+  }
+  .card__actions .actions{ margin-left: auto; }
+}
+
+/* 4) Search toolbar wraps cleanly */
+@media (max-width: 860px){
+  .toolbar{ flex-direction: column; align-items: stretch; gap: 10px; }
+  .search{ min-width: 0; }
+}
+
+/* 5) Table: horizontal scroll + optional column hiding on very small screens */
+.tablewrap{
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.table{ min-width: 980px; } /* keep structure; scroll on small widths */
+
+@media (max-width: 640px){
+  /* Slightly smaller density */
+  .table thead th, .table tbody td{ padding: 12px 12px; }
+  .table{ min-width: 860px; }
+}
+
+/* Optional: hide a couple columns on very small screens. Comment out if undesired. */
+@media (max-width: 520px){
+  /* Hide Year + Team to reduce width */
+  .table thead th:nth-child(4),
+  .table tbody td:nth-child(4),
+  .table thead th:nth-child(5),
+  .table tbody td:nth-child(5){ display: none; }
+}
+@media (max-width: 420px){
+  /* Hide Height + Weight as well */
+  .table thead th:nth-child(6),
+  .table tbody td:nth-child(6),
+  .table thead th:nth-child(7),
+  .table tbody td:nth-child(7){ display: none; }
+}
+
+/* 6) Clickable row hover stays subtle on touch */
+@media (hover: none){
+  .player-row.clickable:hover td { background: transparent; }
+}
+
+/* 7) Pagination becomes column on mobile */
+@media (max-width: 740px){
+  .pager{
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .pager__nav{
+    width: 100%;
+    justify-content: center;
+  }
+  .pager__center{ width: 100%; }
+}
+
+/* 8) Physical chart: stack to 1 column already handled at 980px,
+      but tighten paddings/sizes on small screens */
+@media (max-width: 640px){
+  .physchart__title{ font-size:20px; }
+  .physchart__canvas{ padding: 6px 8px; }
+  .sidecard__value{ font-size:24px; }
+  .physchart__bottom{ grid-template-columns: 1fr; margin-right: 0; }
+}
+
+/* 9) Skills chart: switch to CSS Grid with flexible columns, then 1 column.
+      Remove fixed widths when narrow. */
+.skillchart__grid{
+  display: grid;
+  grid-template-columns: 320px 1fr 360px;
+  gap: 16px;
+}
+@media (max-width: 1140px){
+  .skillchart__grid{ grid-template-columns: 280px 1fr 320px; }
+}
+@media (max-width: 980px){
+  .skillchart__grid{ grid-template-columns: 1fr; }
+}
+@media (max-width: 980px){
+  .scard, .donut, .skillchart__spark{
+    width: 100% !important;
+    min-height: unset;
+  }
+  .donut{ min-height: 280px; }
+  .skillchart__bottom{
+    margin-left: 0;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px){
+  .skillchart__bottom{ grid-template-columns: 1fr; }
+  .skillchart__title{ font-size: 20px; }
+  .donut__value{ font-size: 38px; }
+}
+
+/* 10) Segmented tabs already use grid auto-fit; let them shrink a bit more */
+@media (max-width: 720px){
+  .physchart__tabs,
+  .skillchart__tabs{
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+/* 11) Pills & chips touch targets */
+@media (max-width: 480px){
+  .pill, .filter{
+    padding: 8px 10px;
+  }
+  .chip{ padding: 8px 10px; font-size: 12px; }
+}
+
+/* 12) Floating chat: become bottom sheet on phones */
+@media (max-width: 640px){
+  .chat.dock{
+    right: 0; left: 0; bottom: 0;
+    margin: 0 8px 8px;
+    width: auto; height: 70vh;
+    border-radius: 14px;
+  }
+  .chatfab{ right: 14px; bottom: 14px; width:52px; height:52px; }
+}
+
+/* 13) Misc small polish */
+@media (max-width: 420px){
+  .rankpill{ padding: 5px 8px; font-size: 11px; }
+  .avatar{ width: 28px; height: 28px; }
+  .pname{ font-size: 14px; }
+  .psub{ font-size: 11px; }
+}
 :root{
     --bg:#1a1a1a;
     --panel:#16161b;

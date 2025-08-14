@@ -510,7 +510,7 @@ const SkillDevelopment: React.FC = () => {
           <div className="physchart__side">
             <div className="sidecard">
               <div className="sidecard__title">
-                <span className="spark">⎍</span> Current Team Average
+                Current Team Average
               </div>
               <div className="sidecard__value">
                 {avg.toFixed(2)} {unit}
@@ -1102,14 +1102,15 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
           {/* Search row */}
           <div className="toolbar">
             <div className="search">
-              <SearchIcon size={16} className="search__icon" />
-              <input
-                className="search__input"
-                placeholder="Search players by name, ID, year, or team..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+            <SearchIcon size={16} className="search__icon" />
+            <input
+              className="search__input"
+              placeholder="Search players by name, ID, year, or team..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
           </div>
 
           {/* Table */}
