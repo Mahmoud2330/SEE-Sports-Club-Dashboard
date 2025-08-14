@@ -1,6 +1,6 @@
 import React from "react";
 import '../App.css';
-import { Bell, User as UserIcon } from "lucide-react";
+import { Bell, User as UserIcon, Menu } from "lucide-react";
 
 type Props = {
   appName?: string;
@@ -8,6 +8,8 @@ type Props = {
   userName: string;
   userRole: string;
   avatarUrl?: string;
+  onMenuClick?: () => void;
+  showHamburger?: boolean;
 };
 
 const TopHeader: React.FC<Props> = ({
@@ -16,12 +18,25 @@ const TopHeader: React.FC<Props> = ({
   userName,
   userRole,
   avatarUrl,
+  onMenuClick,
+  showHamburger = false,
 }) => {
   return (
     <header className="top-header">
-      <div className="top-header__brand">
-        <div className="top-header__logo">S</div>
-        <div className="top-header__title">{appName}</div>
+      <div className="top-header__left">
+        {showHamburger && (
+          <button 
+            className="hamburger-menu-btn" 
+            onClick={onMenuClick}
+            aria-label="Toggle navigation menu"
+          >
+            <Menu size={24} />
+          </button>
+        )}
+        <div className="top-header__brand">
+          <div className="top-header__logo">S</div>
+          <div className="top-header__title">{appName}</div>
+        </div>
       </div>
 
       <div className="top-header__right">
