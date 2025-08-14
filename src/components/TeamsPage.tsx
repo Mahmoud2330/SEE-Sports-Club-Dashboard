@@ -1114,7 +1114,7 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
           </div>
 
           {/* Table */}
-          <div className="tablewrap">
+          <div className="tablewrap tablewrap--scroll">
             <table className="table">
               <thead>
                 <tr>
