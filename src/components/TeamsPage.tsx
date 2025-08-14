@@ -14,6 +14,10 @@ import {
   Search as SearchIcon,
   Download,
   Share2,
+  Bot, 
+  MessageSquare, 
+  X, 
+  Minus 
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -606,6 +610,45 @@ const SkillsChartCard: React.FC = () => {
 
   const label = metric === "passing" ? "Passing" : metric === "running" ? "Running with ball" : "Control";
 
+
+  // inside SkillsChartCard
+const [sActiveIdx, setSActiveIdx] = useState<number | null>(null);
+
+const ScActiveDot = (props: any) => {
+  const { cx, cy } = props;
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r={6} fill="#7c4dff" />
+      <circle cx={cx} cy={cy} r={10} fill="none" stroke="#24173a" strokeWidth={6} />
+    </g>
+  );
+};
+
+const ScTooltip = ({ active, label, payload }: any) => {
+  if (!active || !payload?.length) return null;
+  const v = payload[0].value as number;
+  const good = v >= avg; // higher score is better
+  return (
+    <div className="sc-tooltip">
+      <div className="sc-t__head">
+        <span className="sc-dot" /> <span className="sc-week">{label}</span>
+      </div>
+      <div className="sc-metric">{label === "W15" ? "Passing" : "Passing"}</div>
+      <div className="sc-value">
+        {v.toFixed(1)} <span className="sc-outof">/10</span>
+      </div>
+      <div className="sc-row">
+        <span className="sc-label">Rating</span>
+        <span className={`sc-chip ${good ? "sc-chip--good" : "sc-chip--bad"}`}>
+          {good ? "Good" : "Below Avg"}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+
+
   return (
     <section className="skillchart card">
       <div className="skillchart__head" style={{ marginTop:"2%" }}>
@@ -685,29 +728,45 @@ const SkillsChartCard: React.FC = () => {
 
         {/* Right mini line */}
         <div className="skillchart__spark">
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={displayData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7c4dff" stopOpacity={0.45} />
-                  <stop offset="100%" stopColor="#7c4dff" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="week" tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
-              <YAxis domain={[0, 10]} tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  background: "#151519",
-                  border: "1px solid #24242a",
-                  borderRadius: 10,
-                  color: "#e8e8ea",
-                }}
-                formatter={(v: number) => [`${v.toFixed(2)} /10`, label]}
-                labelStyle={{ color: "#9a9aa3" }}
+        <ResponsiveContainer width="100%" height={220}>
+          <AreaChart
+            data={displayData}
+            margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+            onMouseMove={(s: any) => setSActiveIdx(s?.activeTooltipIndex ?? null)}
+            onMouseLeave={() => setSActiveIdx(null)}
+          >
+            <defs>
+              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7c4dff" stopOpacity={0.45} />
+                <stop offset="100%" stopColor="#7c4dff" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+
+            {sActiveIdx !== null && displayData[sActiveIdx] && (
+              <ReferenceLine
+                x={displayData[sActiveIdx].week}
+                stroke="#7c4dff"
+                strokeDasharray="4 8"
+                strokeOpacity={0.75}
               />
-              <Area type="monotone" dataKey="value" stroke="#7c4dff" strokeWidth={3} fill="url(#sparkGrad)" dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
+            )}
+
+            <XAxis dataKey="week" tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, 10]} tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
+            <Tooltip content={<ScTooltip />} />
+
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="#7c4dff"
+              strokeWidth={3}
+              fill="url(#sparkGrad)"
+              dot={false}
+              activeDot={<ScActiveDot />}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+
         </div>
       </div>
 
@@ -821,6 +880,98 @@ const CoachNotes: React.FC = () => {
 };
 
 
+/* -------------------- CHAT WIDGET -------------------- */
+type ChatMsg = { id: number; role: "bot" | "user"; text: string; time?: string };
+
+const ChatWidget: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(1);
+  const [input, setInput] = useState("");
+  const [msgs, setMsgs] = useState<ChatMsg[]>([
+    {
+      id: 1,
+      role: "bot",
+      text:
+        "Hello! I'm your AI assistant for the Sports Club Management system. How can I help you today?",
+      time: "15:34",
+    },
+  ]);
+
+  const send = () => {
+    const t = input.trim();
+    if (!t) return;
+    const id = Date.now();
+    setMsgs((m) => [...m, { id, role: "user", text: t }]);
+    setInput("");
+    // simple stubbed reply
+    setTimeout(() => {
+      setMsgs((m) => [
+        ...m,
+        { id: id + 1, role: "bot", text: "Got it! I’ll look into that for you." },
+      ]);
+      if (!open) setUnread((u) => u + 1);
+    }, 500);
+  };
+
+  const openPanel = () => {
+    setOpen(true);
+    setUnread(0);
+  };
+
+  return (
+    <>
+      {/* FAB */}
+      {!open && (
+        <button className="chatfab" onClick={openPanel} aria-label="Open chat">
+          <MessageSquare size={22} />
+          {unread > 0 && <span className="chatfab__badge">{unread}</span>}
+        </button>
+      )}
+
+      {/* Panel */}
+      {open && (
+        <div className="chat dock">
+          <header className="chat__head">
+            <div className="chat__title">
+              <span className="chat__icon"><Bot size={16} /></span>
+              <div>
+                <div className="chat__name">AI Assistant</div>
+                <div className="chat__status"><span className="dot dot--green" /> Online</div>
+              </div>
+            </div>
+            <div className="chat__actions">
+              <button className="chat__btn" onClick={() => setOpen(false)} title="Close">
+                <X size={16} />
+              </button>
+            </div>
+          </header>
+
+          <div className="chat__body">
+            {msgs.map((m) => (
+              <div key={m.id} className={`msg ${m.role === "bot" ? "msg--bot" : "msg--user"}`}>
+                {m.text}
+                {m.time && <div className="msg__time">{m.time}</div>}
+              </div>
+            ))}
+          </div>
+
+          <footer className="chat__foot">
+            <input
+              className="chat__input"
+              placeholder="Type your message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && send()}
+            />
+            <button className="chat__send" onClick={send} aria-label="Send">
+              <Send size={16} />
+            </button>
+          </footer>
+        </div>
+      )}
+    </>
+  );
+};
 
 /* -------------------- PAGE -------------------- */
 
@@ -854,11 +1005,35 @@ const TeamsPage: React.FC = () => {
     });
   }, [searchTerm, filterPosition]);
 
-  const totalPlayers = filteredPlayers.length;
-  const totalPages = Math.max(1, Math.ceil(totalPlayers / PAGE_SIZE));
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const endIndex = Math.min(startIndex + PAGE_SIZE, totalPlayers);
-  const pagePlayers = filteredPlayers.slice(startIndex, endIndex);
+  // NEW: rank filter
+const [rankFilter, setRankFilter] = useState<'all' | 'top3' | 'top4to10'>('all');
+
+// keep your filteredPlayers as-is, then rank by totalScore once
+const rankedPlayers = useMemo(() => {
+  const arr = [...filteredPlayers].sort(
+    (a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)
+  );
+  return arr.map((p, i) => ({ ...p, __rank: i + 1 })); // attach global rank
+}, [filteredPlayers]);
+
+// apply rank filter (top 3 or 4-10)
+const rankFilteredPlayers = useMemo(() => {
+  if (rankFilter === 'top3') return rankedPlayers.slice(0, 3);
+  if (rankFilter === 'top4to10') return rankedPlayers.slice(3, 10);
+  return rankedPlayers;
+}, [rankFilter, rankedPlayers]);
+
+// RESET page on rank filter change (add to your existing effect deps)
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm, filterPosition, rankFilter]);
+
+const totalPlayers = rankFilteredPlayers.length;
+const totalPages  = Math.max(1, Math.ceil(totalPlayers / PAGE_SIZE));
+const startIndex  = (currentPage - 1) * PAGE_SIZE;
+const endIndex    = Math.min(startIndex + PAGE_SIZE, totalPlayers);
+const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
+
 
   const goPrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const goNext = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
@@ -892,21 +1067,36 @@ const TeamsPage: React.FC = () => {
             </div>
 
             <div className="card__actions">
-              <button className="chip chip--gold">
+              <button
+                className={`chip chip--gold ${rankFilter === 'top3' ? 'is-active' : ''}`}
+                onClick={() =>
+                  setRankFilter(prev => (prev === 'top3' ? 'all' : 'top3'))
+                }
+                title="Show Top 3 players by total score"
+              >
                 <Crown size={14} />
                 <span>Top 3</span>
                 <small>Elite</small>
               </button>
-              <button className="chip chip--violet">
+
+              <button
+                className={`chip chip--violet ${rankFilter === 'top4to10' ? 'is-active' : ''}`}
+                onClick={() =>
+                  setRankFilter(prev => (prev === 'top4to10' ? 'all' : 'top4to10'))
+                }
+                title="Show ranks 4–10 by total score"
+              >
                 <Star size={14} />
                 <span>4-10</span>
                 <small>Top Performers</small>
               </button>
+
               <div className="actions">
                 <button className="iconbtn" title="Share"><Share2 size={16} /></button>
                 <button className="iconbtn" title="Download"><Download size={16} /></button>
               </div>
             </div>
+
           </div>
 
           {/* Search row */}
@@ -939,19 +1129,23 @@ const TeamsPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {pagePlayers.map((player, index) => (
-                  <tr key={player.id} className="player-row">
+                {pagePlayers.map((player) => (
+                  <tr
+                    key={player.id}
+                    className="player-row clickable"
+                    onClick={() => navigate(`/players/${player.id}`)}
+                  >
                     <td>
                       <span
                         className={`rankpill ${
-                          startIndex + index + 1 <= 3
-                            ? "rankpill--gold"
-                            : startIndex + index + 1 <= 10
-                            ? "rankpill--purple"
-                            : ""
+                          player.__rank <= 3
+                            ? 'rankpill--gold'
+                            : player.__rank <= 10
+                            ? 'rankpill--purple'
+                            : ''
                         }`}
                       >
-                        #{startIndex + index + 1}
+                        #{player.__rank}
                       </span>
                     </td>
                     <td className="mono">#{player.id}</td>
@@ -972,15 +1166,12 @@ const TeamsPage: React.FC = () => {
                     <td className="mono">{player.team}</td>
                     <td className="mono">{player.height}</td>
                     <td className="mono">{player.weight}</td>
-                    <td className="metric metric--good">
-                      {Number(player.speed).toFixed(1)}
-                    </td>
-                    <td className="metric metric--good">
-                      {Number(player.endurance).toFixed(1)}
-                    </td>
+                    <td className="metric metric--good">{Number(player.speed).toFixed(1)}</td>
+                    <td className="metric metric--good">{Number(player.endurance).toFixed(1)}</td>
                   </tr>
                 ))}
               </tbody>
+
             </table>
 
             {/* Pagination footer */}
@@ -1036,6 +1227,8 @@ const TeamsPage: React.FC = () => {
         <div>
           <CoachNotes />
         </div>
+        <ChatWidget />
+
       </div>
     </main>
   );
