@@ -7,6 +7,7 @@ import {
   Search,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ChatWidget from "./ChatWidget";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -316,6 +317,9 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+      
+      {/* Floating chat bot */}
+      <ChatWidget />
     </main>
   );
 }

@@ -8,6 +8,7 @@ import PerformanceChart from './PerformanceChart';
 import SkillChart from './SkillChart';
 import VideoAnalysis from './VideoAnalysis';
 import SkillDevelopment from './SkillDevelopment';
+import ChatWidget from './ChatWidget';
 
 const PlayerPage: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState('3 Months');
@@ -38,6 +39,9 @@ const PlayerPage: React.FC = () => {
     
         {/* Video Analysis */}
         <VideoAnalysis />
+        
+        {/* Floating chat bot */}
+        <ChatWidget />
     </div>
   );
 };

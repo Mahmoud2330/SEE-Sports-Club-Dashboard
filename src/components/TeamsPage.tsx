@@ -36,6 +36,7 @@ import { useNavigate } from "react-router-dom";
 import athleteImage from "../assets/Player_Pic.png";
 import "./Teams.css";
 import "../App.css";
+import ChatWidget from "./ChatWidget";
 
 // Mock data (unchanged)
 const mockTeamData = {
@@ -1231,6 +1232,9 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
         <ChatWidget />
 
       </div>
+      
+      {/* Floating chat bot */}
+      <ChatWidget />
     </main>
   );
 };
