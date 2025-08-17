@@ -1,46 +1,51 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
-  ArrowLeft,
-  Users,
-  Trophy,
-  Heart,
-  Target,
-  Clock,
-  Zap,
-  Circle,
-  Send,
-  Star,
-  Crown,
-  Search as SearchIcon,
-  Download,
-  Share2,
-  Bot, 
-  MessageSquare, 
-  X, 
-  Minus 
+  ArrowLeft, Users, Trophy, Heart, Target, Clock, Zap, Circle, Send,
+  Star, Crown, Search as SearchIcon, Download, Share2, Bot, MessageSquare, X
 } from "lucide-react";
 import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  ReferenceLine,
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip,
+  PieChart, Pie, Cell, ReferenceLine,
 } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import athleteImage from "../assets/Player_Pic.png";
 import "./Teams.css";
 import "../App.css";
-import ChatWidget from "./ChatWidget";
-import { dataService } from "../services/dataService";
-import type { Player, Team } from "../services/dataService";
 
-/* ================= PHYSICAL & SKILLS CARDS (Enhanced from TeamsPage2) ================= */
+/* ================= TYPES ================= */
+type TeamRec = {
+  id: string;
+  name: string;
+  tier: string;
+  color: string;
+  totalPlayers: number;
+  teamScore: string;
+  injuries: number;
+};
+type TeamsMap = Record<string, TeamRec>;
+
+type Player = {
+  id: number;
+  name: string;
+  position: string;
+  shortPosition: "GK" | "DF" | "MF" | "FW";
+  totalScore: number;
+  physical: number;
+  skills: number;
+  profilePicture: string | null;
+  jerseyNumber: number;
+  year: number;
+  team: string;
+  teamId: string;
+  height: number;
+  weight: number;
+  speed: number;
+  endurance: number;
+  __rank?: number; // computed
+};
+
+/* ================= PHYSICAL & SKILLS CARDS (unchanged UI) ================= */
 
 const PhysicalPerformance: React.FC = () => {
   const performanceMetrics = [
@@ -91,10 +96,10 @@ const SkillDevelopment: React.FC = () => {
         {SkillMetrics.map((m, i) => (
           <div key={i} className="skill-development-card-teams">
             <div className="skill-development-card-header-teams">
-              <div className="performance-card-icon">{m.icon}</div> &nbsp;&nbsp;
-              <div className="performance-card-title">{m.title}</div>
+              <div className="skill-development-card-icon">{m.icon}</div> &nbsp;&nbsp;
+              <div className="skill-development-card-title">{m.title}</div>
             </div>
-            <div className="performance-card-value-teams">{m.value}</div>
+            <div className="skill-development-card-value-teams">{m.value}</div>
           </div>
         ))}
       </div>
@@ -102,7 +107,7 @@ const SkillDevelopment: React.FC = () => {
   );
 };
 
-/* ================= PHYSICAL CHART CARD (Enhanced from TeamsPage2) ================= */
+/* ================= PHYSICAL CHART CARD (unchanged logic) ================= */
 
 type DataPoint = { week: string; value: number };
 const weeks = Array.from({ length: 24 }, (_, i) => `W${i + 1}`);
@@ -263,7 +268,7 @@ const PhysicalChartCard: React.FC = () => {
   );
 };
 
-/* ================= SKILLS CHART CARD (Enhanced from TeamsPage2) ================= */
+/* ================= SKILLS CHART CARD (unchanged UI/logic) ================= */
 
 type SkillPoint = { week: string; value: number };
 const wks = Array.from({ length: 24 }, (_, i) => `W${i + 1}`);
@@ -435,7 +440,7 @@ const SkillsChartCard: React.FC = () => {
   );
 };
 
-/* ================= COACH NOTES (Enhanced from TeamsPage2) ================= */
+/* ================= COACH NOTES (unchanged) ================= */
 
 type Note = { coach: string; category: "Strategy" | "Technique" | "Performance" | "Training"; color: string; date: string; message: string; };
 const coachNotes: Note[] = [
@@ -463,56 +468,116 @@ const CoachNotes: React.FC = () => (
   </section>
 );
 
+/* ================= CHAT WIDGET (unchanged) ================= */
+type ChatMsg = { id: number; role: "bot" | "user"; text: string; time?: string };
+const ChatWidget: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(1);
+  const [input, setInput] = useState("");
+  const [msgs, setMsgs] = useState<ChatMsg[]>([
+    { id: 1, role: "bot", text:"Hello! I'm your AI assistant for the Sports Club Management system. How can I help you today?", time: "15:34" },
+  ]);
+  const send = () => {
+    const t = input.trim();
+    if (!t) return;
+    const id = Date.now();
+    setMsgs((m) => [...m, { id, role: "user", text: t }]);
+    setInput("");
+    setTimeout(() => {
+      setMsgs((m) => [...m, { id: id + 1, role: "bot", text: "Got it! I’ll look into that for you." }]);
+      if (!open) setUnread((u) => u + 1);
+    }, 500);
+  };
+  return (
+    <>
+      {!open && (
+        <button className="chatfab" onClick={() => { setOpen(true); setUnread(0); }} aria-label="Open chat">
+          <MessageSquare size={22} />
+          {unread > 0 && <span className="chatfab__badge">{unread}</span>}
+        </button>
+      )}
+      {open && (
+        <div className="chat dock">
+          <header className="chat__head">
+            <div className="chat__title"><span className="chat__icon"><Bot size={16} /></span>
+              <div><div className="chat__name">AI Assistant</div><div className="chat__status"><span className="dot dot--green" /> Online</div></div>
+            </div>
+            <div className="chat__actions"><button className="chat__btn" onClick={() => setOpen(false)} title="Close"><X size={16} /></button></div>
+          </header>
+          <div className="chat__body">
+            {msgs.map((m) => (<div key={m.id} className={`msg ${m.role === "bot" ? "msg--bot" : "msg--user"}`}>{m.text}{m.time && <div className="msg__time">{m.time}</div>}</div>))}
+          </div>
+          <footer className="chat__foot">
+            <input className="chat__input" placeholder="Type your message..." value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} />
+            <button className="chat__send" onClick={send} aria-label="Send"><Send size={16} /></button>
+          </footer>
+        </div>
+      )}
+    </>
+  );
+};
+
+/* ================= PAGE ================= */
+
 const TeamsPage: React.FC = () => {
   const navigate = useNavigate();
   const { teamId } = useParams<{ teamId: string }>();
+
+  // JSON-backed state
+  const [teams, setTeams] = useState<TeamsMap>({});
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]   = useState<string | null>(null);
+
+  // UI state
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPosition, setFilterPosition] = useState("all");
-  
-  // State for dynamic data
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [teams, setTeams] = useState<{ [key: string]: Team }>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [rankFilter, setRankFilter] = useState<"all" | "top3" | "top4to10">("all");
 
-  // Get current team data
-  const currentTeam = teamId && teams[teamId] ? teams[teamId] : null;
-  const currentTeamPlayers = players.filter(player => player.teamId === teamId);
-
-  // Fetch data on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const [playersData, teamsData] = await Promise.all([
-          dataService.getPlayers(),
-          dataService.getTeams()
-        ]);
-        
-        setPlayers(playersData);
-        setTeams(teamsData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
-        console.error('Error fetching data:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Pagination
+  // pagination
   const PAGE_SIZE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Reset to page 1 on filter/search change
+  // fetch teams & players JSON once
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterPosition]);
+    (async () => {
+      try {
+        setLoading(true);
+        const [tRes, pRes] = await Promise.all([
+          fetch("/data/teams.json"),
+          fetch("/data/players.json")
+        ]);
+        if (!tRes.ok) throw new Error("Unable to load teams.json");
+        if (!pRes.ok) throw new Error("Unable to load players.json");
 
+        const teamsJson: TeamsMap = await tRes.json();
+        const playersJson: Player[] = await pRes.json();
+
+        setTeams(teamsJson);
+        setPlayers(playersJson);
+      } catch (e: any) {
+        setError(e?.message ?? "Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  // current team selection (fallback to first)
+  const teamKeys = Object.keys(teams);
+  const selectedTeamId = teamId && teams[teamId] ? teamId : teamKeys[0];
+  const currentTeam = selectedTeamId ? teams[selectedTeamId] : undefined;
+
+  // players for team
+  const currentTeamPlayers = useMemo(
+    () => players.filter((p) => p.teamId === selectedTeamId),
+    [players, selectedTeamId]
+  );
+
+  // reset page when inputs change
+  useEffect(() => { setCurrentPage(1); }, [searchTerm, filterPosition, rankFilter, selectedTeamId]);
+
+  // search + position filter
   const filteredPlayers = useMemo(() => {
     const s = searchTerm.trim().toLowerCase();
     return currentTeamPlayers.filter((player) => {
@@ -527,84 +592,32 @@ const TeamsPage: React.FC = () => {
         (player.shortPosition || "").toLowerCase() === filterPosition.toLowerCase();
       return matchesSearch && matchesPosition;
     });
-  }, [searchTerm, filterPosition, currentTeamPlayers]);
+  }, [currentTeamPlayers, searchTerm, filterPosition]);
 
-  // NEW: rank filter
-  const [rankFilter, setRankFilter] = useState<'all' | 'top3' | 'top4to10'>('all');
-
-  // keep your filteredPlayers as-is, then rank by totalScore once
+  // rank calculation + rank filter
   const rankedPlayers = useMemo(() => {
-    const arr = [...filteredPlayers].sort(
-      (a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)
-    );
-    return arr.map((p, i) => ({ ...p, __rank: i + 1 })); // attach global rank
+    const arr = [...filteredPlayers].sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0));
+    return arr.map((p, i) => ({ ...p, __rank: i + 1 }));
   }, [filteredPlayers]);
 
-  // apply rank filter (top 3 or 4-10)
   const rankFilteredPlayers = useMemo(() => {
-    if (rankFilter === 'top3') return rankedPlayers.slice(0, 3);
-    if (rankFilter === 'top4to10') return rankedPlayers.slice(3, 10);
+    if (rankFilter === "top3") return rankedPlayers.slice(0, 3);
+    if (rankFilter === "top4to10") return rankedPlayers.slice(3, 10);
     return rankedPlayers;
   }, [rankFilter, rankedPlayers]);
 
-  // RESET page on rank filter change (add to your existing effect deps)
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterPosition, rankFilter]);
-
+  // pagination math
   const totalPlayers = rankFilteredPlayers.length;
   const totalPages  = Math.max(1, Math.ceil(totalPlayers / PAGE_SIZE));
   const startIndex  = (currentPage - 1) * PAGE_SIZE;
   const endIndex    = Math.min(startIndex + PAGE_SIZE, totalPlayers);
   const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
 
-
   const goPrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const goNext = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <main className="teams-page">
-        <div className="teams-page__inner">
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <div>Loading team data...</div>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <main className="teams-page">
-        <div className="teams-page__inner">
-          <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
-            <div>Error: {error}</div>
-            <button onClick={() => window.location.reload()}>Retry</button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // No team found
-  if (!currentTeam) {
-    return (
-      <main className="teams-page">
-        <div className="teams-page__inner">
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <div>Team not found</div>
-            <button onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // Check if team can show chat widget (Platinum or Premium)
-  const canShowChat = ["PLATINUM", "PREMIUM"].includes((currentTeam?.tier || "").toUpperCase());
+  if (loading) return <main className="teams-page"><div className="teams-page__inner"><p className="muted">Loading…</p></div></main>;
+  if (error || !currentTeam) return <main className="teams-page"><div className="teams-page__inner"><p className="muted" style={{color:"#ff9898"}}>Error: {error || "Team not found"}</p></div></main>;
 
   // Normalize the tier to avoid case/spacing issues
   const canShowChat =
@@ -615,79 +628,60 @@ const TeamsPage: React.FC = () => {
   return (
     <main className="teams-page">
       <div className="teams-page__inner">
-        {/* Back link */}
         <button className="linkback" onClick={() => navigate("/dashboard")}>
-          <ArrowLeft size={18} />
-          <span>Back to Dashboard</span>
+          <ArrowLeft size={18} /><span>Back to Dashboard</span>
         </button>
         <br />
 
-        {/* Title + subtitle */}
         <h1 className="pgtitle">{currentTeam.name} Details</h1>
-        <p className="pgsubtitle">
-          Detailed view of {currentTeam.name} performance, player roster, and statistics.
-        </p>
+        <p className="pgsubtitle">Detailed view of {currentTeam.name} performance, player roster, and statistics.</p>
 
-        {/* Players card */}
         <section className="card">
           <div className="card__head">
             <div className="card__title">
               <div>
                 <h2>Players</h2>
-                <p className="muted">
-                  Complete roster with player metrics and performance data
-                </p>
+                <p className="muted">Complete roster with player metrics and performance data</p>
               </div>
             </div>
 
             <div className="card__actions">
               <button
                 className={`chip chip--gold ${rankFilter === 'top3' ? 'is-active' : ''}`}
-                onClick={() =>
-                  setRankFilter(prev => (prev === 'top3' ? 'all' : 'top3'))
-                }
+                onClick={() => setRankFilter(prev => (prev === 'top3' ? 'all' : 'top3'))}
                 title="Show Top 3 players by total score"
               >
-                <Crown size={14} />
-                <span>Top 3</span>
-                <small>Elite</small>
+                <Crown size={14} /><span>Top 3</span><small>Elite</small>
               </button>
-
               <button
                 className={`chip chip--violet ${rankFilter === 'top4to10' ? 'is-active' : ''}`}
-                onClick={() =>
-                  setRankFilter(prev => (prev === 'top4to10' ? 'all' : 'top4to10'))
-                }
+                onClick={() => setRankFilter(prev => (prev === 'top4to10' ? 'all' : 'top4to10'))}
                 title="Show ranks 4–10 by total score"
               >
-                <Star size={14} />
-                <span>4-10</span>
-                <small>Top Performers</small>
+                <Star size={14} /><span>4-10</span><small>Top Performers</small>
               </button>
-
               <div className="actions">
                 <button className="iconbtn" title="Share"><Share2 size={16} /></button>
                 <button className="iconbtn" title="Download"><Download size={16} /></button>
               </div>
             </div>
-
           </div>
 
-          {/* Search row */}
           <div className="toolbar">
             <div className="search">
-            <SearchIcon size={16} className="search__icon" />
-            <input
-              className="search__input"
-              placeholder="Search players by name, ID, year, or team..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+              <SearchIcon size={16} className="search__icon" />
+              <input
+                className="search__input"
+                placeholder="Search players by name, ID, year, or team..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button className="search__clear" onClick={() => setSearchTerm("")} aria-label="Clear search">×</button>
+              )}
+            </div>
           </div>
 
-          </div>
-
-          {/* Table */}
           <div className="tablewrap tablewrap--scroll">
             <table className="table">
               <thead>
@@ -711,15 +705,7 @@ const TeamsPage: React.FC = () => {
                     onClick={() => navigate(`/players/${player.id}`)}
                   >
                     <td>
-                      <span
-                        className={`rankpill ${
-                          player.__rank <= 3
-                            ? 'rankpill--gold'
-                            : player.__rank <= 10
-                            ? 'rankpill--purple'
-                            : ''
-                        }`}
-                      >
+                      <span className={`rankpill ${player.__rank! <= 3 ? 'rankpill--gold' : player.__rank! <= 10 ? 'rankpill--purple' : ''}`}>
                         #{player.__rank}
                       </span>
                     </td>
@@ -727,13 +713,11 @@ const TeamsPage: React.FC = () => {
                     <td>
                       <div className="pstack">
                         <div className="avatar">
-                          <img src={player.profilePicture} alt={player.name} />
+                          <img src={player.profilePicture || athleteImage} alt={player.name} />
                         </div>
                         <div className="pstack__meta">
                           <div className="pname">{player.name}</div>
-                          <div className="psub muted tiny">
-                            #{player.jerseyNumber} • {player.position}
-                          </div>
+                          <div className="psub muted tiny">#{player.jerseyNumber} • {player.position}</div>
                         </div>
                       </div>
                     </td>
@@ -746,16 +730,13 @@ const TeamsPage: React.FC = () => {
                   </tr>
                 ))}
               </tbody>
-
             </table>
 
-            {/* Pagination footer */}
             <div className="table__footer">
               <div className="pager">
                 <button className="pager__nav" onClick={goPrev} disabled={currentPage === 1}>
                   <ChevronLeft size={16} /> Previous
                 </button>
-
                 <div className="pager__center">
                   <div className="pager__page">Page {currentPage} of {totalPages}</div>
                   <div className="pager__meta muted tiny">
@@ -772,7 +753,6 @@ const TeamsPage: React.FC = () => {
                     ))}
                   </div>
                 </div>
-
                 <button className="pager__nav" onClick={goNext} disabled={currentPage === totalPages}>
                   Next <ChevronRight size={16} />
                 </button>
@@ -783,6 +763,15 @@ const TeamsPage: React.FC = () => {
         
 
         <br />
+        <div><PhysicalPerformance /></div>
+        <br />
+        <div><SkillDevelopment /></div>
+        <br />
+        <div><PhysicalChartCard /></div>
+        <br />
+        <div><SkillsChartCard /></div>
+        <br />
+        <div><CoachNotes /></div>
 
         {canShowChat && <ChatWidget />}
 

@@ -1,6 +1,6 @@
 // Data service for fetching player and team information from JSON files
 export interface Player {
-  id: string;
+  id: number;
   name: string;
   position: string;
   shortPosition: string;
@@ -128,7 +128,11 @@ class DataService {
   // Get player by ID
   async getPlayerById(id: string): Promise<Player | undefined> {
     const players = await this.getPlayers();
-    return players.find(player => player.id === id);
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      return undefined;
+    }
+    return players.find(player => player.id === numericId);
   }
 
   // Get players by team ID
