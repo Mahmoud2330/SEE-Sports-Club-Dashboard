@@ -1,0 +1,24 @@
+[
+{
+  "name": "Team A",
+  "tier": "Premium",
+  "teamScore": "8.7",
+  "injuries": 2,
+  "color": "#DA291C"
+},
+{
+  "name": "Team B",
+  "tier": "Standard",
+  "teamScore": "7.5",
+  "injuries": 1,
+  "color": "#005EB8"
+},
+{
+  "name": "Team C",
+  "tier": "Platinum",
+  "teamScore": "6.3",
+  "injuries": 3,
+  "color": "#FBB040"
+}
+
+]
