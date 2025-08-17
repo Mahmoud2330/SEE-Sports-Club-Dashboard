@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Share2, Filter, ChevronRight, User, TrendingUp } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PlayerCard from './PlayerCard';
@@ -7,6 +7,8 @@ import PhysicalPerformance from './PhysicalPerformance';
 import PerformanceChart from './PerformanceChart';
 import SkillChart from './SkillChart';
 import CustomDatePicker from './CustomDatePicker';
+import { dataService } from '../services/dataService';
+import type { Player } from '../services/dataService';
 
 const PlayerOverview: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState('3 Months');
@@ -29,21 +31,44 @@ const PlayerOverview: React.FC = () => {
   const periods = ['Last Month', '3 Months', '6 Months', 'This Year'];
   const physicalTests = ['Vertical Jump', 'Broad Jump', '10m Run', '5-10-5', 'T-Agility'];
   
-  // Dynamic player and team data - in a real app, this would come from an API or context
-  const playerData = {
-    id: playerId || '1',
-    name: 'Ahmed Mohamed',
-    team: 'Team A',
-    teamId: 'team-a'
-  };
-  
+  // State for dynamic data
+  const [playerData, setPlayerData] = useState<Player | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch player data on component mount
+  useEffect(() => {
+    const fetchPlayerData = async () => {
+      if (!playerId) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const player = await dataService.getPlayerById(playerId);
+        if (player) {
+          setPlayerData(player);
+        } else {
+          setError('Player not found');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch player data');
+        console.error('Error fetching player data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlayerData();
+  }, [playerId]);
+
   // Dynamic breadcrumbs based on current player and team
-  const breadcrumbs = [
+  const breadcrumbs = playerData ? [
     { name: 'Club', path: '/dashboard' },
     { name: 'Teams', path: '/teams' },
     { name: playerData.team, path: `/teams/${playerData.teamId}` },
     { name: playerData.name, path: `/players/${playerData.id}` }
-  ];
+  ] : [];
 
   const handleBreadcrumbClick = (crumb: { name: string; path: string }, index: number) => {
     // Don't navigate if it's the current page (last breadcrumb)
@@ -217,7 +242,7 @@ const PlayerOverview: React.FC = () => {
       {/* Player Header */}
       <div className="player-header">
         <div className="player-info">
-          <h1 className="player-name">{playerData.name}</h1>
+          <h1 className="player-name">{playerData?.name}</h1>
           <p className="player-description">
             Detailed player profile with performance metrics, statistics, and development progress.
           </p>
@@ -268,15 +293,15 @@ const PlayerOverview: React.FC = () => {
               <div className="player-card-background">
                 {/* Player Card Component */}
                 <div className="player-card-wrapper">
-                  <PlayerCard />
+                  <PlayerCard playerData={playerData} />
                 </div>
                 
                 {/* Player Card Footer */}
                 <div className="player-card-footer">
                   <div className="player-info-footer">
                     <div className="left-info">
-                      <div className="player-name-card">{playerData.name}</div>
-                      <div className="team-name-card">{playerData.team}</div>
+                      <div className="player-name-card">{playerData?.name}</div>
+                      <div className="team-name-card">{playerData?.team}</div>
                     </div>
                     <div className="live-status">
                       <span className="live-dot" />

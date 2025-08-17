@@ -1,24 +1,93 @@
-[
 {
-  "name": "Team A",
-  "tier": "Premium",
-  "teamScore": "8.7",
-  "injuries": 2,
-  "color": "#DA291C"
-},
-{
-  "name": "Team B",
-  "tier": "Standard",
-  "teamScore": "7.5",
-  "injuries": 1,
-  "color": "#005EB8"
-},
-{
-  "name": "Team C",
-  "tier": "Platinum",
-  "teamScore": "6.3",
-  "injuries": 3,
-  "color": "#FBB040"
+  "teams": {
+    "team-a": {
+      "id": "team-a",
+      "name": "Team A",
+      "tier": "STANDARD",
+      "color": "#ef4444",
+      "totalPlayers": 6,
+      "teamScore": "78.5",
+      "injuries": 1,
+      "formation": "4-4-2",
+      "manager": "Coach Martinez",
+      "stadium": "Community Ground",
+      "founded": 2020,
+      "league": "Division 2",
+      "description": "Standard tier team focusing on development and growth",
+      "achievements": [
+        "Division 2 Champions 2022",
+        "Youth Development Award 2023"
+      ],
+      "facilities": [
+        "Training Ground A",
+        "Fitness Center",
+        "Recovery Room"
+      ]
+    },
+    "team-b": {
+      "id": "team-b",
+      "name": "Team B",
+      "tier": "PREMIUM",
+      "color": "#3b82f6",
+      "totalPlayers": 5,
+      "teamScore": "82.3",
+      "injuries": 0,
+      "formation": "4-3-3",
+      "manager": "Coach Rodriguez",
+      "stadium": "Elite Arena",
+      "founded": 2018,
+      "league": "Division 1",
+      "description": "Premium tier team with high performance standards",
+      "achievements": [
+        "Division 1 Runners-up 2023",
+        "Best Offensive Team 2023",
+        "Fair Play Award 2022"
+      ],
+      "facilities": [
+        "Elite Training Complex",
+        "Advanced Analytics Center",
+        "Sports Science Lab",
+        "Recovery Spa"
+      ]
+    },
+    "team-c": {
+      "id": "team-c",
+      "name": "Team C",
+      "tier": "PLATINUM",
+      "color": "#10b981",
+      "totalPlayers": 6,
+      "teamScore": "75.8",
+      "injuries": 2,
+      "formation": "3-5-2",
+      "manager": "Coach Thompson",
+      "stadium": "Champions Stadium",
+      "founded": 2015,
+      "league": "Premier League",
+      "description": "Platinum tier team competing at the highest level",
+      "achievements": [
+        "Premier League Champions 2021",
+        "Champions League Qualification 2022",
+        "Best Defensive Record 2023",
+        "Manager of the Year 2022"
+      ],
+      "facilities": [
+        "World-Class Training Complex",
+        "Performance Analytics Center",
+        "Medical & Recovery Center",
+        "Video Analysis Studio",
+        "Player Development Academy"
+      ]
+    }
+  },
+  "metadata": {
+    "lastUpdated": "2024-12-19T10:00:00Z",
+    "version": "1.0.0",
+    "totalTeams": 3,
+    "dataSource": "SEE Sports Club Database",
+    "tierSystem": {
+      "PLATINUM": "Highest tier - Premier League level",
+      "PREMIUM": "Mid tier - Division 1 level", 
+      "STANDARD": "Base tier - Division 2 level"
+    }
+  }
 }
-
-]
