@@ -3,21 +3,25 @@ import athleteImage from "../assets/Player_Pic.png";
 // import { FaLink, FaDribbble, FaBold } from "react-icons/fa";
 // import styles from "../PlayerCard.module.css";
 import '../index.css';
+import type { Player } from '../services/dataService';
 
+interface PlayerCardProps {
+  playerData?: Player;
+}
 
-type PlayerData = {
-  name?: string;
-  sport?: string;
-  profilePicture?: string;
-  totalScore?: number | string;
-  physical?: number | string;
-  skills?: number | string;
-  position?: string;
-  shortPosition?: string;
-  // Add any other fields you use
-};
+const PlayerCard: React.FC<PlayerCardProps> = ({ playerData }) => {
+  // Use player data if available, otherwise fall back to defaults
+  const playerName = playerData?.name || "AHMED";
+  const playerLastName = playerData?.name?.split(' ').slice(1).join(' ') || "ALY";
+  const playerFirstName = playerData?.name?.split(' ')[0] || "AHMED";
+  const playerPosition = playerData?.position || "CENTER ATTACKING MIDFIELDER";
+  const playerShortPosition = playerData?.shortPosition || "CAM";
+  const playerTotalScore = playerData?.totalScore || "72";
+  const playerPhysical = playerData?.physical || "72";
+  const playerSkills = playerData?.skills || "91";
+  const playerProfilePicture = playerData?.profilePicture || athleteImage;
 
-const PlayerCard: React.FC = () => (
+  return (
   <>
     {/* 1) SVG clipPath definition */}
     {/* <svg width="0" height="0" style={{ position: "absolute" }}>
@@ -72,7 +76,7 @@ const PlayerCard: React.FC = () => (
 <rect x="74.09" y="95.52" width="175.52" height="240.24" fill="url(#pattern0_29_6)"/>
 <foreignObject x="74.09" y="95.52" width="175.52" height="240.24">
   <img 
-    src={athleteImage} 
+    src={playerProfilePicture} 
     alt="Athlete" 
     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
   />
@@ -96,7 +100,7 @@ const PlayerCard: React.FC = () => (
   fontWeight={'Bold'}
   alignmentBaseline="hanging"
 >
-  {"72"}
+  {playerPhysical}
 </text>
 
 
@@ -115,7 +119,7 @@ const PlayerCard: React.FC = () => (
   fontWeight={'Bold'}
   alignmentBaseline="hanging"
 >
-  {"91"}
+  {playerSkills}
 </text>
 
 
@@ -175,7 +179,7 @@ const PlayerCard: React.FC = () => (
   fontWeight={'Bold'}
   alignmentBaseline="hanging"
 >
-  {"AHMED"}
+  {playerFirstName}
 </text>
 
 
@@ -190,7 +194,7 @@ const PlayerCard: React.FC = () => (
   fontWeight={'Bold'}
   alignmentBaseline="hanging"
 >
-  {"ALY"}
+  {playerLastName}
 </text>
 
 
@@ -205,22 +209,7 @@ const PlayerCard: React.FC = () => (
   fontWeight={'Bold'}
   alignmentBaseline="hanging"
 >
-  {"CENTER ATTACKING"}    
-</text>
-
-
-{/* Midfielder "Position" */}
-<text
-  x={120}
-  y={366}
-  fill="#8300FF"
-  fontSize={9.13}
-  fontFamily={'Kensington'}
-  fontStyle={'Italic'}
-  fontWeight={'Bold'}
-  alignmentBaseline="hanging"
->
-  {"MIDFIELDER"}    
+  {playerPosition}
 </text>
 
 
@@ -238,7 +227,7 @@ const PlayerCard: React.FC = () => (
   fontWeight={'Bold'}
   alignmentBaseline="hanging"
 >
-  {"CAM"}    
+  {playerShortPosition}
 </text>
 
 
@@ -252,7 +241,7 @@ const PlayerCard: React.FC = () => (
   fontWeight={'Bold'}
   alignmentBaseline="hanging"
 >
-  {"72"}
+  {playerTotalScore}
 </text>
 
 
@@ -334,14 +323,12 @@ const PlayerCard: React.FC = () => (
 <stop stop-color="white"/>
 <stop offset="1" stop-color="#9C70FA"/>
 </linearGradient>
-
-
-
 </defs>
 
 </svg>
       </div>
   </>
   );
+};
 
 export default PlayerCard;

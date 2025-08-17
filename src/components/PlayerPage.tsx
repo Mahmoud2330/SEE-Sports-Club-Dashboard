@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Share2, Filter, ChevronRight, User, TrendingUp } from 'lucide-react';
 import PlayerOverview from './PlayerOverview';
 import PlayerCard from './PlayerCard';
@@ -11,33 +11,7 @@ import SkillDevelopment from './SkillDevelopment';
 import AssessmentNotes from './AssessmentNotes';
 import ChatWidget from './ChatWidget';
 import { useParams } from 'react-router-dom';
-
-// Import the same mock data structure used in TeamsPage
-const mockTeams = {
-  'team-a': { tier: 'STANDARD' },
-  'team-b': { tier: 'PREMIUM' },
-  'team-c': { tier: 'PLATINUM' }
-};
-
-const mockPlayers = [
-  { id: '1', teamId: 'team-c' },
-  { id: '16', teamId: 'team-c' },
-  { id: '15', teamId: 'team-c' },
-  { id: '14', teamId: 'team-c' },
-  { id: '13', teamId: 'team-c' },
-  { id: '12', teamId: 'team-c' },
-  { id: '2', teamId: 'team-b' },
-  { id: '3', teamId: 'team-b' },
-  { id: '4', teamId: 'team-b' },
-  { id: '5', teamId: 'team-b' },
-  { id: '6', teamId: 'team-b' },
-  { id: '7', teamId: 'team-a' },
-  { id: '8', teamId: 'team-a' },
-  { id: '9', teamId: 'team-a' },
-  { id: '10', teamId: 'team-a' },
-  { id: '11', teamId: 'team-a' },
-  { id: '17', teamId: 'team-a' },
-];
+import { dataService } from '../services/dataService';
 
 const PlayerPage: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState('3 Months');
@@ -47,14 +21,33 @@ const PlayerPage: React.FC = () => {
   const periods = ['Last Month', '3 Months', '6 Months', 'This Year'];
   const physicalTests = ['Vertical Jump', 'Broad Jump', '10m Run', '5-10-5', 'T-Agility'];
 
-  // Get team information from the player data
-  const getPlayerTeamInfo = (playerId: string) => {
-    const player = mockPlayers.find(p => p.id === playerId);
-    return player ? mockTeams[player.teamId as keyof typeof mockTeams] : null;
-  };
+  // State for assessment notes
+  const [shouldShowAssessmentNotes, setShouldShowAssessmentNotes] = useState(false);
+  const [teamTier, setTeamTier] = useState<string | undefined>(undefined);
 
-  const playerTeam = playerId ? getPlayerTeamInfo(playerId) : null;
-  const shouldShowAssessmentNotes = playerTeam && (playerTeam.tier === 'PLATINUM' || playerTeam.tier === 'PREMIUM');
+  // Check if player should show assessment notes
+  useEffect(() => {
+    const checkAssessmentNotes = async () => {
+      if (!playerId) return;
+      
+      try {
+        const shouldShow = await dataService.shouldShowAssessmentNotes(playerId);
+        setShouldShowAssessmentNotes(shouldShow);
+        
+        if (shouldShow) {
+          const player = await dataService.getPlayerById(playerId);
+          if (player) {
+            const tier = await dataService.getTeamTier(player.teamId);
+            setTeamTier(tier);
+          }
+        }
+      } catch (err) {
+        console.error('Error checking assessment notes:', err);
+      }
+    };
+
+    checkAssessmentNotes();
+  }, [playerId]);
 
   return (
     <div className="player-page">
@@ -80,9 +73,9 @@ const PlayerPage: React.FC = () => {
         <VideoAnalysis />
         
         {/* Assessment Notes - Only for Platinum/Premium teams */}
-        {shouldShowAssessmentNotes && playerTeam && (
+        {shouldShowAssessmentNotes && teamTier && (
           <div style={{ marginTop: '24px' }}>
-            <AssessmentNotes teamTier={playerTeam.tier} />
+            <AssessmentNotes teamTier={teamTier} />
           </div>
         )}
         
