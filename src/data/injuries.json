@@ -1,0 +1,42 @@
+[
+    {
+      "playerId": 1,
+      "status": "at-risk",
+      "riskScore": 0.72,
+      "confidence": 0.68,
+      "expectedStart": "2025-08-21",
+      "expectedEnd": "2025-09-05",
+      "reasons": [
+        { "code": "fatigue", "label": "Fatigue", "weight": 0.36 },
+        { "code": "overload", "label": "Training Overload", "weight": 0.28 },
+        { "code": "form", "label": "Wrong Form", "weight": 0.18 }
+      ],
+      "notes": "Intensity spiked ~30% while recovery dropped over the last 2 weeks."
+    },
+    {
+      "playerId": 2,
+      "status": "injured",
+      "riskScore": 1.0,
+      "confidence": 0.82,
+      "expectedStart": "2025-08-02",
+      "expectedEnd": "2025-08-17",
+      "reasons": [
+        { "code": "impact", "label": "Contact/Impact", "weight": 0.52 },
+        { "code": "fatigue", "label": "Fatigue", "weight": 0.21 },
+        { "code": "strain", "label": "Muscle Strain", "weight": 0.27 },
+        { "code": "frequency", "label": "High-Frequency Sessions", "weight": 0.15 }
+      ],
+      "notes": "Grade I hamstring strain; expected to resume partial training within 10-14 days."
+    },
+    {
+      "playerId": 3,
+      "status": "healthy",
+      "riskScore": 0.12,
+      "confidence": 0.55,
+      "expectedStart": null,
+      "expectedEnd": null,
+      "reasons": [],
+      "notes": "Stable workload and good recovery metrics."
+    }
+  ]
+  
