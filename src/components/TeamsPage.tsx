@@ -439,10 +439,10 @@ const SkillsChartCard: React.FC = () => {
 
 type Note = { coach: string; category: "Strategy" | "Technique" | "Performance" | "Training"; color: string; date: string; message: string; };
 const coachNotes: Note[] = [
-  { coach: "Coach Martinez",  category: "Strategy",   color: "#ff4d57", date: "Aug 9, 2025",  message:"Need to focus more on defensive positioning in the upcoming training sessions." },
-  { coach: "Coach Rodriguez", category: "Technique",  color: "#f4c531", date: "Jul 31, 2025", message:"Players demonstrated strong teamwork and communication throughout the match." },
-  { coach: "Coach Martinez",  category: "Performance",color: "#7c4dff", date: "Jul 24, 2025", message:"Fitness levels are improving consistently across all players." },
-  { coach: "Coach Rodriguez", category: "Training",   color: "#33d17a", date: "Jul 17, 2025", message:"Tactical awareness needs improvement when transitioning from defense to attack." },
+  { coach: "Hassan Ali",  category: "Strategy",   color: "#ff4d57", date: "Aug 9, 2025",  message:"Need to focus more on defensive positioning in the upcoming training sessions." },
+  { coach: "Hassan Ali", category: "Technique",  color: "#f4c531", date: "Jul 31, 2025", message:"Players demonstrated strong teamwork and communication throughout the match." },
+  { coach: "Hassan Ali",  category: "Performance",color: "#7c4dff", date: "Jul 24, 2025", message:"Fitness levels are improving consistently across all players." },
+  { coach: "Hassan Ali", category: "Training",   color: "#33d17a", date: "Jul 17, 2025", message:"Tactical awareness needs improvement when transitioning from defense to attack." },
 ];
 
 const CoachNotes: React.FC = () => (
@@ -605,6 +605,12 @@ const TeamsPage: React.FC = () => {
 
   // Check if team can show chat widget (Platinum or Premium)
   const canShowChat = ["PLATINUM", "PREMIUM"].includes((currentTeam?.tier || "").toUpperCase());
+
+  // Normalize the tier to avoid case/spacing issues
+  const canShowChat =
+  ["PLATINUM", "PREMIUM"].includes((currentTeam?.tier || "").toUpperCase());
+
+
 
   return (
     <main className="teams-page">
@@ -774,30 +780,10 @@ const TeamsPage: React.FC = () => {
             </div>
           </div>
         </section>
+        
 
         <br />
 
-        <div>
-          <PhysicalPerformance />
-        </div>
-        <br />
-        <div>
-          <SkillDevelopment />
-        </div>
-        <br />
-        <div>
-          <PhysicalChartCard />
-        </div>
-        <br />
-        <div>
-          <SkillsChartCard />
-        </div>
-        <br />
-        <div>
-          <CoachNotes />
-        </div>
-
-        {/* Chat Widget - Only for Platinum/Premium teams */}
         {canShowChat && <ChatWidget />}
 
       </div>
