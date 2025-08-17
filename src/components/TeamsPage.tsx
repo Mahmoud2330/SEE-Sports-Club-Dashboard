@@ -32,7 +32,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import athleteImage from "../assets/Player_Pic.png";
 import "./Teams.css";
 import "../App.css";
@@ -47,6 +47,37 @@ const mockTeamData = {
   color: "#DA291C",
 };
 
+// Updated mock data with proper team structure
+const mockTeams = {
+  'team-a': {
+    id: 'team-a',
+    name: 'Team A',
+    tier: 'STANDARD',
+    color: '#ef4444',
+    totalPlayers: 6,
+    teamScore: '78.5',
+    injuries: 1
+  },
+  'team-b': {
+    id: 'team-b', 
+    name: 'Team B',
+    tier: 'PREMIUM',
+    color: '#3b82f6',
+    totalPlayers: 5,
+    teamScore: '82.3',
+    injuries: 0
+  },
+  'team-c': {
+    id: 'team-c',
+    name: 'Team C', 
+    tier: 'PLATINUM',
+    color: '#10b981',
+    totalPlayers: 6,
+    teamScore: '75.8',
+    injuries: 2
+  }
+};
+
 const mockPlayers = [
   {
     id: 1,
@@ -59,7 +90,8 @@ const mockPlayers = [
     profilePicture: athleteImage,
     jerseyNumber: 10,
     year: 2024,
-    team: "Manchester United",
+    team: "Team C",
+    teamId: "team-c",
     height: 180,
     weight: 70,
     speed: 32.5,
@@ -67,91 +99,6 @@ const mockPlayers = [
   },
   {
     id: 16,
-    name: "Marcus Rashford",
-    position: "Forward",
-    shortPosition: "FW",
-    totalScore: 85,
-    physical: 78,
-    skills: 82,
-    profilePicture: athleteImage,
-    jerseyNumber: 10,
-    year: 2024,
-    team: "Manchester United",
-    height: 180,
-    weight: 70,
-    speed: 32.5,
-    endurance: 85,
-  },
-  {
-    id: 15,
-    name: "Marcus Rashford",
-    position: "Forward",
-    shortPosition: "FW",
-    totalScore: 85,
-    physical: 78,
-    skills: 82,
-    profilePicture: athleteImage,
-    jerseyNumber: 10,
-    year: 2024,
-    team: "Manchester United",
-    height: 180,
-    weight: 70,
-    speed: 32.5,
-    endurance: 85,
-  },
-  {
-    id: 14,
-    name: "Marcus Rashford",
-    position: "Forward",
-    shortPosition: "FW",
-    totalScore: 85,
-    physical: 78,
-    skills: 82,
-    profilePicture: athleteImage,
-    jerseyNumber: 10,
-    year: 2024,
-    team: "Manchester United",
-    height: 180,
-    weight: 70,
-    speed: 32.5,
-    endurance: 85,
-  },
-  {
-    id: 13,
-    name: "Marcus Rashford",
-    position: "Forward",
-    shortPosition: "FW",
-    totalScore: 85,
-    physical: 78,
-    skills: 82,
-    profilePicture: athleteImage,
-    jerseyNumber: 10,
-    year: 2024,
-    team: "Manchester United",
-    height: 180,
-    weight: 70,
-    speed: 32.5,
-    endurance: 85,
-  },
-  {
-    id: 12,
-    name: "Marcus Rashford",
-    position: "Forward",
-    shortPosition: "FW",
-    totalScore: 85,
-    physical: 78,
-    skills: 82,
-    profilePicture: athleteImage,
-    jerseyNumber: 10,
-    year: 2024,
-    team: "Manchester United",
-    height: 180,
-    weight: 70,
-    speed: 32.5,
-    endurance: 85,
-  },
-  {
-    id: 2,
     name: "Bruno Fernandes",
     position: "Midfielder",
     shortPosition: "MF",
@@ -161,14 +108,15 @@ const mockPlayers = [
     profilePicture: athleteImage,
     jerseyNumber: 8,
     year: 2024,
-    team: "Manchester United",
+    team: "Team C",
+    teamId: "team-c",
     height: 179,
     weight: 69,
     speed: 28.2,
     endurance: 90,
   },
   {
-    id: 3,
+    id: 15,
     name: "Harry Maguire",
     position: "Defender",
     shortPosition: "DF",
@@ -178,14 +126,15 @@ const mockPlayers = [
     profilePicture: athleteImage,
     jerseyNumber: 5,
     year: 2024,
-    team: "Manchester United",
+    team: "Team C",
+    teamId: "team-c",
     height: 194,
     weight: 82,
     speed: 26.8,
     endurance: 78,
   },
   {
-    id: 4,
+    id: 14,
     name: "David de Gea",
     position: "Goalkeeper",
     shortPosition: "GK",
@@ -195,31 +144,15 @@ const mockPlayers = [
     profilePicture: athleteImage,
     jerseyNumber: 1,
     year: 2024,
-    team: "Manchester United",
+    team: "Team C",
+    teamId: "team-c",
     height: 192,
     weight: 76,
     speed: 24.5,
     endurance: 82,
   },
   {
-    id: 5,
-    name: "Jadon Sancho",
-    position: "Forward",
-    shortPosition: "FW",
-    totalScore: 81,
-    physical: 75,
-    skills: 84,
-    profilePicture: athleteImage,
-    jerseyNumber: 25,
-    year: 2024,
-    team: "Manchester United",
-    height: 180,
-    weight: 76,
-    speed: 31.8,
-    endurance: 80,
-  },
-  {
-    id: 6,
+    id: 13,
     name: "Paul Pogba",
     position: "Midfielder",
     shortPosition: "MF",
@@ -229,11 +162,229 @@ const mockPlayers = [
     profilePicture: athleteImage,
     jerseyNumber: 6,
     year: 2024,
-    team: "Manchester United",
+    team: "Team C",
+    teamId: "team-c",
     height: 191,
     weight: 84,
     speed: 29.4,
     endurance: 88,
+  },
+  {
+    id: 12,
+    name: "Jadon Sancho",
+    position: "Forward",
+    shortPosition: "FW",
+    totalScore: 81,
+    physical: 75,
+    skills: 84,
+    profilePicture: athleteImage,
+    jerseyNumber: 25,
+    year: 2024,
+    team: "Team C",
+    teamId: "team-c",
+    height: 180,
+    weight: 76,
+    speed: 31.8,
+    endurance: 80,
+  },
+  {
+    id: 2,
+    name: "Erling Haaland",
+    position: "Forward",
+    shortPosition: "FW",
+    totalScore: 89,
+    physical: 82,
+    skills: 87,
+    profilePicture: athleteImage,
+    jerseyNumber: 9,
+    year: 2024,
+    team: "Team B",
+    teamId: "team-b",
+    height: 194,
+    weight: 88,
+    speed: 33.1,
+    endurance: 88,
+  },
+  {
+    id: 3,
+    name: "Kevin De Bruyne",
+    position: "Midfielder",
+    shortPosition: "MF",
+    totalScore: 88,
+    physical: 75,
+    skills: 91,
+    profilePicture: athleteImage,
+    jerseyNumber: 17,
+    year: 2024,
+    team: "Team B",
+    teamId: "team-b",
+    height: 181,
+    weight: 70,
+    speed: 27.8,
+    endurance: 85,
+  },
+  {
+    id: 4,
+    name: "Virgil van Dijk",
+    position: "Defender",
+    shortPosition: "DF",
+    totalScore: 86,
+    physical: 88,
+    skills: 78,
+    profilePicture: athleteImage,
+    jerseyNumber: 4,
+    year: 2024,
+    team: "Team B",
+    teamId: "team-b",
+    height: 193,
+    weight: 92,
+    speed: 28.5,
+    endurance: 82,
+  },
+  {
+    id: 5,
+    name: "Alisson Becker",
+    position: "Goalkeeper",
+    shortPosition: "GK",
+    totalScore: 85,
+    physical: 78,
+    skills: 89,
+    profilePicture: athleteImage,
+    jerseyNumber: 1,
+    year: 2024,
+    team: "Team B",
+    teamId: "team-b",
+    height: 191,
+    weight: 91,
+    speed: 25.2,
+    endurance: 85,
+  },
+  {
+    id: 6,
+    name: "Mohamed Salah",
+    position: "Forward",
+    shortPosition: "FW",
+    totalScore: 87,
+    physical: 80,
+    skills: 86,
+    profilePicture: athleteImage,
+    jerseyNumber: 11,
+    year: 2024,
+    team: "Team B",
+    teamId: "team-b",
+    height: 175,
+    weight: 71,
+    speed: 32.8,
+    endurance: 87,
+  },
+  // Team A (STANDARD) players
+  {
+    id: 7,
+    name: "John Smith",
+    position: "Forward",
+    shortPosition: "FW",
+    totalScore: 72,
+    physical: 68,
+    skills: 75,
+    profilePicture: athleteImage,
+    jerseyNumber: 7,
+    year: 2024,
+    team: "Team A",
+    teamId: "team-a",
+    height: 178,
+    weight: 73,
+    speed: 28.5,
+    endurance: 75,
+  },
+  {
+    id: 8,
+    name: "Mike Johnson",
+    position: "Midfielder",
+    shortPosition: "MF",
+    totalScore: 74,
+    physical: 70,
+    skills: 77,
+    profilePicture: athleteImage,
+    jerseyNumber: 12,
+    year: 2024,
+    team: "Team A",
+    teamId: "team-a",
+    height: 175,
+    weight: 68,
+    speed: 27.2,
+    endurance: 78,
+  },
+  {
+    id: 9,
+    name: "Tom Wilson",
+    position: "Defender",
+    shortPosition: "DF",
+    totalScore: 71,
+    physical: 73,
+    skills: 69,
+    profilePicture: athleteImage,
+    jerseyNumber: 3,
+    year: 2024,
+    team: "Team A",
+    teamId: "team-a",
+    height: 185,
+    weight: 79,
+    speed: 25.8,
+    endurance: 72,
+  },
+  {
+    id: 10,
+    name: "Chris Davis",
+    position: "Goalkeeper",
+    shortPosition: "GK",
+    totalScore: 73,
+    physical: 69,
+    skills: 76,
+    profilePicture: athleteImage,
+    jerseyNumber: 22,
+    year: 2024,
+    team: "Team A",
+    teamId: "team-a",
+    height: 188,
+    weight: 82,
+    speed: 24.1,
+    endurance: 74,
+  },
+  {
+    id: 11,
+    name: "Alex Brown",
+    position: "Midfielder",
+    shortPosition: "MF",
+    totalScore: 70,
+    physical: 67,
+    skills: 72,
+    profilePicture: athleteImage,
+    jerseyNumber: 15,
+    year: 2024,
+    team: "Team A",
+    teamId: "team-a",
+    height: 172,
+    weight: 65,
+    speed: 26.5,
+    endurance: 70,
+  },
+  {
+    id: 17,
+    name: "Ryan Miller",
+    position: "Forward",
+    shortPosition: "FW",
+    totalScore: 69,
+    physical: 66,
+    skills: 71,
+    profilePicture: athleteImage,
+    jerseyNumber: 18,
+    year: 2024,
+    team: "Team A",
+    teamId: "team-a",
+    height: 180,
+    weight: 71,
+    speed: 27.8,
+    endurance: 73,
   },
 ];
 
@@ -991,8 +1142,13 @@ const ChatWidget: React.FC = () => {
 
 const TeamsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { teamId } = useParams<{ teamId: string }>();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPosition, setFilterPosition] = useState("all");
+
+  // Get current team data
+  const currentTeam = teamId && mockTeams[teamId as keyof typeof mockTeams] ? mockTeams[teamId as keyof typeof mockTeams] : mockTeams['team-a'];
+  const currentTeamPlayers = mockPlayers.filter(player => player.teamId === teamId);
 
   // Pagination
   const PAGE_SIZE = 10;
@@ -1005,7 +1161,7 @@ const TeamsPage: React.FC = () => {
 
   const filteredPlayers = useMemo(() => {
     const s = searchTerm.trim().toLowerCase();
-    return mockPlayers.filter((player) => {
+    return currentTeamPlayers.filter((player) => {
       const matchesSearch =
         !s ||
         player.name.toLowerCase().includes(s) ||
@@ -1017,7 +1173,7 @@ const TeamsPage: React.FC = () => {
         (player.shortPosition || "").toLowerCase() === filterPosition.toLowerCase();
       return matchesSearch && matchesPosition;
     });
-  }, [searchTerm, filterPosition]);
+  }, [searchTerm, filterPosition, currentTeamPlayers]);
 
   // NEW: rank filter
 const [rankFilter, setRankFilter] = useState<'all' | 'top3' | 'top4to10'>('all');
@@ -1063,9 +1219,9 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
         <br />
 
         {/* Title + subtitle */}
-        <h1 className="pgtitle">Team A Details</h1>
+        <h1 className="pgtitle">{currentTeam.name} Details</h1>
         <p className="pgsubtitle">
-          Detailed view of team performance, player roster, and statistics.
+          Detailed view of {currentTeam.name} performance, player roster, and statistics.
         </p>
 
         {/* Players card */}
