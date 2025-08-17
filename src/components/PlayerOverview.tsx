@@ -32,7 +32,7 @@ const PlayerOverview: React.FC = () => {
   const physicalTests = ['Vertical Jump', 'Broad Jump', '10m Run', '5-10-5', 'T-Agility'];
   
   // State for dynamic data
-  const [playerData, setPlayerData] = useState<Player | null>(null);
+  const [playerData, setPlayerData] = useState<Player | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,15 +45,18 @@ const PlayerOverview: React.FC = () => {
         setIsLoading(true);
         setError(null);
         
+        console.log('Fetching player data for ID:', playerId, 'Type:', typeof playerId);
         const player = await dataService.getPlayerById(playerId);
+        console.log('Received player data:', player);
+        
         if (player) {
           setPlayerData(player);
         } else {
           setError('Player not found');
         }
       } catch (err) {
+        console.error('Error in fetchPlayerData:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch player data');
-        console.error('Error fetching player data:', err);
       } finally {
         setIsLoading(false);
       }
@@ -220,247 +223,267 @@ const PlayerOverview: React.FC = () => {
 
   return (
     <div className="player-overview">
-      {/* Top Bar */}
-      <div className="top-bar">
-        <div className="breadcrumbs">
-          {breadcrumbs.map((crumb, index) => (
-            <React.Fragment key={index}>
-              <button 
-                onClick={() => handleBreadcrumbClick(crumb, index)}
-                className={index === breadcrumbs.length - 1 ? 'active' : ''}
-              >
-                {crumb.name}
-              </button>
-              {index < breadcrumbs.length - 1 && (
-                <ChevronRight size={16} className="chevron" />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-    
-      {/* Player Header */}
-      <div className="player-header">
-        <div className="player-info">
-          <h1 className="player-name">{playerData?.name}</h1>
-          <p className="player-description">
-            Detailed player profile with performance metrics, statistics, and development progress.
-          </p>
-        </div>
-      </div>
-
-      {/* Period Selector */}
-      <div className="period-selector">
-        <div className="period-label">Period:</div>
-        <div className="period-buttons">
-          {periods.map((period) => (
-            <button
-              key={period}
-              className={`period-btn ${activePeriod === period ? 'active' : ''}`}
-              onClick={() => handlePeriodChange(period)}
-            >
-              {period}
-            </button>
-          ))}
-        </div>
-        <div className="date-range">
-         <span className="date-active-dot"><span className="live-dot"></span> {getCurrentDateRange()}</span>
-          <CustomDatePicker 
-            onDateChange={handleCustomDateChange}
-            currentStartDate={customStartDate}
-            currentEndDate={customEndDate}
-          />
-          <button className="reset-btn" onClick={handleReset}>Reset</button>
-        </div>
-      </div>
-
-      {/* Loading Indicator */}
-      {isUpdating && (
-        <div className="updating-data">
-          <div className="spinner"></div>
-          <span>Updating data...</span>
+      {/* Loading State */}
+      {isLoading && (
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div>Loading player data...</div>
         </div>
       )}
 
-      {/* Two-Column Layout: Player Card and Physical Progress */}
-      <div className="player-content-layout">
-        {/* Left Column: Player Card */}
-        <div className="player-card-column">
-          <div className="player-card-section">
-            <h2 className="section-title1">Player Card <span className="active-dot"><span className="live-dot"></span> Active</span></h2>
-            <div className="player-card-container">
-              {/* Unified Background Container */}
-              <div className="player-card-background">
-                {/* Player Card Component */}
-                <div className="player-card-wrapper">
-                  <PlayerCard playerData={playerData} />
-                </div>
-                
-                {/* Player Card Footer */}
-                <div className="player-card-footer">
-                  <div className="player-info-footer">
-                    <div className="left-info">
-                      <div className="player-name-card">{playerData?.name}</div>
-                      <div className="team-name-card">{playerData?.team}</div>
-                    </div>
-                    <div className="live-status">
-                      <span className="live-dot" />
-                      <span className="live-text">Live</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Error State */}
+      {error && (
+        <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+          <div>Error: {error}</div>
+          <button onClick={() => window.location.reload()}>Retry</button>
         </div>
+      )}
 
-        {/* Right Column: Physical Progress */}
-        <div className="physical-progress-column">
-          <div className="physical-progress">
-            <div className="section-header">
-              <h2 className="section-title physical-progress-title">
-                Physical Progress
-              </h2>
-            </div>
-            <div className="sub-sec" >
-              <div className="test-tabs">
-                {physicalTests.map((test) => (
-                  <button
-                    key={test}
-                    className={`test-tab ${activeTest === test ? 'active' : ''}`}
-                    onClick={() => setActiveTest(test)}
+      {/* Main Content - Only show when data is loaded and no errors */}
+      {!isLoading && !error && playerData && (
+        <>
+          {/* Top Bar */}
+          <div className="top-bar">
+            <div className="breadcrumbs">
+              {breadcrumbs.map((crumb, index) => (
+                <React.Fragment key={index}>
+                  <button 
+                    onClick={() => handleBreadcrumbClick(crumb, index)}
+                    className={index === breadcrumbs.length - 1 ? 'active' : ''}
                   >
-                    {test}
+                    {crumb.name}
                   </button>
-                ))}
-              </div>
+                  {index < breadcrumbs.length - 1 && (
+                    <ChevronRight size={16} className="chevron" />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        
+          {/* Player Header */}
+          <div className="player-header">
+            <div className="player-info">
+              <h1 className="player-name">{playerData?.name}</h1>
+              <p className="player-description">
+                Detailed player profile with performance metrics, statistics, and development progress.
+              </p>
+            </div>
+          </div>
 
-              <div className="progress-cards">
-                <div className="progress-card">
-                  <h3 className="card-title">{getCurrentTestData().title}</h3>
-                  <div className="progress-circle-container">
-                    <div className="progress-circle">
-                      <svg className="progress-svg" viewBox="0 0 120 120">
-                        <circle
-                          className="progress-background"
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          stroke="#333"
-                          strokeWidth="8"
-                          fill="none"
-                        />
-                        <circle
-                          className="progress-fill"
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          stroke="#6728f5"
-                          strokeWidth="8"
-                          fill="none"
-                          strokeDasharray={calculateCircleValues(getCurrentTestData().currentProgress, 50).strokeDasharray}
-                          strokeDashoffset={calculateCircleValues(getCurrentTestData().currentProgress, 50).strokeDashoffset}
-                          transform="rotate(-90 60 60)"
-                          strokeLinecap="round"
-                        />
+          {/* Period Selector */}
+          <div className="period-selector">
+            <div className="period-label">Period:</div>
+            <div className="period-buttons">
+              {periods.map((period) => (
+                <button
+                  key={period}
+                  className={`period-btn ${activePeriod === period ? 'active' : ''}`}
+                  onClick={() => handlePeriodChange(period)}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
+            <div className="date-range">
+             <span className="date-active-dot"><span className="live-dot"></span> {getCurrentDateRange()}</span>
+              <CustomDatePicker 
+                onDateChange={handleCustomDateChange}
+                currentStartDate={customStartDate}
+                currentEndDate={customEndDate}
+              />
+              <button className="reset-btn" onClick={handleReset}>Reset</button>
+            </div>
+          </div>
 
-                        <circle
-                          className="progress-background"
-                          cx="60"
-                          cy="60"
-                          r="38"
-                          stroke="#333"
-                          strokeWidth="8"
-                          fill="none"
-                        />
-                        <circle
-                          className="progress-fill2"
-                          cx="60"
-                          cy="60"
-                          r="38"
-                          stroke="#6728f5"
-                          strokeWidth="8"
-                          fill="none"
-                          strokeDasharray={calculateCircleValues(getCurrentTestData().bestProgress, 38).strokeDasharray}
-                          strokeDashoffset={calculateCircleValues(getCurrentTestData().bestProgress, 38).strokeDashoffset}
-                          transform="rotate(-90 60 60)"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <div className="progress-text">
-                        <div className="progress-label">Current</div>
-                        <div className="progress-value">{getCurrentTestData().current}{getCurrentTestData().unit}</div>
+          {/* Loading Indicator */}
+          {isUpdating && (
+            <div className="updating-data">
+              <div className="spinner"></div>
+              <span>Updating data...</span>
+            </div>
+          )}
+
+          {/* Two-Column Layout: Player Card and Physical Progress */}
+          <div className="player-content-layout">
+            {/* Left Column: Player Card */}
+            <div className="player-card-column">
+              <div className="player-card-section">
+                <h2 className="section-title1">Player Card <span className="active-dot"><span className="live-dot"></span> Active</span></h2>
+                <div className="player-card-container">
+                  {/* Unified Background Container */}
+                  <div className="player-card-background">
+                    {/* Player Card Component */}
+                    <div className="player-card-wrapper">
+                      <PlayerCard playerData={playerData} />
+                    </div>
+                    
+                    {/* Player Card Footer */}
+                    <div className="player-card-footer">
+                      <div className="player-info-footer">
+                        <div className="left-info">
+                          <div className="player-name-card">{playerData?.name}</div>
+                          <div className="team-name-card">{playerData?.team}</div>
+                        </div>
+                        <div className="live-status">
+                          <span className="live-dot" />
+                          <span className="live-text">Live</span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="progress-details">
-                    <div className="detail-item">
-                      <span className="detail-dot">•</span>
-                      <span>Current {getCurrentTestData().current}{getCurrentTestData().unit}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-dot">•</span>
-                      <span>Best {getCurrentTestData().best}{getCurrentTestData().unit}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="progress-card">
-                  <h3 className="card-title">Consistency</h3>
-                  <div className="progress-circle-container">
-                    <div className="progress-circle">
-                      <svg className="progress-svg" viewBox="0 0 120 120">
-                        <circle
-                          className="progress-background"
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          stroke="#333"
-                          strokeWidth="8"
-                          fill="none"
-                        />
-                        <circle
-                          className="progress-fill2"
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          stroke="#6728f5"
-                          strokeWidth="8"
-                          fill="none"
-                          strokeDasharray={calculateCircleValues(getCurrentTestData().consistencyProgress, 50).strokeDasharray}
-                          strokeDashoffset={calculateCircleValues(getCurrentTestData().consistencyProgress, 50).strokeDashoffset}
-                          transform="rotate(-90 60 60)"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <div className="progress-text">
-                        <div className="progress-label">Rate</div>
-                        <div className="progress-value">{getCurrentTestData().consistency}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="progress-details">
-                    <div className="improvement-item">
-                      <TrendingUp size={16} />
-                      <span>{getCurrentTestData().improvement}</span>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="summary-card">
-                <div className="summary-items">
-                  <div className="summary-item">
-                    <span className="improvement-dot">• Improved:</span>
-                    <span> Overall Physical Performance</span>
+            {/* Right Column: Physical Progress */}
+            <div className="physical-progress-column">
+              <div className="physical-progress">
+                <div className="section-header">
+                  <h2 className="section-title physical-progress-title">
+                    Physical Progress
+                  </h2>
+                </div>
+                <div className="sub-sec" >
+                  <div className="test-tabs">
+                    {physicalTests.map((test) => (
+                      <button
+                        key={test}
+                        className={`test-tab ${activeTest === test ? 'active' : ''}`}
+                        onClick={() => setActiveTest(test)}
+                      >
+                        {test}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="progress-cards">
+                    <div className="progress-card">
+                      <h3 className="card-title">{getCurrentTestData().title}</h3>
+                      <div className="progress-circle-container">
+                        <div className="progress-circle">
+                          <svg className="progress-svg" viewBox="0 0 120 120">
+                            <circle
+                              className="progress-background"
+                              cx="60"
+                              cy="60"
+                              r="50"
+                              stroke="#333"
+                              strokeWidth="8"
+                              fill="none"
+                            />
+                            <circle
+                              className="progress-fill"
+                              cx="60"
+                              cy="60"
+                              r="50"
+                              stroke="#6728f5"
+                              strokeWidth="8"
+                              fill="none"
+                              strokeDasharray={calculateCircleValues(getCurrentTestData().currentProgress, 50).strokeDasharray}
+                              strokeDashoffset={calculateCircleValues(getCurrentTestData().currentProgress, 50).strokeDashoffset}
+                              transform="rotate(-90 60 60)"
+                              strokeLinecap="round"
+                            />
+
+                            <circle
+                              className="progress-background"
+                              cx="60"
+                              cy="60"
+                              r="38"
+                              stroke="#333"
+                              strokeWidth="8"
+                              fill="none"
+                            />
+                            <circle
+                              className="progress-fill2"
+                              cx="60"
+                              cy="60"
+                              r="38"
+                              stroke="#6728f5"
+                              strokeWidth="8"
+                              fill="none"
+                              strokeDasharray={calculateCircleValues(getCurrentTestData().bestProgress, 38).strokeDasharray}
+                              strokeDashoffset={calculateCircleValues(getCurrentTestData().bestProgress, 38).strokeDashoffset}
+                              transform="rotate(-90 60 60)"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <div className="progress-text">
+                            <div className="progress-label">Current</div>
+                            <div className="progress-value">{getCurrentTestData().current}{getCurrentTestData().unit}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="progress-details">
+                        <div className="detail-item">
+                          <span className="detail-dot">•</span>
+                          <span>Current {getCurrentTestData().current}{getCurrentTestData().unit}</span>
+                        </div>
+                        <div className="detail-item">
+                          <span className="detail-dot">•</span>
+                          <span>Best {getCurrentTestData().best}{getCurrentTestData().unit}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="progress-card">
+                      <h3 className="card-title">Consistency</h3>
+                      <div className="progress-circle-container">
+                        <div className="progress-circle">
+                          <svg className="progress-svg" viewBox="0 0 120 120">
+                            <circle
+                              className="progress-background"
+                              cx="60"
+                              cy="60"
+                              r="50"
+                              stroke="#333"
+                              strokeWidth="8"
+                              fill="none"
+                            />
+                            <circle
+                              className="progress-fill2"
+                              cx="60"
+                              cy="60"
+                              r="50"
+                              stroke="#6728f5"
+                              strokeWidth="8"
+                              fill="none"
+                              strokeDasharray={calculateCircleValues(getCurrentTestData().consistencyProgress, 50).strokeDasharray}
+                              strokeDashoffset={calculateCircleValues(getCurrentTestData().consistencyProgress, 50).strokeDashoffset}
+                              transform="rotate(-90 60 60)"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <div className="progress-text">
+                            <div className="progress-label">Rate</div>
+                            <div className="progress-value">{getCurrentTestData().consistency}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="progress-details">
+                        <div className="improvement-item">
+                          <TrendingUp size={16} />
+                          <span>{getCurrentTestData().improvement}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="summary-card">
+                    <div className="summary-items">
+                      <div className="summary-item">
+                        <span className="improvement-dot">• Improved:</span>
+                        <span> Overall Physical Performance</span>
+                      </div>
+                    </div>
+                    <div className="period-info">Period: Jun 2025 - Aug 2025</div>
                   </div>
                 </div>
-                <div className="period-info">Period: Jun 2025 - Aug 2025</div>
               </div>
             </div>
           </div>
-        </div>
-      </div>      
+        </>
+      )}
     </div>
   );
 };
