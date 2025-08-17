@@ -325,27 +325,41 @@ const SkillDevelopment: React.FC = () => {
     week: w,
     value: 9.3 + Math.sin(i / 6) * 0.25 + (i % 5) * 0.02, // ~9.0–10.0 sec
   }));
+  const dataVJump: DataPoint[] = weeks.map((w, i) => ({
+    week: w,
+    value: 230 + Math.sin(i / 6) * 12 + (i % 4) * 2, // ~220–250 cm
+  }));
+  const data10MRun: DataPoint[] = weeks.map((w, i) => ({
+    week: w,
+    value: 8.1 + Math.sin(i / 6) * 0.25 + (i % 5) * 0.02, // ~9.0–10.0 sec
+  }));
   
   const metricUnits: Record<string, string> = {
     fiveTenFive: "s",
     broadJump: "cm",
     tAgility: "s",
+    verticalJump: "cm",
+    tenMRun: "s",
   };
   
   const metricLabel: Record<string, string> = {
     fiveTenFive: "Five Ten Five",
     broadJump: "Broad Jump",
     tAgility: "T-Agility",
+    verticalJump: "Vertical Jump",
+    tenMRun: "10M Run",
   };
   
   const seriesMap: Record<string, DataPoint[]> = {
     fiveTenFive: dataFiveTenFive,
     broadJump: dataBroadJump,
     tAgility: dataTAgility,
+    verticalJump: dataVJump,
+    tenMRun: data10MRun,
   };
   
   const PhysicalChartCard: React.FC = () => {
-    const [metric, setMetric] = useState<"fiveTenFive" | "broadJump" | "tAgility">(
+    const [metric, setMetric] = useState<"fiveTenFive" | "broadJump" | "tAgility" | "verticalJump" | "tenMRun">(
       "fiveTenFive"
     );
     const [range, setRange] = useState<"3m" | "6m" | "all">("6m");
@@ -441,7 +455,7 @@ const SkillDevelopment: React.FC = () => {
   
         {/* Tabs */}
         <div className="physchart__tabs ">
-          {(["fiveTenFive", "broadJump", "tAgility"] as const).map((k) => (
+          {(["fiveTenFive", "broadJump", "tAgility" , "verticalJump", "tenMRun"] as const).map((k) => (
             <button
               key={k}
               onClick={() => setMetric(k)}
