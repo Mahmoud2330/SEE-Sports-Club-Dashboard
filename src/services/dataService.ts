@@ -80,10 +80,10 @@ class DataService {
     this.error = null;
 
     try {
-      // Fetch both players and teams data
+      // Fetch both players and teams data from the new location
       const [playersResponse, teamsResponse] = await Promise.all([
-        fetch('/fonts/kensington-font-family-1751956222-0/data/Players.json'),
-        fetch('/fonts/kensington-font-family-1751956222-0/data/Teams.json')
+        fetch('/data/players.json'),
+        fetch('/data/teams.json')
       ]);
       
       if (!playersResponse.ok) {
@@ -99,11 +99,14 @@ class DataService {
 
       // Combine the data
       this.data = {
-        players: playersData.players,
-        teams: teamsData.teams,
+        players: playersData,
+        teams: teamsData,
         metadata: {
-          ...playersData.metadata,
-          totalTeams: teamsData.metadata.totalTeams
+          lastUpdated: new Date().toISOString(),
+          version: "1.0.0",
+          totalPlayers: playersData.length,
+          totalTeams: Object.keys(teamsData).length,
+          dataSource: "SEE Sports Club Database"
         }
       };
       
@@ -143,14 +146,14 @@ class DataService {
   // Fetch teams data separately (useful for team-specific operations)
   async fetchTeamsData(): Promise<{ [key: string]: Team }> {
     try {
-      const response = await fetch('/fonts/kensington-font-family-1751956222-0/data/Teams.json');
+      const response = await fetch('/data/teams.json');
       
       if (!response.ok) {
         throw new Error(`Failed to fetch teams data: ${response.status} ${response.statusText}`);
       }
 
       const teamsData = await response.json();
-      return teamsData.teams;
+      return teamsData;
     } catch (err) {
       console.error('Error fetching teams data:', err);
       throw err;
