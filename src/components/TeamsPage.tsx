@@ -588,15 +588,25 @@ const controlData: SkillPoint[] = wks.map((w, i) => ({
   week: w,
   value: 6.8 + Math.sin(i / 6) * 0.45 + (i % 3) * 0.05,
 }));
+const shootingData: SkillPoint[] = wks.map((w, i) => ({
+  week: w,
+  value: 7.8 + Math.sin(i / 6) * 0.45 + (i % 3) * 0.05,
+}));
+const oneVoneData: SkillPoint[] = wks.map((w, i) => ({
+  week: w,
+  value: 8.6 + Math.sin(i / 6) * 0.45 + (i % 3) * 0.05,
+}));
 
 const skillSeries: Record<string, SkillPoint[]> = {
   passing: passingData,
   running: runningBallData,
   control: controlData,
+  shooting: shootingData,
+  oneVone: oneVoneData,
 };
 
 const SkillsChartCard: React.FC = () => {
-  const [metric, setMetric] = useState<"passing" | "running" | "control">("passing");
+  const [metric, setMetric] = useState<"passing" | "running" | "control" | "shooting"| "oneVone">("passing");
   const [range, setRange] = useState<"3m" | "6m" | "all">("6m");
 
   const full = skillSeries[metric];
@@ -622,7 +632,7 @@ const SkillsChartCard: React.FC = () => {
     { name: "rest", value: Math.max(0, 10 - Math.min(10, Math.max(0, current))) },
   ];
 
-  const label = metric === "passing" ? "Passing" : metric === "running" ? "Running with ball" : "Control";
+  const label = metric === "passing" ? "Passing" : metric === "running" ? "Running with ball" : metric === "oneVone" ? "1V1" : metric === "shooting" ? "Shooting" : "Control";
 
 
   // inside SkillsChartCard
@@ -690,13 +700,13 @@ const ScTooltip = ({ active, label, payload }: any) => {
 
       {/* Tabs */}
       <div className="skillchart__tabs">
-        {(["passing", "running", "control"] as const).map((k) => (
+        {(["passing", "running", "control", "shooting", "oneVone" ] as const).map((k) => (
           <button
             key={k}
             onClick={() => setMetric(k)}
             className={`stab ${metric === k ? "is-active" : ""}`}
           >
-            {k === "running" ? "Running with ball" : k[0].toUpperCase() + k.slice(1)}
+            {k === "running" ? "Running with ball" : k === "oneVone" ? "1v1":k[0].toUpperCase() + k.slice(1)}
           </button>
         ))}
       </div>
