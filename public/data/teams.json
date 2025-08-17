@@ -1,0 +1,30 @@
+{
+    "team-a": {
+      "id": "team-a",
+      "name": "Team A",
+      "tier": "STANDARD",
+      "color": "#ef4444",
+      "totalPlayers": 6,  
+      "teamScore": "78.5",
+      "injuries": 1
+    },
+    "team-b": {
+      "id": "team-b",
+      "name": "Team B",
+      "tier": "PREMIUM",
+      "color": "#3b82f6",
+      "totalPlayers": 5,
+      "teamScore": "82.3",
+      "injuries": 0
+    },
+    "team-c": {
+      "id": "team-c",
+      "name": "Team C",
+      "tier": "PLATINUM",
+      "color": "#10b981",
+      "totalPlayers": 6,
+      "teamScore": "75.8",
+      "injuries": 2
+    }
+  }
+  
