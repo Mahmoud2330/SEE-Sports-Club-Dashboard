@@ -676,13 +676,7 @@ const injOrExpectedCount = useMemo(
         <br />
 
         <h1 className="pgtitle">
-          {currentTeam.name} Details{" "}
-          {injOrExpectedCount > 0 && (
-            <span className="injbadge" title={`${injOrExpectedCount} injured or expected injury`}>
-              <span className="injbadge__num">{injOrExpectedCount}</span>
-              <AlertTriangle size={18} className="injbadge__icon" />
-            </span>
-          )}
+          {currentTeam.name} {" "}           
         </h1>
 
         <p className="pgsubtitle">Detailed view of {currentTeam.name} performance, player roster, and statistics.</p>
