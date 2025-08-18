@@ -1,6 +1,6 @@
 [
     {
-      "playerId": 1,
+      "playerId": 12,
       "status": "at-risk",
       "riskScore": 0.72,
       "confidence": 0.68,
@@ -14,7 +14,7 @@
       "notes": "Intensity spiked ~30% while recovery dropped over the last 2 weeks."
     },
     {
-      "playerId": 2,
+      "playerId": 12,
       "status": "injured",
       "riskScore": 1.0,
       "confidence": 0.82,

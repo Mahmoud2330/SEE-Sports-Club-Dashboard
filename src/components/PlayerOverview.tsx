@@ -6,6 +6,7 @@ import SkillsDevelopmentAnalysis from './SkillsDevelopmentAnalysis';
 import PhysicalPerformance from './PhysicalPerformance';
 import PerformanceChart from './PerformanceChart';
 import SkillChart from './SkillChart';
+import ChatWidget from './ChatWidget';
 import CustomDatePicker from './CustomDatePicker';
 import { dataService } from '../services/dataService';
 import type { Player } from '../services/dataService';
@@ -220,7 +221,7 @@ const PlayerOverview: React.FC = () => {
   const getCurrentTestData = () => {
     return physicalTestData[activeTest as keyof typeof physicalTestData] || physicalTestData['Vertical Jump'];
   };
-
+  
   return (
     <div className="player-overview">
       {/* Loading State */}
