@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft, Users, Trophy, Heart, Target, Clock, Zap, Circle, Send,
-  Star, Crown, Search as SearchIcon, Download, Share2, Bot, MessageSquare, X
+  Star, Crown, Search as SearchIcon, Download, Share2, Bot, MessageSquare, X, AlertTriangle
 } from "lucide-react";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip,
@@ -43,6 +43,20 @@ type Player = {
   speed: number;
   endurance: number;
   __rank?: number; // computed
+  // joined at runtime:
+  injury?: InjuryRow | null;
+};
+
+type Reason = { code: string; label: string; weight: number };
+type InjuryRow = {
+  playerId: number;
+  status: "healthy" | "injured" | "at-risk";
+  riskScore: number;
+  confidence: number;
+  expectedStart: string | null;
+  expectedEnd: string | null;
+  reasons: Reason[];
+  notes?: string;
 };
 
 /* ================= PHYSICAL & SKILLS CARDS (unchanged UI) ================= */
@@ -107,7 +121,7 @@ const SkillDevelopment: React.FC = () => {
   );
 };
 
-/* ================= PHYSICAL CHART CARD (unchanged logic) ================= */
+/* ================= PHYSICAL CHART CARD ================= */
 
 type DataPoint = { week: string; value: number };
 const weeks = Array.from({ length: 24 }, (_, i) => `W${i + 1}`);
@@ -268,7 +282,7 @@ const PhysicalChartCard: React.FC = () => {
   );
 };
 
-/* ================= SKILLS CHART CARD (unchanged UI/logic) ================= */
+/* ================= SKILLS CHART CARD (unchanged core) ================= */
 
 type SkillPoint = { week: string; value: number };
 const wks = Array.from({ length: 24 }, (_, i) => `W${i + 1}`);
@@ -440,7 +454,7 @@ const SkillsChartCard: React.FC = () => {
   );
 };
 
-/* ================= COACH NOTES (unchanged) ================= */
+/* ================= COACH NOTES ================= */
 
 type Note = { coach: string; category: "Strategy" | "Technique" | "Performance" | "Training"; color: string; date: string; message: string; };
 const coachNotes: Note[] = [
@@ -468,7 +482,7 @@ const CoachNotes: React.FC = () => (
   </section>
 );
 
-/* ================= CHAT WIDGET (unchanged) ================= */
+/* ================= CHAT WIDGET ================= */
 type ChatMsg = { id: number; role: "bot" | "user"; text: string; time?: string };
 const ChatWidget: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -526,6 +540,7 @@ const TeamsPage: React.FC = () => {
   // JSON-backed state
   const [teams, setTeams] = useState<TeamsMap>({});
   const [players, setPlayers] = useState<Player[]>([]);
+  const [injuries, setInjuries] = useState<InjuryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState<string | null>(null);
 
@@ -533,28 +548,33 @@ const TeamsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPosition, setFilterPosition] = useState("all");
   const [rankFilter, setRankFilter] = useState<"all" | "top3" | "top4to10">("all");
+  const [injOnly, setInjOnly] = useState(false);
 
   // pagination
   const PAGE_SIZE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
-  // fetch teams & players JSON once
+  // fetch teams, players, injuries JSON once
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const [tRes, pRes] = await Promise.all([
+        const [tRes, pRes, iRes] = await Promise.all([
           fetch("/data/teams.json"),
-          fetch("/data/players.json")
+          fetch("/data/players.json"),
+          fetch("/data/injuries.json"),
         ]);
         if (!tRes.ok) throw new Error("Unable to load teams.json");
         if (!pRes.ok) throw new Error("Unable to load players.json");
+        if (!iRes.ok) throw new Error("Unable to load injuries.json");
 
         const teamsJson: TeamsMap = await tRes.json();
         const playersJson: Player[] = await pRes.json();
+        const injuriesJson: InjuryRow[] = await iRes.json();
 
         setTeams(teamsJson);
         setPlayers(playersJson);
+        setInjuries(injuriesJson);
       } catch (e: any) {
         setError(e?.message ?? "Failed to load data");
       } finally {
@@ -574,25 +594,49 @@ const TeamsPage: React.FC = () => {
     [players, selectedTeamId]
   );
 
-  // reset page when inputs change
-  useEffect(() => { setCurrentPage(1); }, [searchTerm, filterPosition, rankFilter, selectedTeamId]);
+  // join injuries to players
+  const playersJoined = useMemo<Player[]>(() => {
+    return currentTeamPlayers.map(p => ({
+      ...p,
+      injury: injuries.find(i => i.playerId === p.id) || null
+    }));
+  }, [currentTeamPlayers, injuries]);
 
-  // search + position filter
+  // derived injured/expected count for header + chip badge
+const injOrExpectedCount = useMemo(
+  () =>
+    playersJoined.filter(
+      (p) => p.injury && (p.injury.status === "injured" || p.injury.status === "at-risk")
+    ).length,
+  [playersJoined]
+);
+
+  // reset page when inputs change
+  useEffect(() => { setCurrentPage(1); },
+    [searchTerm, filterPosition, rankFilter, injOnly, selectedTeamId]
+  );
+
+  // search + position + injury filter
   const filteredPlayers = useMemo(() => {
     const s = searchTerm.trim().toLowerCase();
-    return currentTeamPlayers.filter((player) => {
+    return playersJoined.filter((player) => {
       const matchesSearch =
         !s ||
         player.name.toLowerCase().includes(s) ||
         String(player.id).toLowerCase().includes(s) ||
         String(player.year).toLowerCase().includes(s) ||
         (player.team || "").toLowerCase().includes(s);
+
       const matchesPosition =
         filterPosition === "all" ||
         (player.shortPosition || "").toLowerCase() === filterPosition.toLowerCase();
-      return matchesSearch && matchesPosition;
+
+      const matchesInjury =
+      !injOnly || (player.injury?.status === "injured" || player.injury?.status === "at-risk");
+      
+      return matchesSearch && matchesPosition && matchesInjury;
     });
-  }, [currentTeamPlayers, searchTerm, filterPosition]);
+  }, [playersJoined, searchTerm, filterPosition, injOnly]);
 
   // rank calculation + rank filter
   const rankedPlayers = useMemo(() => {
@@ -621,9 +665,7 @@ const TeamsPage: React.FC = () => {
 
   // Normalize the tier to avoid case/spacing issues
   const canShowChat =
-  ["PLATINUM", "PREMIUM"].includes((currentTeam?.tier || "").toUpperCase());
-
-
+    ["PLATINUM", "PREMIUM"].includes((currentTeam?.tier || "").toUpperCase());
 
   return (
     <main className="teams-page">
@@ -633,7 +675,16 @@ const TeamsPage: React.FC = () => {
         </button>
         <br />
 
-        <h1 className="pgtitle">{currentTeam.name} Details</h1>
+        <h1 className="pgtitle">
+          {currentTeam.name} Details{" "}
+          {injOrExpectedCount > 0 && (
+            <span className="injbadge" title={`${injOrExpectedCount} injured or expected injury`}>
+              <span className="injbadge__num">{injOrExpectedCount}</span>
+              <AlertTriangle size={18} className="injbadge__icon" />
+            </span>
+          )}
+        </h1>
+
         <p className="pgsubtitle">Detailed view of {currentTeam.name} performance, player roster, and statistics.</p>
 
         <section className="card">
@@ -646,6 +697,16 @@ const TeamsPage: React.FC = () => {
             </div>
 
             <div className="card__actions">
+              {/* NEW: Injured filter */}
+              <button
+                className={`chip chip--danger ${injOnly ? "is-active" : ""}`}
+                onClick={() => setInjOnly(v => !v)}
+                title="Show only currently injured or expected-injury players"
+              >
+                <AlertTriangle size={14} />
+                <span>Injured / Expected</span>
+                {injOrExpectedCount > 0 && <span className="chip__badge">{injOrExpectedCount}</span>}
+              </button>
               <button
                 className={`chip chip--gold ${rankFilter === 'top3' ? 'is-active' : ''}`}
                 onClick={() => setRankFilter(prev => (prev === 'top3' ? 'all' : 'top3'))}
@@ -716,8 +777,16 @@ const TeamsPage: React.FC = () => {
                           <img src={player.profilePicture || athleteImage} alt={player.name} />
                         </div>
                         <div className="pstack__meta">
-                          <div className="pname">{player.name}</div>
-                          <div className="psub muted tiny">#{player.jerseyNumber} • {player.position}</div>
+                        <div className="pname">
+                          {player.name}
+                          {player.injury?.status === "injured" && (
+                            <span className="pill pill--danger tinyml">Injured</span>
+                          )}
+                          {player.injury?.status === "at-risk" && (
+                            <span className="pill pill--warn tinyml">Expected Injury</span>
+                          )}
+                        </div>
+                        <div className="psub muted tiny">#{player.jerseyNumber} • {player.position}</div>
                         </div>
                       </div>
                     </td>
@@ -760,7 +829,6 @@ const TeamsPage: React.FC = () => {
             </div>
           </div>
         </section>
-        
 
         <br />
         <div><PhysicalPerformance /></div>

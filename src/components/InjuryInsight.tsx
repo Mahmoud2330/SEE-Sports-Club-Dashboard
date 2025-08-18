@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import injuries from "../data/injuries.json"; // requires tsconfig: resolveJsonModule: true
+import injuries from "../public/data/injuries.json"; // requires tsconfig: resolveJsonModule: true
 
 type Reason = { code: string; label: string; weight: number };
 type InjuryRow = {
