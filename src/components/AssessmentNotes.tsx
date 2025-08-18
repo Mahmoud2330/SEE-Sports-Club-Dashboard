@@ -46,7 +46,7 @@ const AssessmentNotes: React.FC<AssessmentNotesProps> = ({ teamTier }) => {
                     Assessment Notes
                   </h2>
                   <div className="text-dashboard-text-muted text-sm">
-                    Detailed observations for each assessment category
+                    Detailed observations
                   </div>
                 </div>
               </div>
