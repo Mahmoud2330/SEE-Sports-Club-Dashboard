@@ -1,6 +1,7 @@
+// src/pages/TeamsPage.tsx
 import React, { useState, useMemo, useEffect } from "react";
 import {
-  ArrowLeft, Users, Trophy, Heart, Target, Clock, Zap, Circle, Send,
+  ArrowLeft, Users, Target, Clock, Zap, Circle, Send,
   Star, Crown, Search as SearchIcon, Download, Share2, Bot, MessageSquare, X, AlertTriangle
 } from "lucide-react";
 import {
@@ -25,6 +26,18 @@ type TeamRec = {
 };
 type TeamsMap = Record<string, TeamRec>;
 
+type Reason = { code: string; label: string; weight: number };
+type InjuryRow = {
+  playerId: number;
+  status: "healthy" | "injured" | "at-risk";
+  riskScore: number;
+  confidence: number;
+  expectedStart: string | null;
+  expectedEnd: string | null;
+  reasons: Reason[];
+  notes?: string;
+};
+
 type Player = {
   id: number;
   name: string;
@@ -43,23 +56,10 @@ type Player = {
   speed: number;
   endurance: number;
   __rank?: number; // computed
-  // joined at runtime:
-  injury?: InjuryRow | null;
+  injury?: InjuryRow | null; // joined at runtime
 };
 
-type Reason = { code: string; label: string; weight: number };
-type InjuryRow = {
-  playerId: number;
-  status: "healthy" | "injured" | "at-risk";
-  riskScore: number;
-  confidence: number;
-  expectedStart: string | null;
-  expectedEnd: string | null;
-  reasons: Reason[];
-  notes?: string;
-};
-
-/* ================= PHYSICAL & SKILLS CARDS (unchanged UI) ================= */
+/* ================= SMALL CARDS ================= */
 
 const PhysicalPerformance: React.FC = () => {
   const performanceMetrics = [
@@ -121,47 +121,80 @@ const SkillDevelopment: React.FC = () => {
   );
 };
 
+/* ================= REUSABLE SCROLLABLE SEGMENTED TABS ================= */
+
+type SegItem<T extends string> = { key: T; label: string };
+type SegProps<T extends string> = {
+  items: Array<SegItem<T>>;
+  value: T;
+  onChange: (v: T) => void;
+  variant: "phys" | "skill";
+};
+
+function SegmentedTabs<T extends string>({ items, value, onChange, variant }: SegProps<T>) {
+  return (
+    <div className={`seg seg--${variant}`} role="tablist" aria-label={`${variant} metric selector`}>
+      <div className="seg__rail">
+        {items.map((it) => (
+          <button
+            key={it.key}
+            role="tab"
+            aria-selected={value === it.key}
+            className={`seg__tab ${value === it.key ? "is-active" : ""}`}
+            onClick={() => onChange(it.key)}
+            title={it.label}
+          >
+            {it.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ================= PHYSICAL CHART CARD ================= */
-  
-  type DataPoint = { week: string; value: number };
-  const weeks = Array.from({ length: 24 }, (_, i) => `W${i + 1}`);
-  
+
+type DataPoint = { week: string; value: number };
+const weeks = Array.from({ length: 24 }, (_, i) => `W${i + 1}`);
+
 const dataFiveTenFive: DataPoint[] = weeks.map((w, i) => ({ week: w, value: 3.9 + Math.sin(i / 5) * 0.15 + (i % 3) * 0.03 }));
 const dataBroadJump:  DataPoint[] = weeks.map((w, i) => ({ week: w, value: 240 + Math.sin(i / 4) * 12 + (i % 4) * 2 }));
 const dataTAgility:   DataPoint[] = weeks.map((w, i) => ({ week: w, value: 9.3 + Math.sin(i / 6) * 0.25 + (i % 5) * 0.02 }));
 const dataVJump:      DataPoint[] = weeks.map((w, i) => ({ week: w, value: 230 + Math.sin(i / 6) * 12 + (i % 4) * 2 }));
 const data10MRun:     DataPoint[] = weeks.map((w, i) => ({ week: w, value: 8.1 + Math.sin(i / 6) * 0.25 + (i % 5) * 0.02 }));
-  
-  const metricUnits: Record<string, string> = {
-  fiveTenFive: "s", broadJump: "cm", tAgility: "s", verticalJump: "cm", tenMRun: "s",
-  };
-  const metricLabel: Record<string, string> = {
-  fiveTenFive: "Five Ten Five", broadJump: "Broad Jump", tAgility: "T-Agility", verticalJump: "Vertical Jump", tenMRun: "10M Run",
-  };
-  const seriesMap: Record<string, DataPoint[]> = {
-  fiveTenFive: dataFiveTenFive, broadJump: dataBroadJump, tAgility: dataTAgility, verticalJump: dataVJump, tenMRun: data10MRun,
-  };
-  
-  const PhysicalChartCard: React.FC = () => {
-  const [metric, setMetric] = useState<"fiveTenFive" | "broadJump" | "tAgility" | "verticalJump" | "tenMRun">("fiveTenFive");
-    const [range, setRange] = useState<"3m" | "6m" | "all">("6m");
-    const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
-    const PcActiveDot = (props: any) => {
-      const { cx, cy } = props;
-      return (
-        <g>
-          <circle cx={cx} cy={cy} r={6} fill="#7BFFBA" />
-          <circle cx={cx} cy={cy} r={6} fill="none" stroke="#000" strokeWidth={3} />
-        </g>
-      );
-    };
+const metricUnits: Record<string, string> = {
+  fiveTenFive: "s", broadJump: "cm", tAgility: "s", verticalJump: "cm", tenMRun: "s",
+};
+const metricLabel: Record<string, string> = {
+  fiveTenFive: "Five Ten Five", broadJump: "Broad Jump", tAgility: "T-Agility", verticalJump: "Vertical Jump", tenMRun: "10M Run",
+};
+const seriesMap: Record<string, DataPoint[]> = {
+  fiveTenFive: dataFiveTenFive, broadJump: dataBroadJump, tAgility: dataTAgility, verticalJump: dataVJump, tenMRun: data10MRun,
+};
+
+const PhysicalChartCard: React.FC = () => {
+  const [metric, setMetric] = useState<"fiveTenFive" | "broadJump" | "tAgility" | "verticalJump" | "tenMRun">("fiveTenFive");
+  const [range, setRange] = useState<"3m" | "6m" | "all">("6m");
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  const PcActiveDot = (props: any) => {
+    const { cx, cy } = props;
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={6} fill="#7BFFBA" />
+        <circle cx={cx} cy={cy} r={6} fill="none" stroke="#000" strokeWidth={3} />
+      </g>
+    );
+  };
+
   const full = seriesMap[metric];
   const displayData = useMemo(() => {
     if (range === "3m") return full.slice(-12);
     if (range === "6m") return full.slice(-24);
     return full;
   }, [full, range]);
+
   const avg = displayData.reduce((s, d) => s + d.value, 0) / (displayData.length || 1);
   const current = displayData[displayData.length - 1]?.value ?? 0;
   const best = metric === "broadJump"
@@ -169,52 +202,58 @@ const data10MRun:     DataPoint[] = weeks.map((w, i) => ({ week: w, value: 8.1 +
     : Math.min(...displayData.map((d) => d.value));
   const unit = metricUnits[metric];
 
-    const PcTooltip = ({ active, label, payload }: any) => {
-      if (!active || !payload?.length) return null;
-      const v = payload[0].value as number;
+  const PcTooltip = ({ active, label, payload }: any) => {
+    if (!active || !payload?.length) return null;
+    const v = payload[0].value as number;
     const good = metric === "broadJump" ? v >= avg : v <= avg;
-      return (
-        <div className="pc-tooltip">
+    return (
+      <div className="pc-tooltip">
         <div className="pc-t__row pc-t__head"><span className="pc-dot" /><span className="pc-t__week">{label}</span></div>
-          <div className="pc-t__metric">{metricLabel[metric]}</div>
+        <div className="pc-t__metric">{metricLabel[metric]}</div>
         <div className="pc-t__value">{v.toFixed(2)} <span className="pc-unit">{unit}</span></div>
         <div className="pc-t__row"><span className="pc-t__label">Performance</span>
           <span className={`pc-chip ${good ? "pc-chip--good" : "pc-chip--bad"}`}>{good ? "Good" : "Below Avg"}</span>
-          </div>
         </div>
-      );
-    };
-  
-    return (
-      <section className="physchart card">
-        <div className="physchart__head" style={{marginTop:"2%"}}>
-          <div>
-            <h2 className="physchart__title">Physical Chart</h2>
-            <p className="muted tiny">Track physical performance metrics over time</p>
-          </div>
-          <div className="physchart__ranges">
-            {[
-              { key: "3m", label: "3 Months" },
-              { key: "6m", label: "6 Months" },
-              { key: "all", label: "All Time" },
-            ].map((r) => (
+      </div>
+    );
+  };
+
+  return (
+    <section className="physchart card">
+      <div className="physchart__head" style={{marginTop:"2%"}}>
+        <div>
+          <h2 className="physchart__title">Physical Chart</h2>
+          <p className="muted tiny">Track physical performance metrics over time</p>
+        </div>
+        <div className="physchart__ranges">
+          {[
+            { key: "3m", label: "3 Months" },
+            { key: "6m", label: "6 Months" },
+            { key: "all", label: "All Time" },
+          ].map((r) => (
             <button key={r.key} className={`pill ${range === r.key ? "is-active" : ""}`} onClick={() => setRange(r.key as any)}>
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-  
-        <div className="physchart__tabs ">
-        {(["fiveTenFive", "broadJump", "tAgility" , "verticalJump", "tenMRun"] as const).map((k) => (
-          <button key={k} onClick={() => setMetric(k)} className={`tab ${metric === k ? "is-active" : ""}`}>
-              {metricLabel[k]}
+              {r.label}
             </button>
           ))}
         </div>
-  
-        <div className="physchart__grid">
-          <div className="physchart__canvas">
+      </div>
+
+      {/* SCROLLABLE "breadcrumbs" tabs (tablet + mobile) */}
+      <SegmentedTabs
+        variant="phys"
+        items={[
+          { key: "fiveTenFive", label: metricLabel.fiveTenFive },
+          { key: "broadJump",   label: metricLabel.broadJump },
+          { key: "tAgility",    label: metricLabel.tAgility },
+          { key: "verticalJump",label: metricLabel.verticalJump },
+          { key: "tenMRun",     label: metricLabel.tenMRun },
+        ]}
+        value={metric}
+        onChange={(v) => setMetric(v)}
+      />
+
+      <div className="physchart__grid">
+        <div className="physchart__canvas">
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart
               data={displayData}
@@ -238,51 +277,52 @@ const data10MRun:     DataPoint[] = weeks.map((w, i) => ({ week: w, value: 8.1 +
             </AreaChart>
           </ResponsiveContainer>
 
-            <div className="pc-overlay">
+          <div className="pc-overlay">
             <div className="pc-badge"><span className="pc-bullet" /> Live Data</div>
-              <div className="pc-avg">Avg: {avg.toFixed(2)} {unit}</div>
-            </div>
+            <div className="pc-avg">Avg: {avg.toFixed(2)} {unit}</div>
           </div>
-  
-          <div className="physchart__side">
-            <div className="sidecard">
+        </div>
+
+        {/* This side box is retained: "Current Team Average 3.96 s — Based on 24 weeks" */}
+        <div className="physchart__side">
+          <div className="sidecard">
             <div className="sidecard__title">Current Team Average</div>
             <div className="sidecard__value">{avg.toFixed(2)} {unit}</div>
-              <div className="muted tiny">Based on {displayData.length} weeks</div>
-            </div>
+            <div className="muted tiny">Based on {displayData.length} weeks</div>
           </div>
         </div>
-  
-        <div className="physchart__bottom">
-          <div className="mcard">
-            <div className="mcard__label">Current</div>
-            <div className="mcard__value">{current.toFixed(2)} {unit}</div>
-            <span className="dot dot--green" />
-          </div>
-          <div className="mcard mcard--purple">
-            <div className="mcard__label">Best</div>
-            <div className="mcard__value">{best.toFixed(2)} {unit}</div>
-            <span className="dot dot--violet" />
-          </div>
-          <div className="mcard mcard--amber">
-            <div className="mcard__label">Trend</div>
-            <div className="mcard__value">
-              {(() => {
-                const idx = Math.max(0, displayData.length - 5);
-                const base = displayData[idx]?.value ?? current;
-                const pct = base ? ((current - base) / base) * 100 : 0;
-                const sign = pct >= 0 ? "+" : "";
-                return `${sign}${pct.toFixed(1)}%`;
-            })()} <span className="muted tiny">vs last month</span>
-            </div>
-            <span className="dot dot--amber" />
-          </div>
-        </div>
-      </section>
-    );
-  };
+      </div>
 
-/* ================= SKILLS CHART CARD (unchanged core) ================= */
+      <div className="physchart__bottom">
+        <div className="mcard">
+          <div className="mcard__label">Current</div>
+          <div className="mcard__value">{current.toFixed(2)} {unit}</div>
+          <span className="dot dot--green" />
+        </div>
+        <div className="mcard mcard--purple">
+          <div className="mcard__label">Best</div>
+          <div className="mcard__value">{best.toFixed(2)} {unit}</div>
+          <span className="dot dot--violet" />
+        </div>
+        <div className="mcard mcard--amber">
+          <div className="mcard__label">Trend</div>
+          <div className="mcard__value">
+            {(() => {
+              const idx = Math.max(0, displayData.length - 5);
+              const base = displayData[idx]?.value ?? current;
+              const pct = base ? ((current - base) / base) * 100 : 0;
+              const sign = pct >= 0 ? "+" : "";
+              return `${sign}${pct.toFixed(1)}%`;
+            })()} <span className="muted tiny">vs last month</span>
+          </div>
+          <span className="dot dot--amber" />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ================= SKILLS CHART CARD ================= */
 
 type SkillPoint = { week: string; value: number };
 const wks = Array.from({ length: 24 }, (_, i) => `W${i + 1}`);
@@ -321,30 +361,30 @@ const SkillsChartCard: React.FC = () => {
   ];
   const label = metric === "passing" ? "Passing" : metric === "running" ? "Running with ball" : metric === "oneVone" ? "1V1" : metric === "shooting" ? "Shooting" : "Control";
 
-const ScActiveDot = (props: any) => {
-  const { cx, cy } = props;
-  return (
-    <g>
+  const ScActiveDot = (props: any) => {
+    const { cx, cy } = props;
+    return (
+      <g>
         <circle cx={cx} cy={cy} r={6}  fill="#7c4dff" />
-      <circle cx={cx} cy={cy} r={10} fill="none" stroke="#24173a" strokeWidth={6} />
-    </g>
-  );
-};
-const ScTooltip = ({ active, label, payload }: any) => {
-  if (!active || !payload?.length) return null;
-  const v = payload[0].value as number;
+        <circle cx={cx} cy={cy} r={10} fill="none" stroke="#24173a" strokeWidth={6} />
+      </g>
+    );
+  };
+  const ScTooltip = ({ active, label, payload }: any) => {
+    if (!active || !payload?.length) return null;
+    const v = payload[0].value as number;
     const good = v >= avg;
-  return (
-    <div className="sc-tooltip">
+    return (
+      <div className="sc-tooltip">
         <div className="sc-t__head"><span className="sc-dot" /> <span className="sc-week">{label}</span></div>
-      <div className="sc-metric">{label === "W15" ? "Passing" : "Passing"}</div>
+        <div className="sc-metric">{label === "W15" ? "Passing" : "Passing"}</div>
         <div className="sc-value">{v.toFixed(1)} <span className="sc-outof">/10</span></div>
         <div className="sc-row"><span className="sc-label">Rating</span>
           <span className={`sc-chip ${good ? "sc-chip--good" : "sc-chip--bad"}`}>{good ? "Good" : "Below Avg"}</span>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   return (
     <section className="skillchart card">
@@ -366,13 +406,19 @@ const ScTooltip = ({ active, label, payload }: any) => {
         </div>
       </div>
 
-      <div className="skillchart__tabs">
-        {(["passing", "running", "control", "shooting", "oneVone" ] as const).map((k) => (
-          <button key={k} onClick={() => setMetric(k)} className={`stab ${metric === k ? "is-active" : ""}`}>
-            {k === "running" ? "Running with ball" : k === "oneVone" ? "1v1" : k[0].toUpperCase() + k.slice(1)}
-          </button>
-        ))}
-      </div>
+      {/* SCROLLABLE "breadcrumbs" tabs (tablet + mobile) */}
+      <SegmentedTabs
+        variant="skill"
+        items={[
+          { key: "passing", label: "Passing" },
+          { key: "running", label: "Running with ball" },
+          { key: "control", label: "Control" },
+          { key: "shooting", label: "Shooting" },
+          { key: "oneVone", label: "1v1" },
+        ]}
+        value={metric}
+        onChange={(v) => setMetric(v)}
+      />
 
       <div className="skillchart__grid">
         <div className="scard scard--left">
@@ -382,18 +428,31 @@ const ScTooltip = ({ active, label, payload }: any) => {
         </div>
 
         <div className="donut">
-          <PieChart width={520} height={320}>
-            <defs>
-              <linearGradient id="sgPurple" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#7c4dff" />
-                <stop offset="100%" stopColor="#932bff" />
-              </linearGradient>
-            </defs>
-            <Pie data={donut} dataKey="value" innerRadius={100} outerRadius={140} startAngle={90} endAngle={-270} stroke="none">
-              <Cell key="score" fill="url(#sgPurple)" />
-              <Cell key="rest"  fill="#221b33" />
-            </Pie>
-          </PieChart>
+          <div className="donut__rc">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <defs>
+                  <linearGradient id="sgPurple" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#7c4dff" />
+                    <stop offset="100%" stopColor="#932bff" />
+                  </linearGradient>
+                </defs>
+                <Pie
+                  data={donut}
+                  dataKey="value"
+                  innerRadius={100}
+                  outerRadius={140}
+                  startAngle={90}
+                  endAngle={-270}
+                  stroke="none"
+                >
+                  <Cell key="score" fill="url(#sgPurple)" />
+                  <Cell key="rest"  fill="#221b33" />
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
           <div className="donut__center">
             <div className="donut__value">{current.toFixed(1)}</div>
             <div className="donut__sub">out of 10</div>
@@ -402,28 +461,28 @@ const ScTooltip = ({ active, label, payload }: any) => {
         </div>
 
         <div className="skillchart__spark">
-        <ResponsiveContainer width="100%" height={220}>
-          <AreaChart
-            data={displayData}
-            margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
-            onMouseMove={(s: any) => setSActiveIdx(s?.activeTooltipIndex ?? null)}
-            onMouseLeave={() => setSActiveIdx(null)}
-          >
-            <defs>
-              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7c4dff" stopOpacity={0.45} />
-                <stop offset="100%" stopColor="#7c4dff" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            {sActiveIdx !== null && displayData[sActiveIdx] && (
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart
+              data={displayData}
+              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+              onMouseMove={(s: any) => setSActiveIdx(s?.activeTooltipIndex ?? null)}
+              onMouseLeave={() => setSActiveIdx(null)}
+            >
+              <defs>
+                <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#7c4dff" stopOpacity={0.45} />
+                  <stop offset="100%" stopColor="#7c4dff" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              {sActiveIdx !== null && displayData[sActiveIdx] && (
                 <ReferenceLine x={displayData[sActiveIdx].week} stroke="#7c4dff" strokeDasharray="4 8" strokeOpacity={0.75} />
               )}
-            <XAxis dataKey="week" tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
-            <YAxis domain={[0, 10]} tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
-            <Tooltip content={<ScTooltip />} />
+              <XAxis dataKey="week" tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
+              <YAxis domain={[0, 10]} tick={{ fill: "#a6a6ae" }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ScTooltip />} />
               <Area type="monotone" dataKey="value" stroke="#7c4dff" strokeWidth={3} fill="url(#sparkGrad)" dot={false} activeDot={<ScActiveDot />} />
-          </AreaChart>
-        </ResponsiveContainer>
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
@@ -459,27 +518,27 @@ const ScTooltip = ({ active, label, payload }: any) => {
 type Note = { coach: string; category: "Strategy" | "Technique" | "Performance" | "Training"; color: string; date: string; message: string; };
 const coachNotes: Note[] = [
   { coach: "Hassan Ali",  category: "Strategy",   color: "#ff4d57", date: "Aug 9, 2025",  message:"Need to focus more on defensive positioning in the upcoming training sessions." },
-  { coach: "Hassan Ali", category: "Technique",  color: "#f4c531", date: "Jul 31, 2025", message:"Players demonstrated strong teamwork and communication throughout the match." },
+  { coach: "Hassan Ali",  category: "Technique",  color: "#f4c531", date: "Jul 31, 2025", message:"Players demonstrated strong teamwork and communication throughout the match." },
   { coach: "Hassan Ali",  category: "Performance",color: "#7c4dff", date: "Jul 24, 2025", message:"Fitness levels are improving consistently across all players." },
-  { coach: "Hassan Ali", category: "Training",   color: "#33d17a", date: "Jul 17, 2025", message:"Tactical awareness needs improvement when transitioning from defense to attack." },
+  { coach: "Hassan Ali",  category: "Training",   color: "#33d17a", date: "Jul 17, 2025", message:"Tactical awareness needs improvement when transitioning from defense to attack." },
 ];
 
 const CoachNotes: React.FC = () => (
-    <section className="coachnotes">
-      <div className="cnotes__header">
-        <h2 className="cnotes__title">Coach Notes</h2>
-        <span className="badge badge--danger">{coachNotes.length}</span>
-      </div>
-      <ul className="cnotes__list">
-        {coachNotes.map((n, i) => (
-          <li key={i} className="cnotes__item">
+  <section className="coachnotes">
+    <div className="cnotes__header">
+      <h2 className="cnotes__title">Coach Notes</h2>
+      <span className="badge badge--danger">{coachNotes.length}</span>
+    </div>
+    <ul className="cnotes__list">
+      {coachNotes.map((n, i) => (
+        <li key={i} className="cnotes__item">
           <div className="cnotes__top"><span className="cnotes__coach">{n.coach}</span><time className="cnotes__date">{n.date}</time></div>
           <div className="cnotes__catrow"><span className="cnotes__swatch" style={{ background: n.color }} /><span className="cnotes__cat">{n.category}</span></div>
           <p className="cnotes__text">{n.message}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+        </li>
+      ))}
+    </ul>
+  </section>
 );
 
 /* ================= CHAT WIDGET ================= */
@@ -546,7 +605,7 @@ const TeamsPage: React.FC = () => {
 
   // UI state
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterPosition, setFilterPosition] = useState("all");
+  const [filterPosition] = useState("all");
   const [rankFilter, setRankFilter] = useState<"all" | "top3" | "top4to10">("all");
   const [injOnly, setInjOnly] = useState(false);
 
@@ -603,17 +662,17 @@ const TeamsPage: React.FC = () => {
   }, [currentTeamPlayers, injuries]);
 
   // derived injured/expected count for header + chip badge
-const injOrExpectedCount = useMemo(
-  () =>
-    playersJoined.filter(
-      (p) => p.injury && (p.injury.status === "injured" || p.injury.status === "at-risk")
-    ).length,
-  [playersJoined]
-);
+  const injOrExpectedCount = useMemo(
+    () =>
+      playersJoined.filter(
+        (p) => p.injury && (p.injury.status === "injured" || p.injury.status === "at-risk")
+      ).length,
+    [playersJoined]
+  );
 
   // reset page when inputs change
   useEffect(() => { setCurrentPage(1); },
-    [searchTerm, filterPosition, rankFilter, injOnly, selectedTeamId]
+    [searchTerm, rankFilter, injOnly, selectedTeamId]
   );
 
   // search + position + injury filter
@@ -627,35 +686,31 @@ const injOrExpectedCount = useMemo(
         String(player.year).toLowerCase().includes(s) ||
         (player.team || "").toLowerCase().includes(s);
 
-      const matchesPosition =
-        filterPosition === "all" ||
-        (player.shortPosition || "").toLowerCase() === filterPosition.toLowerCase();
-
       const matchesInjury =
-      !injOnly || (player.injury?.status === "injured" || player.injury?.status === "at-risk");
-      
-      return matchesSearch && matchesPosition && matchesInjury;
+        !injOnly || (player.injury?.status === "injured" || player.injury?.status === "at-risk");
+
+      return matchesSearch && matchesInjury;
     });
-  }, [playersJoined, searchTerm, filterPosition, injOnly]);
+  }, [playersJoined, searchTerm, injOnly]);
 
   // rank calculation + rank filter
-const rankedPlayers = useMemo(() => {
+  const rankedPlayers = useMemo(() => {
     const arr = [...filteredPlayers].sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0));
     return arr.map((p, i) => ({ ...p, __rank: i + 1 }));
-}, [filteredPlayers]);
+  }, [filteredPlayers]);
 
-const rankFilteredPlayers = useMemo(() => {
+  const rankFilteredPlayers = useMemo(() => {
     if (rankFilter === "top3") return rankedPlayers.slice(0, 3);
     if (rankFilter === "top4to10") return rankedPlayers.slice(3, 10);
-  return rankedPlayers;
-}, [rankFilter, rankedPlayers]);
+    return rankedPlayers;
+  }, [rankFilter, rankedPlayers]);
 
   // pagination math
-const totalPlayers = rankFilteredPlayers.length;
-const totalPages  = Math.max(1, Math.ceil(totalPlayers / PAGE_SIZE));
-const startIndex  = (currentPage - 1) * PAGE_SIZE;
-const endIndex    = Math.min(startIndex + PAGE_SIZE, totalPlayers);
-const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
+  const totalPlayers = rankFilteredPlayers.length;
+  const totalPages  = Math.max(1, Math.ceil(totalPlayers / PAGE_SIZE));
+  const startIndex  = (currentPage - 1) * PAGE_SIZE;
+  const endIndex    = Math.min(startIndex + PAGE_SIZE, totalPlayers);
+  const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
 
   const goPrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const goNext = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
@@ -676,7 +731,13 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
         <br />
 
         <h1 className="pgtitle">
-          {currentTeam.name} {" "}           
+          {currentTeam.name}
+          {injOrExpectedCount > 0 && (
+            <span className="injbadge" title={`${injOrExpectedCount} injured or expected injury`}>
+              <span className="injbadge__icon"><AlertTriangle size={18} /></span>
+              <span className="injbadge__num">{injOrExpectedCount}</span>
+            </span>
+          )}
         </h1>
 
         <p className="pgsubtitle">Detailed view of {currentTeam.name} performance, player roster, and statistics.</p>
@@ -691,7 +752,6 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
             </div>
 
             <div className="card__actions">
-              {/* NEW: Injured filter */}
               <button
                 className={`chip chip--danger ${injOnly ? "is-active" : ""}`}
                 onClick={() => setInjOnly(v => !v)}
@@ -724,17 +784,17 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
 
           <div className="toolbar">
             <div className="search">
-            <SearchIcon size={16} className="search__icon" />
-            <input
-              className="search__input"
-              placeholder="Search players by name, ID, year, or team..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+              <SearchIcon size={16} className="search__icon" />
+              <input
+                className="search__input"
+                placeholder="Search players by name, ID, year, or team..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
               {searchTerm && (
                 <button className="search__clear" onClick={() => setSearchTerm("")} aria-label="Clear search">×</button>
               )}
-          </div>
+            </div>
           </div>
 
           <div className="tablewrap tablewrap--scroll">
@@ -771,16 +831,16 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
                           <img src={player.profilePicture || athleteImage} alt={player.name} />
                         </div>
                         <div className="pstack__meta">
-                        <div className="pname">
-                          {player.name}
-                          {player.injury?.status === "injured" && (
-                            <span className="pill pill--danger tinyml">Injured</span>
-                          )}
-                          {player.injury?.status === "at-risk" && (
-                            <span className="pill pill--warn tinyml">Expected Injury</span>
-                          )}
+                          <div className="pname">
+                            {player.name}
+                            {player.injury?.status === "injured" && (
+                              <span className="pill pill--danger tinyml">Injured</span>
+                            )}
+                            {player.injury?.status === "at-risk" && (
+                              <span className="pill pill--warn tinyml">Expected Injury</span>
+                            )}
                           </div>
-                        <div className="psub muted tiny">#{player.jerseyNumber} • {player.position}</div>
+                          <div className="psub muted tiny">#{player.jerseyNumber} • {player.position}</div>
                         </div>
                       </div>
                     </td>
@@ -836,7 +896,6 @@ const pagePlayers = rankFilteredPlayers.slice(startIndex, endIndex);
         <div><CoachNotes /></div>
 
         {canShowChat && <ChatWidget />}
-      
       </div>
     </main>
   );
