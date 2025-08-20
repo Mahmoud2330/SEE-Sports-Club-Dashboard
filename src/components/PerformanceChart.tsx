@@ -314,20 +314,15 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ playerName = 'Ahmed
                 </linearGradient>
               </defs>
 
-              <Area
-                type="monotone"
-                dataKey="ahmed"
-                stroke="none"
-                fill={`url(#${gradientId})`}
-                stackId="1"
-              />
-
-              <Line 
+                <Area
                 type="monotone" 
                 dataKey="ahmed" 
                 stroke={getCurrentMetricColors().color} 
                 strokeWidth={2}
+                recharts-wrapper
                 dot={{ fill: getCurrentMetricColors().color, strokeWidth: 2, r: 4 }}
+                fill={`url(#${gradientId})`}
+
               />
               <Line 
                 type="monotone" 

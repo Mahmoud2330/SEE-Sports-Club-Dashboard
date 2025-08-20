@@ -304,19 +304,14 @@ const SkillChart: React.FC<SkillChartProps> = ({ playerName = 'Ahmed Mohamed' })
                   <stop offset="70%" stopColor={getCurrentSkillColors().color} stopOpacity={0.05} />
                 </linearGradient>
               </defs>
-              <Area
-                type="monotone"
-                dataKey="ballControl"
-                stroke="none"
-                fill={`url(#${gradientId})`}
-                stackId="1"
-              />
+              
 
-              <Line 
+              <Area 
                 type="monotone" 
                 dataKey="ballControl" 
                 stroke={getCurrentSkillColors().color} 
                 strokeWidth={2}
+                fill={`url(#${gradientId})`}
                 dot={{ fill: getCurrentSkillColors().color, strokeWidth: 2, r: 4 }}
               />
               <Line 
