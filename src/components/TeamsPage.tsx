@@ -732,12 +732,6 @@ const TeamsPage: React.FC = () => {
 
         <h1 className="pgtitle">
           {currentTeam.name}
-          {injOrExpectedCount > 0 && (
-            <span className="injbadge" title={`${injOrExpectedCount} injured or expected injury`}>
-              <span className="injbadge__icon"><AlertTriangle size={18} /></span>
-              <span className="injbadge__num">{injOrExpectedCount}</span>
-            </span>
-          )}
         </h1>
 
         <p className="pgsubtitle">Detailed view of {currentTeam.name} performance, player roster, and statistics.</p>
