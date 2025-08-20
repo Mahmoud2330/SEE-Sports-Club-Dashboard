@@ -84,6 +84,74 @@ const PlayerOverview: React.FC = () => {
     navigate(crumb.path);
   };
 
+  // Handle share functionality
+  const handleShare = async () => {
+    try {
+      // Check if Web Share API is supported
+      if (navigator.share) {
+        await navigator.share({
+          title: `${playerData?.name} - Player Profile`,
+          text: `Check out ${playerData?.name}'s performance profile and statistics.`,
+          url: window.location.href
+        });
+      } else {
+        // Fallback: copy URL to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Profile URL copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Fallback: copy URL to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Profile URL copied to clipboard!');
+      } catch (clipboardError) {
+        console.error('Error copying to clipboard:', clipboardError);
+        alert('Unable to share. Please copy the URL manually.');
+      }
+    }
+  };
+
+//   // Handle PDF download functionality
+//   const handleDownloadPDF = () => {
+//     // For now, we'll use a simple approach - in a real app, you'd use a library like jsPDF
+//     // or send a request to the server to generate a PDF
+//     try {
+//       // Create a simple text representation of the player data
+//       const playerInfo = `
+// Player Profile: ${playerData?.name}
+// Team: ${playerData?.team}
+// Position: ${playerData?.position}
+// Overall Score: ${playerData?.totalScore}/100
+// Physical: ${playerData?.physical}/100
+// Skills: ${playerData?.skills}/100
+// Nationality: ${playerData?.nationality}
+// Age: ${playerData?.age}
+// Contract Expiry: ${playerData?.contractExpiry}
+// Market Value: ${playerData?.marketValue}
+
+// Profile URL: ${window.location.href}
+// Generated on: ${new Date().toLocaleDateString()}
+//       `;
+      
+//       // Create and download a text file (as a placeholder for PDF)
+//       const blob = new Blob([playerInfo], { type: 'text/plain' });
+//       const url = URL.createObjectURL(blob);
+//       const a = document.createElement('a');
+//       a.href = url;
+//       a.download = `${playerData?.name?.replace(/\s+/g, '_')}_Profile.txt`;
+//       document.body.appendChild(a);
+//       a.click();
+//       document.body.removeChild(a);
+//       URL.revokeObjectURL(url);
+      
+//       alert('Profile data downloaded! (Note: This is a text file. PDF generation would require additional setup.)');
+//     } catch (error) {
+//       console.error('Error downloading profile:', error);
+//       alert('Unable to download profile. Please try again.');
+//     }
+//   };
+
   // Comprehensive data for each physical test
   const physicalTestData = {
     'Vertical Jump': {
@@ -258,6 +326,18 @@ const PlayerOverview: React.FC = () => {
                   )}
                 </React.Fragment>
               ))}
+            </div>
+            
+            {/* Share Button */}
+            <div className="share-section">
+              <button className="share-btn" onClick={handleShare}>
+                <Share2 size={18} />
+                <span>Share Profile</span>
+              </button>
+              {/* <button className="pdf-btn" onClick={handleDownloadPDF}>
+                <Share2 size={18} />
+                <span>Download PDF</span>
+              </button> */}
             </div>
           </div>
         

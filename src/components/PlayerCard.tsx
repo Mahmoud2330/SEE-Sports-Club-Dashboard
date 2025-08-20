@@ -5,6 +5,7 @@ import athleteImage from "../assets/Player_Pic.png";
 import '../index.css';
 import type { Player } from '../services/dataService';
 
+
 interface PlayerCardProps {
   playerData?: Player;
 }

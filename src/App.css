@@ -816,20 +816,74 @@ body {
 .share-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--db-primary);
-  color: var(--db-white);
+  gap: 0.5rem;
+  background: var(--db-primary);
+  color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .share-btn:hover {
-  background-color: #5220c4;
+  background: #5a1fd8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+.share-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.share-btn svg {
+  flex-shrink: 0;
+}
+
+.share-btn span {
+  white-space: nowrap;
+}
+
+/* .pdf-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--db-gray-700);
+  color: white;
+  border: 1px solid var(--db-gray-600);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: 0.75rem;
+}
+
+.pdf-btn:hover {
+  background: var(--db-gray-600);
+  border-color: var(--db-gray-500);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pdf-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-btn svg {
+  flex-shrink: 0;
+}
+
+.pdf-btn span {
+  white-space: nowrap;
+} */
 
 .user-info {
   display: flex;
@@ -1645,6 +1699,7 @@ body {
   padding: 8px;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  justify-content: space-between;
 }
 
 .skills-tabs::-webkit-scrollbar {
@@ -1660,7 +1715,7 @@ body {
 }
 
 .skill-tab {
-  flex: 0 0 auto;
+  flex: 1;
   background: none;
   border: none;
   color: var(--db-gray-500);
@@ -1671,7 +1726,8 @@ body {
   transition: all 0.2s;
   text-align: center;
   font-size: 14px;
-  min-width: 120px;
+  min-width: 0;
+  max-width: none;
 }
 
 .skill-tab:hover {
@@ -1685,8 +1741,8 @@ body {
 
 /* Ensure tabs maintain proper sizing */
 .skills-tabs .skill-tab {
-  flex: 0 0 auto;
-  min-width: 120px;
+  flex: 1;
+  min-width: 0;
 }
 
 /* ===== ASSESSMENT NOTES STYLES ===== */
@@ -5040,7 +5096,8 @@ body {
     min-width: 0;
     height: 32px;
     font-size: 12px;
-    padding: 6px 12px;
+    padding: 6px 8px;
+    margin: 0 2px;
   }
   
   .skill-progress-card .card-title {
@@ -5123,8 +5180,20 @@ body {
   
   .period-info {
     text-align: center;
-    margin-left: 0;
-    font-size: 11px;
+  }
+  
+  /* Extra small mobile for skills tabs */
+  @media (max-width: 480px) {
+    .skills-tabs {
+      gap: 4px;
+      padding: 6px;
+    }
+    
+    .skill-tab {
+      padding: 4px 6px;
+      font-size: 11px;
+      margin: 0 1px;
+    }
   }
   
   /* Skills Development Analysis Mobile Styles */
@@ -5152,11 +5221,11 @@ body {
   }
   
   .skill-tab {
-    flex: 0 0 auto;
+    flex: 1;
     height: 36px;
     font-size: 13px;
     white-space: nowrap;
-    min-width: 100px;
+    min-width: 0;
     padding: 8px 12px;
   }
   
@@ -6072,6 +6141,55 @@ body {
     font-size: 0.8rem;
     max-width: 100%;
     padding: 0 0.5rem;
+  }
+}
+
+/* ================= SHARE BUTTON RESPONSIVE STYLES ================= */
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .share-section {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .share-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  
+  .share-btn,
+  .pdf-btn {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-bar {
+    gap: 0.75rem;
+  }
+  
+  .share-btn,
+  .pdf-btn {
+    max-width: 180px;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8rem;
+  }
+  
+  .share-btn span,
+  .pdf-btn span {
+    font-size: 0.8rem;
   }
 }
 
