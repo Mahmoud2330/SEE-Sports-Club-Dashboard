@@ -227,11 +227,15 @@ const PhysicalChartCard: React.FC = () => {
         </div>
         <div className="physchart__ranges">
           {[
-            { key: "3m", label: "3 Months" },
-            { key: "6m", label: "6 Months" },
+            { key: "3m",  label: "3 Months" },
+            { key: "6m",  label: "6 Months" },
             { key: "all", label: "All Time" },
           ].map((r) => (
-            <button key={r.key} className={`pill ${range === r.key ? "is-active" : ""}`} onClick={() => setRange(r.key as any)}>
+            <button
+              key={r.key}
+              className={`pill ${range === r.key ? "is-active" : ""}`}
+              onClick={() => setRange(r.key as any)}
+            >
               {r.label}
             </button>
           ))}
@@ -429,7 +433,7 @@ const SkillsChartCard: React.FC = () => {
 
         <div className="donut">
           <div className="donut__rc">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer>
               <PieChart>
                 <defs>
                   <linearGradient id="sgPurple" x1="0" y1="0" x2="1" y2="1">
@@ -440,8 +444,10 @@ const SkillsChartCard: React.FC = () => {
                 <Pie
                   data={donut}
                   dataKey="value"
-                  innerRadius={100}
-                  outerRadius={140}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="58%"      // percentage keeps ring thickness responsive
+                  outerRadius="80%"
                   startAngle={90}
                   endAngle={-270}
                   stroke="none"
@@ -791,8 +797,8 @@ const TeamsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="tablewrap tablewrap--scroll">
-            <table className="table">
+          <div className="tablewrap ">
+            <table className="table table--scroll">
               <thead>
                 <tr>
                   <th>Rank</th>
