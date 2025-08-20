@@ -1696,7 +1696,7 @@ body {
   border-radius: 20px;
   border: 1px solid var(--db-gray-700);
   overflow-x: auto;
-  padding: 0px;
+  padding: 8px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   justify-content: space-between;
@@ -2838,14 +2838,18 @@ body {
 }
 
 .notif-btn{
+  padding-left: 3%; padding-right: 3%;
   position: relative;
   width: 36px; height: 36px;
   border: none; background: transparent; color: var(--db-gray-300);
   border-radius: 8px; cursor: pointer;
+  justify-self: center;
 }
-.notif-btn:hover{ background: var(--db-gray-900); }
+.notif-btn:hover{ background: var(--db-primary); }
 .notif-dot{
-  position: absolute; top: 4px; right: 0px;
+  position: absolute; 
+  top: -10%; 
+  right: -10%;
   width: 10px; height: 10px; background: #e11d48;
   border-radius: 999px;
   animation: pulse 1.4s infinite;
@@ -2867,8 +2871,10 @@ body {
   border: none; background: transparent; color: var(--db-gray-300);
   outline: none; cursor: pointer;
   box-shadow: 0 0 0 2px transparent;
+  padding-left: 3%; padding-right: 3%;
 }
-.avatar-btn:hover{ box-shadow: 0 0 0 2px #6d28d9; }
+.avatar-btn:hover{ box-shadow: 0 0 0 2px var(--db-primary);
+  background: var(--db-primary); }
 .avatar-img{ width: 100%; height: 100%; object-fit: cover; }
 
 @keyframes pulse{

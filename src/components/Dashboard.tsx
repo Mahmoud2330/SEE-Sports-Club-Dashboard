@@ -316,8 +316,6 @@ export default function Dashboard() {
         </section>
       </div>
       
-      {/* Floating chat bot */}
-      <ChatWidget />
     </main>
   );
 }
