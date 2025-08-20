@@ -122,8 +122,6 @@ const MiniDualSpark: React.FC<{ data: { label: string; physical: number; skill: 
             <stop offset="95%" stopColor="#6728f5" stopOpacity={0.03} />
           </linearGradient>
         </defs>
-        <Area type="monotone" dataKey="skill" stroke="none" fill="url(#skillGradient)" fillOpacity={0.6} />
-        <Area type="monotone" dataKey="physical" stroke="none" fill="url(#physicalGradient)" fillOpacity={0.6} />
         <Line type="monotone" dataKey="physical" stroke="#7BFFBA" strokeWidth={3} dot={false} />
         <Line type="monotone" dataKey="skill" stroke="#6728f5" strokeWidth={2.5} dot={false} />
         <Tooltip 

@@ -240,7 +240,7 @@
 .mcard--amber{ background:#2a1f0c; border-color:#3b2b10; }
 .mcard__label{ color:#d0d0d6; margin-bottom:6px; }
 .mcard__value{ font-size:22px; font-weight:800; }
-.dot{ position:absolute; top:12px; right:12px; width:8px; height:8px; border-radius:50%; }
+.dot{ position:absolute; top:2%; right:2.5%; width:8px; height:8px; border-radius:50%; }
 .dot--green{ background:#7BFFBA; } .dot--violet{ background:#6728f5; } .dot--amber{ background:#ffa500; }
 
 /* ===== Skills Chart Card ===== */
@@ -314,7 +314,7 @@
   position:fixed; right:16px; bottom:16px; z-index:60;
   width:56px; height:56px; border-radius:100%;
   border:1px solid #2a1f4a; background:#7c4dff; color:#fff;
-  display:grid; place-items:center; box-shadow:0 10px 28px rgba(0,0,0,.35); cursor:pointer;
+  display:grid; justify-content: center; box-shadow:0 10px 28px rgba(0,0,0,.35); cursor:pointer;
 }
 .chatfab__badge{
   position:absolute; top:-6px; right:-6px; background:#ff3b30; color:#0f0f12;
@@ -332,7 +332,7 @@
 .chat__icon{ width:28px; height:28px; border-radius:8px; display:grid; place-items:center; background:#1b1430; color:#cdbbff; }
 .chat__name{ font-weight:800; }
 .chat__status{ font-size:12px; color:#a6a6ae; display:flex; align-items:center; gap:6px; }
-.chat__actions .chat__btn{ background:transparent; border:1px solid var(--border); color:#c9cad1; width:34px; height:34px; border-radius:8px; display:grid; place-items:center; cursor:pointer; }
+.chat__actions .chat__btn{ background:transparent; border:1px solid var(--border); color:#c9cad1; width:34px; height:34px; border-radius:8px; display:grid; justify-content: center; cursor:pointer; }
 .chat__body{ padding:12px; gap:10px; display:flex; flex-direction:column; overflow:auto; flex:1; background:linear-gradient(180deg,#0f0f12, #0f0f12 60%, #121217); }
 .msg{ max-width:85%; padding:10px 12px; border-radius:12px; font-size:14px; }
 .msg--bot{ background:#191428; border:1px solid #2a1f4a; color:#e7dbff; align-self:flex-start; }
@@ -340,7 +340,7 @@
 .msg__time{ margin-top:4px; font-size:11px; color:#9a9aa3; }
 .chat__foot{ display:flex; gap:8px; padding:10px; border-top:1px solid var(--border); }
 .chat__input{ flex:1; height:40px; border-radius:10px; border:1px solid var(--border); background:#101015; color:#e8e8ea; padding:0 12px; outline:none; }
-.chat__send{ width:40px; height:40px; border-radius:10px; border:1px solid #2a1f4a; background:#7c4dff; color:#fff; display:grid; place-items:center; cursor:pointer; }
+.chat__send{ width:40px; height:40px; border-radius:10px; border:1px solid #2a1f4a; background:#7c4dff; color:#fff; display:grid; justify-content: center; cursor:pointer; }
 
 /* ===== Responsive helpers ===== */
 @media (max-width: 640px){
