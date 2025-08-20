@@ -1,4 +1,15 @@
 // Data service for fetching player and team information from JSON files
+
+// -------- Time-series types (added) --------
+export type MonthKey =
+  | 'Jan' | 'Feb' | 'Mar' | 'Apr' | 'May' | 'Jun'
+  | 'Jul' | 'Aug' | 'Sep' | 'Oct' | 'Nov' | 'Dec';
+
+export interface SeriesByMonth {
+  [seriesName: string]: Record<MonthKey, number>;
+}
+
+// -------- Your existing interfaces (Player extended with optional series) --------
 export interface Player {
   id: number;
   name: string;
@@ -32,6 +43,10 @@ export interface Player {
   dribbling: number;
   defending: number;
   overall: number;
+
+  // Optional time‑series blocks used by charts/progress
+  ['Physical Performance']?: SeriesByMonth;
+  ['Skill Performance']?: SeriesByMonth;
 }
 
 export interface Team {
@@ -66,7 +81,7 @@ class DataService {
   private isLoading = false;
   private error: string | null = null;
 
-  // Fetch data from JSON file
+  // Fetch data from JSON files
   async fetchData(): Promise<DataResponse> {
     if (this.data && !this.isLoading) {
       return this.data;
@@ -83,13 +98,13 @@ class DataService {
       // Fetch both players and teams data from the new location
       const [playersResponse, teamsResponse] = await Promise.all([
         fetch('/data/players.json'),
-        fetch('/data/teams.json')
+        fetch('/data/teams.json'),
       ]);
-      
+
       if (!playersResponse.ok) {
         throw new Error(`Failed to fetch players data: ${playersResponse.status} ${playersResponse.statusText}`);
       }
-      
+
       if (!teamsResponse.ok) {
         throw new Error(`Failed to fetch teams data: ${teamsResponse.status} ${teamsResponse.statusText}`);
       }
@@ -103,13 +118,13 @@ class DataService {
         teams: teamsData,
         metadata: {
           lastUpdated: new Date().toISOString(),
-          version: "1.0.0",
+          version: '1.0.0',
           totalPlayers: playersData.length,
           totalTeams: Object.keys(teamsData).length,
-          dataSource: "SEE Sports Club Database"
-        }
+          dataSource: 'SEE Sports Club Database',
+        },
       };
-      
+
       this.isLoading = false;
       return this.data;
     } catch (err) {
@@ -125,20 +140,20 @@ class DataService {
     return data.players;
   }
 
-  // Get player by ID
+  // Get player by ID (route param as string)
   async getPlayerById(id: string): Promise<Player | undefined> {
     const players = await this.getPlayers();
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
       return undefined;
     }
-    return players.find(player => player.id === numericId);
+    return players.find((player) => player.id === numericId);
   }
 
   // Get players by team ID
   async getPlayersByTeam(teamId: string): Promise<Player[]> {
     const players = await this.getPlayers();
-    return players.filter(player => player.teamId === teamId);
+    return players.filter((player) => player.teamId === teamId);
   }
 
   // Get all teams
@@ -151,7 +166,7 @@ class DataService {
   async fetchTeamsData(): Promise<{ [key: string]: Team }> {
     try {
       const response = await fetch('/data/teams.json');
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch teams data: ${response.status} ${response.statusText}`);
       }
@@ -190,7 +205,7 @@ class DataService {
     return {
       isLoading: this.isLoading,
       error: this.error,
-      hasData: !!this.data
+      hasData: !!this.data,
     };
   }
 
@@ -203,6 +218,36 @@ class DataService {
 
 // Export singleton instance
 export const dataService = new DataService();
-
-// Export default for convenience
 export default dataService;
+
+// -------- Lightweight helpers for charts/progress (added) --------
+
+export function months(): MonthKey[] {
+  return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+}
+
+/** Convert { seriesName: { Jan..Dec } } into [{month, series1, series2, ...}] */
+export function seriesToArray(
+  namedSeries: Record<string, Record<MonthKey, number>> | undefined
+) {
+  const m = months();
+  if (!namedSeries) return m.map((month) => ({ month }));
+  return m.map((month) => {
+    const row: Record<string, number | string> = { month };
+    for (const key of Object.keys(namedSeries)) {
+      row[key] = namedSeries[key]?.[month] ?? 0;
+    }
+    return row;
+  });
+}
+
+/** For a single series {Jan..Dec}: returns current, best, and month‑over‑month change */
+export function currentAndBest(series: Record<MonthKey, number> | undefined) {
+  const m = months();
+  const values = m.map((k) => series?.[k] ?? 0);
+  const current = values[values.length - 1] ?? 0;
+  const prev = values[Math.max(0, values.length - 2)] ?? 0;
+  const best = Math.max(...values);
+  const change = current - prev;
+  return { current, best, change };
+}
