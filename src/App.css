@@ -1696,7 +1696,7 @@ body {
   border-radius: 20px;
   border: 1px solid var(--db-gray-700);
   overflow-x: auto;
-  padding: 8px;
+  padding: 0px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   justify-content: space-between;
