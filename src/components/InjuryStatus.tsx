@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AlertTriangle, Activity, Check, Play } from 'lucide-react';
 
 interface InjuryReason {
@@ -7,9 +7,12 @@ interface InjuryReason {
   weight: number;
 }
 
+type InjuryStatusValue = 'at-risk' | 'injured' | 'healthy';
+
 interface InjuryData {
   playerId: number;
-  status: 'at-risk' | 'injured' | 'healthy';
+  status: InjuryStatusValue;
+  bodyPart: string | null;
   riskScore: number;
   confidence: number;
   expectedStart: string | null;
@@ -28,7 +31,7 @@ interface InjuryStatusProps {
   playerId: number;
 }
 
-// Video Card component for injury references
+// Simple card used in your UI
 const VideoCard: React.FC<{ video: { title: string; duration?: string; sectionType: 'physical' | 'skills' } }> = ({ video }) => {
   return (
     <div className="video-card">
@@ -36,19 +39,34 @@ const VideoCard: React.FC<{ video: { title: string; duration?: string; sectionTy
         <div className="play-button">
           <Play size={16} />
         </div>
-        {video.duration && (
-          <div className="video-duration">{video.duration}</div>
-        )}
+        {video.duration && <div className="video-duration">{video.duration}</div>}
       </div>
       <div className="video-title-container">
         <p className="video-title-text">{video.title}</p>
-        <div className={`video-title-underline ${video.sectionType === 'physical' ? 'physical-underline' : 'skills-underline'}`}></div>
+        <div className={`video-title-underline ${video.sectionType === 'physical' ? 'physical-underline' : 'skills-underline'}`} />
       </div>
     </div>
   );
 };
 
+// =================== CONFIG ===================
+const VIEWER_SRC    = "https://euphonious-eclair-d25580.netlify.app"; // your live viewer
+const VIEWER_ORIGIN = "https://euphonious-eclair-d25580.netlify.app"; // lock to exact origin
+// ==============================================
 
+// Build the payload the viewer expects (injured > at-risk)
+function buildInjuryPayload(rows: InjuryData[]): Record<string, 'injured' | 'risk'> {
+  const map: Record<string, 'injured' | 'risk'> = {};
+  for (const r of rows) {
+    if (!r.bodyPart) continue;
+    if (r.status === 'injured') {
+      map[r.bodyPart] = 'injured';
+    } else if (r.status === 'at-risk') {
+      if (map[r.bodyPart] !== 'injured') map[r.bodyPart] = 'risk';
+    }
+  }
+  return map;
+}
 
 const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
   const [injurySummary, setInjurySummary] = useState<PlayerInjurySummary>({
@@ -56,31 +74,50 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
     injured: null,
     hasAnyInjuries: false
   });
+  const [allRowsForPlayer, setAllRowsForPlayer] = useState<InjuryData[]>([]);
   const [expandedReason, setExpandedReason] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // iframe + handshake
+  const viewerRef = useRef<HTMLIFrameElement>(null);
+  const viewerReady = useRef(false);
+
+  // Listen for "viewerReady" from the iframe (handshake)
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if (e.origin !== VIEWER_ORIGIN) return;
+      if (e.data && typeof e.data === 'object' && e.data.type === 'viewerReady') {
+        viewerReady.current = true;
+        // Immediately send current data on ready
+        const win = viewerRef.current?.contentWindow;
+        if (win) {
+          const payloadNow = buildInjuryPayload(allRowsForPlayer);
+          win.postMessage({ type: 'injuryUpdate', payload: payloadNow }, VIEWER_ORIGIN);
+        }
+      }
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [allRowsForPlayer]);
+
+  // Fetch injuries.json and filter by player
   useEffect(() => {
     const fetchInjuryData = async () => {
       try {
         setLoading(true);
-        
         const response = await fetch('/data/injuries.json');
         if (!response.ok) throw new Error('Failed to fetch injury data');
-        
         const injuries: InjuryData[] = await response.json();
+
         const playerInjuries = injuries.filter(injury => injury.playerId === playerId);
-        
-        console.log('All injuries data:', injuries);
-        console.log('Player ID:', playerId);
-        console.log('Player injuries:', playerInjuries);
-        
+
         const summary: PlayerInjurySummary = {
           atRisk: playerInjuries.find(injury => injury.status === 'at-risk') || null,
           injured: playerInjuries.find(injury => injury.status === 'injured') || null,
           hasAnyInjuries: playerInjuries.some(injury => injury.status !== 'healthy')
         };
-        
-        console.log('Injury summary:', summary);
+
+        setAllRowsForPlayer(playerInjuries);
         setInjurySummary(summary);
       } catch (error) {
         console.error('Error fetching injury data:', error);
@@ -92,15 +129,34 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
     fetchInjuryData();
   }, [playerId]);
 
+  const viewerPayload = useMemo(
+    () => buildInjuryPayload(allRowsForPlayer),
+    [allRowsForPlayer]
+  );
+
+  // Send to iframe whenever the payload changes (but only after ready)
+  useEffect(() => {
+    if (!viewerReady.current) return;
+    const win = viewerRef.current?.contentWindow;
+    if (!win) return;
+    win.postMessage({ type: 'injuryUpdate', payload: viewerPayload }, VIEWER_ORIGIN);
+  }, [viewerPayload]);
+
+  // Backup: send once the iframe reports load
+  const handleViewerLoad = () => {
+    const win = viewerRef.current?.contentWindow;
+    if (!win) return;
+    setTimeout(() => {
+      win.postMessage({ type: 'injuryUpdate', payload: viewerPayload }, VIEWER_ORIGIN);
+    }, 150);
+  };
+
+  // ====== your existing UI below ======
   if (loading) {
     return (
       <div className="injury-status">
-        <div className="injury-status__header">
-          <h2 className="injury-status__title">Injury Status</h2>
-        </div>
-        <div className="injury-status__content">
-          <div className="loading-placeholder">Loading injury data...</div>
-        </div>
+        <div className="injury-status__header"><h2 className="injury-status__title">Injury Status</h2></div>
+        <div className="injury-status__content"><div className="loading-placeholder">Loading injury data...</div></div>
       </div>
     );
   }
@@ -108,14 +164,10 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
   if (!injurySummary.hasAnyInjuries) {
     return (
       <div className="injury-status">
-        <div className="injury-status__header">
-          <h2 className="injury-status__title">Injury Status</h2>
-        </div>
+        <div className="injury-status__header"><h2 className="injury-status__title">Injury Status</h2></div>
         <div className="injury-status__content">
           <div className="healthy-status">
-            <div className="healthy-status-icon">
-              <Check className="check-icon" size={32} />
-            </div>
+            <div className="healthy-status-icon"><Check className="check-icon" size={32} /></div>
             <div className="healthy-status-message">
               <p className="healthy-status-title">No Injuries Detected</p>
               <p className="healthy-status-subtitle">Player has no existing or predicted injuries. Keep monitoring and training to maintain this status.</p>
@@ -126,79 +178,53 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
     );
   }
 
-  const hasExistingInjuries = injurySummary.injured !== null;
-  const hasPredictedRisks = injurySummary.atRisk !== null || injurySummary.injured !== null;
+  const hasExistingInjuries = !!injurySummary.injured;
+  const hasPredictedRisks   = !!injurySummary.atRisk || !!injurySummary.injured;
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'injured':
-        return <AlertTriangle className="status-icon injured" size={16} />;
-      case 'at-risk':
-        return <Activity className="status-icon at-risk" size={16} />;
-      default:
-        return <Check className="status-icon healthy" size={16} />;
-    }
-  };
+  const getStatusIcon = (status: string) =>
+    status === 'injured'
+      ? <AlertTriangle className="status-icon injured" size={16} />
+      : status === 'at-risk'
+      ? <Activity className="status-icon at-risk" size={16} />
+      : <Check className="status-icon healthy" size={16} />;
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'injured':
-        return 'var(--db-danger-10)';
-      case 'at-risk':
-        return 'var(--risk-yellow-10)';
-      default:
-        return 'var(--db-success-10)';
-    }
-  };
+  const getStatusColor = (status: string) =>
+    status === 'injured' ? 'var(--db-danger-10)'
+    : status === 'at-risk' ? 'var(--risk-yellow-10)'
+    : 'var(--db-success-10)';
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+  const formatDate = (dateString: string | null) =>
+    !dateString ? 'N/A' :
+    new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
     <div className="injury-status">
-      <div className="injury-status__header">
-        <h2 className="injury-status__title">Injury Status</h2>
-      </div>
+      <div className="injury-status__header"><h2 className="injury-status__title">Injury Status</h2></div>
       
       <div className="injury-status__layout">
-        {/* Left Column: Stacked Existing and Predicted */}
+        {/* Left Column */}
         <div className="injury-status__left">
-          {/* Existing Injuries Column */}
           {hasExistingInjuries && injurySummary.injured && (
             <div className="injury-column">
               <h3 className="injury-column__title">Existing</h3>
               <div className="injury-column__content">
                 {injurySummary.injured.reasons
-                  .filter((reason: InjuryReason) => reason.weight > 0.3) // Show only significant reasons
-                  .map((reason: InjuryReason, index: number) => (
-                    <div key={index} className="injury-item">
+                  .filter((r) => r.weight > 0.3)
+                  .map((reason, i) => (
+                    <div key={i} className="injury-item">
                       <button
                         className="injury-toggle"
-                        onClick={() => setExpandedReason(
-                          expandedReason === `injured-${reason.code}` ? null : `injured-${reason.code}`
-                        )}
+                        onClick={() =>
+                          setExpandedReason(expandedReason === `injured-${reason.code}` ? null : `injured-${reason.code}`)
+                        }
                       >
-                        <div 
-                          className="injury-bullet1"
-                          style={{ backgroundColor: getStatusColor(injurySummary.injured!.status) }}
-                        >
-                          <div className="injury-arrow1">
-                            {expandedReason === `injured-${reason.code}` ? '▼' : '▶'}
-                          </div>
+                        <div className="injury-bullet1" style={{ backgroundColor: getStatusColor(injurySummary.injured!.status) }}>
+                          <div className="injury-arrow1">{expandedReason === `injured-${reason.code}` ? '▼' : '▶'}</div>
                         </div>
                         <span className="injury-label">{reason.label}</span>
                       </button>
-                      
                       {expandedReason === `injured-${reason.code}` && (
-                        <div className="injury-notes">
-                          <p>{injurySummary.injured!.notes}</p>
-                        </div>
+                        <div className="injury-notes"><p>{injurySummary.injured!.notes}</p></div>
                       )}
                     </div>
                   ))}
@@ -206,33 +232,25 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
             </div>
           )}
 
-          {/* Predicted/At-Risk Column */}
           {hasPredictedRisks && (
             <div className="injury-column">
               <h3 className="injury-column__title">Predicted</h3>
               <div className="injury-column__content">
-                {/* Show at-risk reasons */}
                 {injurySummary.atRisk && injurySummary.atRisk.reasons
-                  .filter((reason: InjuryReason) => reason.weight <= 0.3) // Show lower weight reasons as predictions
-                  .map((reason: InjuryReason, index: number) => (
-                    <div key={`atrisk-${index}`} className="injury-item">
+                  .filter((r) => r.weight <= 0.3)
+                  .map((reason, i) => (
+                    <div key={`atrisk-${i}`} className="injury-item">
                       <button
                         className="injury-toggle"
-                        onClick={() => setExpandedReason(
-                          expandedReason === `atrisk-${reason.code}` ? null : `atrisk-${reason.code}`
-                        )}
+                        onClick={() =>
+                          setExpandedReason(expandedReason === `atrisk-${reason.code}` ? null : `atrisk-${reason.code}`)
+                        }
                       >
-                        <div 
-                          className="injury-bullet2"
-                          style={{ backgroundColor: getStatusColor('at-risk') }}
-                        >
-                          <div className="injury-arrow2">
-                            {expandedReason === `atrisk-${reason.code}` ? '▼' : '▶'}
-                          </div>
+                        <div className="injury-bullet2" style={{ backgroundColor: getStatusColor('at-risk') }}>
+                          <div className="injury-arrow2">{expandedReason === `atrisk-${reason.code}` ? '▼' : '▶'}</div>
                         </div>
                         <span className="injury-label">{reason.label}</span>
                       </button>
-                      
                       {expandedReason === `atrisk-${reason.code}` && (
                         <div className="injury-notes">
                           <p>{injurySummary.atRisk!.notes}</p>
@@ -240,47 +258,32 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
                             <span>Risk Score: {(reason.weight * 100).toFixed(0)}%</span>
                             <span>Confidence: {(injurySummary.atRisk!.confidence * 100).toFixed(0)}%</span>
                           </div>
-                          
-                          {/* Video reference for Wrong Form */}
                           {reason.code === 'form' && (
                             <div className="injury-video-reference">
                               <h4>Reference Video:</h4>
-                              <VideoCard 
-                                video={{
-                                  title: "Vertical Jump",
-                                  duration: "2:34",
-                                  sectionType: "physical"
-                                }}
-                              />
+                              <VideoCard video={{ title: "Vertical Jump", duration: "2:34", sectionType: "physical" }} />
                             </div>
                           )}
                         </div>
                       )}
                     </div>
                   ))}
-                
-                {/* Show injured reasons with lower weights as predictions */}
+
                 {injurySummary.injured && injurySummary.injured.reasons
-                  .filter((reason: InjuryReason) => reason.weight <= 0.3) // Show lower weight reasons as predictions
-                  .map((reason: InjuryReason, index: number) => (
-                    <div key={`injured-${index}`} className="injury-item">
+                  .filter((r) => r.weight <= 0.3)
+                  .map((reason, i) => (
+                    <div key={`injured-${i}`} className="injury-item">
                       <button
                         className="injury-toggle"
-                        onClick={() => setExpandedReason(
-                          expandedReason === `injured-${reason.code}` ? null : `injured-${reason.code}`
-                        )}
+                        onClick={() =>
+                          setExpandedReason(expandedReason === `injured-${reason.code}` ? null : `injured-${reason.code}`)
+                        }
                       >
-                        <div 
-                          className="injury-bullet2"
-                          style={{ backgroundColor: getStatusColor('at-risk') }}
-                        >
-                          <div className="injury-arrow2">
-                            {expandedReason === `injured-${reason.code}` ? '▼' : '▶'}
-                          </div>
+                        <div className="injury-bullet2" style={{ backgroundColor: getStatusColor('at-risk') }}>
+                          <div className="injury-arrow2">{expandedReason === `injured-${reason.code}` ? '▼' : '▶'}</div>
                         </div>
                         <span className="injury-label">{reason.label}</span>
                       </button>
-                      
                       {expandedReason === `injured-${reason.code}` && (
                         <div className="injury-notes">
                           <p>{injurySummary.injured!.notes}</p>
@@ -297,7 +300,7 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
           )}
         </div>
 
-        {/* Right Column: Container for future content (only visible when injuries exist) */}
+        {/* Right Column: 3D Viewer */}
         {(injurySummary.atRisk || injurySummary.injured) && (
           <div className="injury-status__right">
             <div className="injury-right-container">
@@ -305,12 +308,14 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
               <div className="injury-right-content">
                 <div className="anatomy-viewer-container">
                   <iframe
-                    src="https://euphonious-eclair-d25580.netlify.app"
+                    ref={viewerRef}
+                    src={VIEWER_SRC}
                     style={{ width: "100%", height: "100%", border: 0 }}
                     title="3D Anatomy Viewer"
                     loading="lazy"
                     allow="xr-spatial-tracking; fullscreen"
                     className="anatomy-viewer-iframe"
+                    onLoad={handleViewerLoad}
                   />
                 </div>
               </div>
@@ -319,15 +324,12 @@ const InjuryStatus: React.FC<InjuryStatusProps> = ({ playerId }) => {
         )}
       </div>
 
-      {/* Additional Injury Information */}
-      {(injurySummary.atRisk || injurySummary.injured) && (
+      {(injurySummary.atRisk || injurySummary.injured) && injurySummary.injured?.expectedEnd && (
         <div className="injury-details">
-            {injurySummary.injured?.expectedEnd && (
-              <div className="summary-item">
-                <span className="summary-label">Expected Return:</span>
-                <span className="summary-value">{formatDate(injurySummary.injured.expectedEnd)}</span>
-              </div>
-            )}
+          <div className="summary-item">
+            <span className="summary-label">Expected Return:</span>
+            <span className="summary-value">{formatDate(injurySummary.injured.expectedEnd)}</span>
+          </div>
         </div>
       )}
     </div>

@@ -63,6 +63,62 @@
       "shooting": {
         "Jan": 86, "Feb": 87, "Mar": 85, "Apr": 88, "May": 89, "Jun": 90, "Jul": 91, "Aug": 92, "Sep": 93, "Oct": 94, "Nov": 95, "Dec": 96
       }
+    },
+    "Assessment Notes": {
+      "Physical Assessments": {
+        "Vertical Jump": [
+          "Needs to focus on arm swing coordination",
+          "Landing technique could be refined",
+          "Good explosive power from legs"
+        ],
+        "Broad Jump": [
+          "Strong leg drive during jump phase",
+          "Excellent horizontal distance achieved",
+          "Could improve arm positioning"
+        ],
+        "10 Meter Run": [
+          "Maintain running form at high speed",
+          "Focus on stride frequency",
+          "Good acceleration phase"
+        ],
+        "Five Ten Five": [
+          "Deceleration technique improving",
+          "Work on maintaining speed through turns",
+          "Good change of direction"
+        ],
+        "T-Agility": [
+          "Good body positioning during cuts",
+          "Consistent times across multiple attempts",
+          "Could improve lateral movement speed"
+        ]
+      },
+      "Skills Assessments": {
+        "Ball Control": [
+          "Excellent first touch under pressure",
+          "Good use of both feet for control",
+          "Maintains control in tight spaces"
+        ],
+        "Passing": [
+          "Improve passing under defensive pressure",
+          "Good vision for through balls",
+          "Accurate short-range passing"
+        ],
+        "1v1": [
+          "Good use of body feints and skills",
+          "Work on finishing after beating defender",
+          "Excellent dribbling technique"
+        ],
+        "Running with Ball": [
+          "Close control at speed is excellent",
+          "Keep head up more to spot teammates",
+          "Good acceleration with ball"
+        ],
+        "Shooting": [
+          "Powerful shots with good accuracy",
+          "Good composure in front of goal",
+          "Could improve weak foot shooting"
+        ]
+      }
     }
   },
   {
@@ -100,7 +156,7 @@
     "overall": 86,
     "Physical Performance": {
       "Vertical Jump": {
-        "Jan": 80, "Feb": 81, "Mar": 79, "Apr": 82, "May": 83, "Jun": 84, "Jul": 85, "Aug": 86, "Sep": 87, "Oct": 88, "Nov": 89, "Dec": 90
+        "Jan": 50, "Feb": 81, "Mar": 79, "Apr": 82, "May": 83, "Jun": 84, "Jul": 85, "Aug": 86, "Sep": 87, "Oct": 88, "Nov": 89, "Dec": 50
       },
       "T-Agility": {
         "Jan": 78, "Feb": 79, "Mar": 77, "Apr": 80, "May": 81, "Jun": 82, "Jul": 83, "Aug": 84, "Sep": 85, "Oct": 86, "Nov": 87, "Dec": 88
@@ -130,6 +186,62 @@
       },
       "shooting": {
         "Jan": 82, "Feb": 83, "Mar": 81, "Apr": 84, "May": 85, "Jun": 86, "Jul": 87, "Aug": 88, "Sep": 89, "Oct": 90, "Nov": 91, "Dec": 92
+      }
+    },
+    "Assessment Notes": {
+      "Physical Assessments": {
+        "Vertical Jump": [
+          "Inconsistent jump heights",
+          "Good recovery from low performance",
+          "Needs consistent training focus"
+        ],
+        "Broad Jump": [
+          "Steady improvement over time",
+          "Good technique execution",
+          "Could benefit from plyometric training"
+        ],
+        "10 Meter Run": [
+          "Consistent sprint times",
+          "Good acceleration mechanics",
+          "Maintains form under fatigue"
+        ],
+        "Five Ten Five": [
+          "Excellent agility performance",
+          "Good change of direction speed",
+          "Consistent execution across attempts"
+        ],
+        "T-Agility": [
+          "Strong lateral movement",
+          "Good body control during turns",
+          "Could improve acceleration out of turns"
+        ]
+      },
+      "Skills Assessments": {
+        "Ball Control": [
+          "Good first touch under pressure",
+          "Consistent ball handling",
+          "Could improve weak foot control"
+        ],
+        "Passing": [
+          "Excellent passing accuracy",
+          "Good vision and decision making",
+          "Strong long-range passing"
+        ],
+        "1v1": [
+          "Good defensive positioning",
+          "Could improve attacking 1v1 skills",
+          "Good tactical awareness"
+        ],
+        "Running with Ball": [
+          "Good control at moderate speed",
+          "Could improve high-speed control",
+          "Good passing while running"
+        ],
+        "Shooting": [
+          "Accurate shooting technique",
+          "Could improve power and placement",
+          "Good composure in shooting situations"
+        ]
       }
     }
   },
@@ -331,6 +443,62 @@
       },
       "passing": 76,
       "shooting": 52
+    },
+    "Assessment Notes": {
+      "Physical Assessments": {
+        "Vertical Jump": [
+          "Good explosive power from legs",
+          "Could improve arm swing coordination",
+          "Consistent jump heights"
+        ],
+        "Broad Jump": [
+          "Strong horizontal power",
+          "Good landing technique",
+          "Could benefit from plyometric training"
+        ],
+        "10 Meter Run": [
+          "Good acceleration mechanics",
+          "Maintains form under pressure",
+          "Could improve top-end speed"
+        ],
+        "Five Ten Five": [
+          "Excellent change of direction",
+          "Good deceleration control",
+          "Consistent performance across attempts"
+        ],
+        "T-Agility": [
+          "Strong lateral movement",
+          "Good body positioning during cuts",
+          "Could improve acceleration out of turns"
+        ]
+      },
+      "Skills Assessments": {
+        "Ball Control": [
+          "Good first touch under pressure",
+          "Could improve weak foot control",
+          "Maintains control in tight spaces"
+        ],
+        "Passing": [
+          "Accurate short-range passing",
+          "Good vision for through balls",
+          "Could improve long-range accuracy"
+        ],
+        "1v1": [
+          "Good defensive positioning",
+          "Could improve attacking 1v1 skills",
+          "Strong tactical awareness"
+        ],
+        "Running with Ball": [
+          "Good control at moderate speed",
+          "Could improve high-speed control",
+          "Good passing while running"
+        ],
+        "Shooting": [
+          "Accurate shooting technique",
+          "Could improve power and placement",
+          "Good composure in shooting situations"
+        ]
+      }
     }
   },
   {
@@ -379,6 +547,62 @@
       "1v1": {"Jan": 81, "Feb": 82, "Mar": 80, "Apr": 83, "May": 84, "Jun": 85, "Jul": 86, "Aug": 87, "Sep": 88, "Oct": 89, "Nov": 90, "Dec": 91},
       "passing": {"Jan": 74, "Feb": 75, "Mar": 73, "Apr": 76, "May": 77, "Jun": 78, "Jul": 79, "Aug": 80, "Sep": 81, "Oct": 82, "Nov": 83, "Dec": 84},
       "shooting": {"Jan": 79, "Feb": 80, "Mar": 78, "Apr": 81, "May": 82, "Jun": 83, "Jul": 84, "Aug": 85, "Sep": 86, "Oct": 87, "Nov": 88, "Dec": 89}
+    },
+    "Assessment Notes": {
+      "Physical Assessments": {
+        "Vertical Jump": [
+          "Good explosive power development",
+          "Could improve arm swing technique",
+          "Consistent jump performance"
+        ],
+        "Broad Jump": [
+          "Strong horizontal power output",
+          "Good landing mechanics",
+          "Could benefit from plyometric work"
+        ],
+        "10 Meter Run": [
+          "Excellent acceleration phase",
+          "Good sprint mechanics",
+          "Could improve top-end speed"
+        ],
+        "Five Ten Five": [
+          "Good change of direction speed",
+          "Excellent deceleration control",
+          "Consistent performance across attempts"
+        ],
+        "T-Agility": [
+          "Strong lateral movement ability",
+          "Good body positioning during cuts",
+          "Could improve acceleration out of turns"
+        ]
+      },
+      "Skills Assessments": {
+        "Ball Control": [
+          "Excellent first touch under pressure",
+          "Good use of both feet",
+          "Maintains control in tight spaces"
+        ],
+        "Passing": [
+          "Good short-range accuracy",
+          "Could improve long-range passing",
+          "Good vision for through balls"
+        ],
+        "1v1": [
+          "Good attacking 1v1 skills",
+          "Could improve defensive positioning",
+          "Strong tactical awareness"
+        ],
+        "Running with Ball": [
+          "Good control at high speed",
+          "Excellent acceleration with ball",
+          "Good passing while running"
+        ],
+        "Shooting": [
+          "Good shooting accuracy",
+          "Could improve power and placement",
+          "Good composure in front of goal"
+        ]
+      }
     }
   },
   {
@@ -655,18 +879,18 @@
     "defending": 65,
     "overall": 83,
     "Physical Performance": {
-      "Vertical Jump": {"Jan": 76, "Feb": 77, "Mar": 75, "Apr": 78, "May": 79, "Jun": 80, "Jul": 81, "Aug": 82, "Sep": 83, "Oct": 84, "Nov": 85, "Dec": 86},
-      "T-Agility": {"Jan": 78, "Feb": 79, "Mar": 77, "Apr": 80, "May": 81, "Jun": 82, "Jul": 83, "Aug": 84, "Sep": 85, "Oct": 86, "Nov": 87, "Dec": 88},
-      "Broad Jump": {"Jan": 73, "Feb": 74, "Mar": 72, "Apr": 75, "May": 76, "Jun": 77, "Jul": 78, "Aug": 79, "Sep": 80, "Oct": 81, "Nov": 82, "Dec": 83},
-      "10 Meter Run": {"Jan": 80, "Feb": 81, "Mar": 79, "Apr": 82, "May": 83, "Jun": 84, "Jul": 85, "Aug": 86, "Sep": 87, "Oct": 88, "Nov": 89, "Dec": 90},
-      "Five Ten Five": {"Jan": 83, "Feb": 84, "Mar": 82, "Apr": 85, "May": 86, "Jun": 87, "Jul": 88, "Aug": 89, "Sep": 90, "Oct": 91, "Nov": 92, "Dec": 93}
+      "Vertical Jump": {"Jan": 76, "Feb": 77, "Mar": 75, "Apr": 78, "May": 79, "Jun": 87, "Jul": 81, "Aug": 82, "Sep": 83, "Oct": 84, "Nov": 85, "Dec": 80},
+      "T-Agility": {"Jan": 78, "Feb": 89, "Mar": 77, "Apr": 80, "May": 81, "Jun": 82, "Jul": 83, "Aug": 84, "Sep": 85, "Oct": 86, "Nov": 87, "Dec": 90},
+      "Broad Jump": {"Jan": 73, "Feb": 74, "Mar": 72, "Apr": 75, "May": 76, "Jun": 77, "Jul": 78, "Aug": 82, "Sep": 80, "Oct": 81, "Nov": 82, "Dec": 80},
+      "10 Meter Run": {"Jan": 80, "Feb": 81, "Mar": 79, "Apr": 82, "May": 83, "Jun": 84, "Jul": 85, "Aug": 86, "Sep": 87, "Oct": 88, "Nov": 89, "Dec": 70},
+      "Five Ten Five": {"Jan": 83, "Feb": 84, "Mar": 82, "Apr": 85, "May": 86, "Jun": 87, "Jul": 88, "Aug": 89, "Sep": 90, "Oct": 91, "Nov": 92, "Dec": 90}
     },
     "Skill Performance": {
-      "Ball Control": {"Jan": 82, "Feb": 83, "Mar": 81, "Apr": 84, "May": 85, "Jun": 86, "Jul": 87, "Aug": 88, "Sep": 89, "Oct": 90, "Nov": 91, "Dec": 92},
+      "Ball Control": {"Jan": 82, "Feb": 83, "Mar": 81, "Apr": 94, "May": 85, "Jun": 56, "Jul": 87, "Aug": 28, "Sep": 89, "Oct": 90, "Nov": 91, "Dec": 80},
       "Running with Ball": {"Jan": 80, "Feb": 81, "Mar": 79, "Apr": 82, "May": 83, "Jun": 84, "Jul": 85, "Aug": 86, "Sep": 87, "Oct": 88, "Nov": 89, "Dec": 90},
       "1v1": {"Jan": 78, "Feb": 79, "Mar": 77, "Apr": 80, "May": 81, "Jun": 82, "Jul": 83, "Aug": 84, "Sep": 85, "Oct": 86, "Nov": 87, "Dec": 88},
       "passing": {"Jan": 85, "Feb": 86, "Mar": 84, "Apr": 87, "May": 88, "Jun": 89, "Jul": 90, "Aug": 91, "Sep": 92, "Oct": 93, "Nov": 94, "Dec": 95},
-      "shooting": {"Jan": 76, "Feb": 77, "Mar": 75, "Apr": 78, "May": 79, "Jun": 80, "Jul": 81, "Aug": 82, "Sep": 83, "Oct": 84, "Nov": 85, "Dec": 86}
+      "shooting": {"Jan": 76, "Feb": 77, "Mar": 75, "Apr": 78, "May": 79, "Jun": 60, "Jul": 71, "Aug": 72, "Sep": 73, "Oct": 74, "Nov": 65, "Dec": 76}
     }
   }
   ]

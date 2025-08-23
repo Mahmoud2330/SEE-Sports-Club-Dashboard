@@ -1,15 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { Share2, Filter, ChevronRight, User, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Share2, ChevronRight, TrendingUp } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PlayerCard from './PlayerCard';
-import SkillsDevelopmentAnalysis from './SkillsDevelopmentAnalysis';
-import PhysicalPerformance from './PhysicalPerformance';
-import PerformanceChart from './PerformanceChart';
-import SkillChart from './SkillChart';
-import ChatWidget from './ChatWidget';
 import CustomDatePicker from './CustomDatePicker';
 import { dataService } from '../services/dataService';
 import type { Player } from '../services/dataService';
+
+/* ------------------------------ Helpers ------------------------------ */
+
+const MONTHS_ORDER = [
+  'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
+] as const;
+
+type SeriesPoint = { month: string; value: number };
+
+function getMonthlySeries(player: any, jsonKey: string): SeriesPoint[] {
+  const bucket = player?.['Physical Performance']?.[jsonKey];
+  if (!bucket) return [];
+  return MONTHS_ORDER
+    .filter((m) => typeof bucket[m] === 'number')
+    .map((m) => ({ month: m, value: Number(bucket[m]) }));
+}
+
+function pctOfRange(value:number, min:number, max:number){
+  const span = Math.max(1e-6, max-min);
+  return Math.round(((value-min)/span)*100);
+}
+
+function computeTrendAndConsistency(vals: number[]) {
+  if (vals.length < 2) return { label: 'Stable' as const, consistencyPct: 100 };
+
+  // least-squares slope for trend
+  const n = vals.length;
+  const xs = Array.from({ length: n }, (_, i) => i);
+  const xMean = xs.reduce((a,b)=>a+b,0)/n;
+  const yMean = vals.reduce((a,b)=>a+b,0)/n;
+  const num = xs.reduce((s,x,i)=>s+(x-xMean)*(vals[i]-yMean),0);
+  const den = xs.reduce((s,x)=>s+Math.pow(x-xMean,2),0) || 1;
+  const slope = num/den;
+
+  // label thresholds – tweak if you want a stricter/looser call
+  const IMPROVE_T = 0.08;
+  const DECLINE_T = -0.08;
+
+  let label:'Improving'|'Declining'|'Stable'='Stable';
+  if (slope > IMPROVE_T) label='Improving';
+  else if (slope < DECLINE_T) label='Declining';
+
+  // Consistency: Coefficient of Variation (CV) approach
+  // Lower CV = more consistent performance
+  const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const variance = vals.reduce((s,v)=>s+Math.pow(v-mean,2),0)/vals.length;
+  const stdDev = Math.sqrt(variance);
+  
+  // CV = standard deviation / mean (as percentage)
+  // We want to invert this so higher percentage = more consistent
+  const cv = mean > 0 ? (stdDev / mean) * 100 : 0;
+  
+  // Convert CV to consistency percentage (0-100)
+  // CV of 0% = perfect consistency (100%)
+  // CV of 50% = moderate consistency (50%)
+  // CV of 100%+ = poor consistency (0%)
+  const consistencyPct = Math.max(0, Math.min(100, Math.round(100 - Math.min(cv, 100))));
+
+  return { label, consistencyPct };
+}
+
+/* ----------------------------- Component ----------------------------- */
 
 const PlayerOverview: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState('3 Months');
@@ -17,10 +74,10 @@ const PlayerOverview: React.FC = () => {
   const navigate = useNavigate();
   const { id: playerId } = useParams<{ id: string }>();
   const location = useLocation();
-  
+
   // Loading state for period changes
   const [isUpdating, setIsUpdating] = useState(false);
-  
+
   // Custom date range state
   const [customStartDate, setCustomStartDate] = useState<Date>(() => {
     const date = new Date();
@@ -31,7 +88,7 @@ const PlayerOverview: React.FC = () => {
 
   const periods = ['Last Month', '3 Months', '6 Months', 'This Year'];
   const physicalTests = ['Vertical Jump', 'Broad Jump', '10m Run', '5-10-5', 'T-Agility'];
-  
+
   // State for dynamic data
   const [playerData, setPlayerData] = useState<Player | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,22 +98,18 @@ const PlayerOverview: React.FC = () => {
   useEffect(() => {
     const fetchPlayerData = async () => {
       if (!playerId) return;
-      
+
       try {
         setIsLoading(true);
         setError(null);
-        
-        console.log('Fetching player data for ID:', playerId, 'Type:', typeof playerId);
+
         const player = await dataService.getPlayerById(playerId);
-        console.log('Received player data:', player);
-        
         if (player) {
           setPlayerData(player);
         } else {
           setError('Player not found');
         }
       } catch (err) {
-        console.error('Error in fetchPlayerData:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch player data');
       } finally {
         setIsLoading(false);
@@ -67,195 +120,75 @@ const PlayerOverview: React.FC = () => {
   }, [playerId]);
 
   // Dynamic breadcrumbs based on current player and team
-  const breadcrumbs = playerData ? [
-    { name: 'Club', path: '/dashboard' },
-    { name: 'Teams', path: '/teams' },
-    { name: playerData.team, path: `/teams/${playerData.teamId}` },
-    { name: playerData.name, path: `/players/${playerData.id}` }
-  ] : [];
+  const breadcrumbs = playerData
+    ? [
+        { name: 'Club', path: '/dashboard' },
+        { name: 'Teams', path: '/teams' },
+        { name: playerData.team, path: `/teams/${playerData.teamId}` },
+        { name: playerData.name, path: `/players/${playerData.id}` },
+      ]
+    : [];
 
   const handleBreadcrumbClick = (crumb: { name: string; path: string }, index: number) => {
-    // Don't navigate if it's the current page (last breadcrumb)
-    if (index === breadcrumbs.length - 1) {
-      return;
-    }
-    
-    // Navigate to the appropriate page
+    if (index === breadcrumbs.length - 1) return; // current page
     navigate(crumb.path);
   };
 
-  // Handle share functionality
+  // Share functionality
   const handleShare = async () => {
     try {
-      // Check if Web Share API is supported
       if (navigator.share) {
         await navigator.share({
           title: `${playerData?.name} - Player Profile`,
           text: `Check out ${playerData?.name}'s performance profile and statistics.`,
-          url: window.location.href
+          url: window.location.href,
         });
       } else {
-        // Fallback: copy URL to clipboard
         await navigator.clipboard.writeText(window.location.href);
         alert('Profile URL copied to clipboard!');
       }
-    } catch (error) {
-      console.error('Error sharing:', error);
-      // Fallback: copy URL to clipboard
+    } catch {
       try {
         await navigator.clipboard.writeText(window.location.href);
         alert('Profile URL copied to clipboard!');
-      } catch (clipboardError) {
-        console.error('Error copying to clipboard:', clipboardError);
+      } catch {
         alert('Unable to share. Please copy the URL manually.');
       }
     }
   };
 
-//   // Handle PDF download functionality
-//   const handleDownloadPDF = () => {
-//     // For now, we'll use a simple approach - in a real app, you'd use a library like jsPDF
-//     // or send a request to the server to generate a PDF
-//     try {
-//       // Create a simple text representation of the player data
-//       const playerInfo = `
-// Player Profile: ${playerData?.name}
-// Team: ${playerData?.team}
-// Position: ${playerData?.position}
-// Overall Score: ${playerData?.totalScore}/100
-// Physical: ${playerData?.physical}/100
-// Skills: ${playerData?.skills}/100
-// Nationality: ${playerData?.nationality}
-// Age: ${playerData?.age}
-// Contract Expiry: ${playerData?.contractExpiry}
-// Market Value: ${playerData?.marketValue}
-
-// Profile URL: ${window.location.href}
-// Generated on: ${new Date().toLocaleDateString()}
-//       `;
-      
-//       // Create and download a text file (as a placeholder for PDF)
-//       const blob = new Blob([playerInfo], { type: 'text/plain' });
-//       const url = URL.createObjectURL(blob);
-//       const a = document.createElement('a');
-//       a.href = url;
-//       a.download = `${playerData?.name?.replace(/\s+/g, '_')}_Profile.txt`;
-//       document.body.appendChild(a);
-//       a.click();
-//       document.body.removeChild(a);
-//       URL.revokeObjectURL(url);
-      
-//       alert('Profile data downloaded! (Note: This is a text file. PDF generation would require additional setup.)');
-//     } catch (error) {
-//       console.error('Error downloading profile:', error);
-//       alert('Unable to download profile. Please try again.');
-//     }
-//   };
-
-  // Comprehensive data for each physical test
-  const physicalTestData = {
-    'Vertical Jump': {
-      title: 'Vertical Jump',
-      current: 8.4,
-      best: 7.7,
-      consistency: 7.8,
-      currentProgress: 74, // percentage for circle
-      bestProgress: 85,
-      consistencyProgress: 75,
-      unit: 'cm',
-      improvement: 'Improving',
-      summary: 'Jump height increased by 9%'
-    },
-    'Broad Jump': {
-      title: 'Broad Jump',
-      current: 2.74,
-      best: 2.85,
-      consistency: 8.2,
-      currentProgress: 82,
-      bestProgress: 90,
-      consistencyProgress: 82,
-      unit: 'm',
-      improvement: 'Stable',
-      summary: 'Distance maintained consistently'
-    },
-    '10m Run': {
-      title: '10m Run',
-      current: 1.70,
-      best: 1.65,
-      consistency: 8.5,
-      currentProgress: 88,
-      bestProgress: 92,
-      consistencyProgress: 85,
-      unit: 'sec',
-      improvement: 'Improving',
-      summary: 'Speed improved by 3%'
-    },
-    '5-10-5': {
-      title: '5-10-5',
-      current: 4.30,
-      best: 4.15,
-      consistency: 7.9,
-      currentProgress: 78,
-      bestProgress: 85,
-      consistencyProgress: 79,
-      unit: 'sec',
-      improvement: 'Stable',
-      summary: 'Agility test performance maintained'
-    },
-    'T-Agility': {
-      title: 'T-Agility',
-      current: 9.70,
-      best: 9.45,
-      consistency: 8.1,
-      currentProgress: 76,
-      bestProgress: 82,
-      consistencyProgress: 81,
-      unit: 'sec',
-      improvement: 'Improving',
-      summary: 'Agility improved by 2.6%'
-    }
-  };
-
+  // Period controls (kept as-is)
   const handlePeriodChange = (period: string) => {
     setIsUpdating(true);
     setActivePeriod(period);
-    
-    // Simulate data update delay
-    setTimeout(() => {
-      setIsUpdating(false);
-    }, 700);
+    setTimeout(() => setIsUpdating(false), 700);
   };
 
   const handleCustomDateChange = (startDate: Date, endDate: Date) => {
     setIsUpdating(true);
     setCustomStartDate(startDate);
     setCustomEndDate(endDate);
-    
-    // Simulate data update delay
-    setTimeout(() => {
-      setIsUpdating(false);
-    }, 700);
+    setTimeout(() => setIsUpdating(false), 700);
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      year: 'numeric' 
-    });
-  };
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   const getCurrentDateRange = () => {
     if (activePeriod === 'Last Month') {
       const lastMonth = new Date();
       lastMonth.setMonth(lastMonth.getMonth() - 1);
       return `${formatDate(lastMonth)} - ${formatDate(new Date())}`;
-    } else if (activePeriod === '3 Months') {
+    }
+    if (activePeriod === '3 Months') {
       return `${formatDate(customStartDate)} - ${formatDate(customEndDate)}`;
-    } else if (activePeriod === '6 Months') {
+    }
+    if (activePeriod === '6 Months') {
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
       return `${formatDate(sixMonthsAgo)} - ${formatDate(new Date())}`;
-    } else if (activePeriod === 'This Year') {
+    }
+    if (activePeriod === 'This Year') {
       const thisYear = new Date();
       thisYear.setMonth(0, 1);
       return `${formatDate(thisYear)} - ${formatDate(new Date())}`;
@@ -271,35 +204,98 @@ const PlayerOverview: React.FC = () => {
     threeMonthsAgo.setMonth(today.getMonth() - 3);
     setCustomStartDate(threeMonthsAgo);
     setCustomEndDate(today);
-    
-    // Simulate data update delay
-    setTimeout(() => {
-      setIsUpdating(false);
-    }, 700);
+    setTimeout(() => setIsUpdating(false), 700);
   };
 
-  // Helper functions for SVG circle calculations
-  const calculateCircleValues = (percentage: number, radius: number) => {
-    const circumference = 2 * Math.PI * radius;
-    const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
-    return { strokeDasharray, strokeDashoffset };
-  };
+  /* ------------------ Dynamic Physical-Progress Derivations ------------------ */
 
-  const getCurrentTestData = () => {
-    return physicalTestData[activeTest as keyof typeof physicalTestData] || physicalTestData['Vertical Jump'];
-  };
-  
+  // UI tab -> JSON key in players.json
+  const TEST_KEY_MAP = {
+    'Vertical Jump': 'Vertical Jump',
+    'Broad Jump': 'Broad Jump',
+    '10m Run': '10 Meter Run',
+    '5-10-5': 'Five Ten Five',
+    'T-Agility': 'T-Agility',
+  } as const;
+
+  const UNIT_MAP = {
+    'Vertical Jump': 'cm',
+    'Broad Jump': 'cm',
+    '10m Run': 'sec',
+    '5-10-5': 'sec',
+    'T-Agility': 'sec',
+  } as const;
+
+  const derived = useMemo(() => {
+    if (!playerData) {
+      return {
+        title: activeTest,
+        unit: UNIT_MAP[activeTest as keyof typeof UNIT_MAP] ?? '',
+        current: 0,
+        best: 0,
+        currentPct: 0,
+        bestPct: 0,
+        consistencyPct: 0,
+        trendLabel: 'Stable' as 'Stable'|'Improving'|'Declining',
+        showUnit: false,
+      };
+    }
+
+    const jsonKey = TEST_KEY_MAP[activeTest as keyof typeof TEST_KEY_MAP];
+    const series = getMonthlySeries(playerData, jsonKey);
+    const values = series.map(s=>s.value);
+    if (!values.length) {
+      return {
+        title: activeTest,
+        unit: UNIT_MAP[activeTest as keyof typeof UNIT_MAP] ?? '',
+        current: 0,
+        best: 0,
+        currentPct: 0,
+        bestPct: 0,
+        consistencyPct: 0,
+        trendLabel: 'Stable' as const,
+        showUnit: false,
+      };
+    }
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const current = values[values.length-1];
+    const best = max; // highest in the year
+
+    // Detect score vs unit. If your JSON is 0..100 scores, we don't append unit text.
+    const looksLikeScore = max <= 100 && min >= 0;
+
+    const currentPct = looksLikeScore ? Math.round(current) : pctOfRange(current, min, max);
+    const bestPct    = looksLikeScore ? Math.round(best)    : pctOfRange(best, min, max);
+
+    const { label, consistencyPct } = computeTrendAndConsistency(values);
+
+    return {
+      title: activeTest,
+      unit: looksLikeScore ? '' : (UNIT_MAP[activeTest as keyof typeof UNIT_MAP] ?? ''),
+      current,
+      best,
+      currentPct: Math.max(0, Math.min(100, currentPct)),
+      bestPct:    Math.max(0, Math.min(100, bestPct)),
+      consistencyPct,
+      trendLabel: label,
+      showUnit: !looksLikeScore,
+    };
+  }, [playerData, activeTest]);
+
+  /* ------------------------------------------------------------------------- */
+
   return (
     <div className="player-overview">
-      {/* Loading State */}
+      {/* Loading */}
       {isLoading && (
         <div style={{ textAlign: 'center', padding: '2rem' }}>
           <div>Loading player data...</div>
         </div>
       )}
 
-      {/* Error State */}
+      {/* Error */}
       {error && (
         <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
           <div>Error: {error}</div>
@@ -307,7 +303,7 @@ const PlayerOverview: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content - Only show when data is loaded and no errors */}
+      {/* Content */}
       {!isLoading && !error && playerData && (
         <>
           {/* Top Bar */}
@@ -315,7 +311,7 @@ const PlayerOverview: React.FC = () => {
             <div className="breadcrumbs">
               {breadcrumbs.map((crumb, index) => (
                 <React.Fragment key={index}>
-                  <button 
+                  <button
                     onClick={() => handleBreadcrumbClick(crumb, index)}
                     className={index === breadcrumbs.length - 1 ? 'active' : ''}
                   >
@@ -327,24 +323,19 @@ const PlayerOverview: React.FC = () => {
                 </React.Fragment>
               ))}
             </div>
-            
-            {/* Share Button */}
+
             <div className="share-section">
               <button className="share-btn" onClick={handleShare}>
                 <Share2 size={18} />
                 <span>Share Profile</span>
               </button>
-              {/* <button className="pdf-btn" onClick={handleDownloadPDF}>
-                <Share2 size={18} />
-                <span>Download PDF</span>
-              </button> */}
             </div>
           </div>
-        
+
           {/* Player Header */}
           <div className="player-header">
             <div className="player-info">
-              <h1 className="player-name">{playerData?.name}</h1>
+              <h1 className="player-name">{playerData.name}</h1>
               <p className="player-description">
                 Detailed player profile with performance metrics, statistics, and development progress.
               </p>
@@ -366,17 +357,21 @@ const PlayerOverview: React.FC = () => {
               ))}
             </div>
             <div className="date-range">
-             <span className="date-active-dot"><span className="live-dot"></span> {getCurrentDateRange()}</span>
-              <CustomDatePicker 
+              <span className="date-active-dot">
+                <span className="live-dot"></span> {getCurrentDateRange()}
+              </span>
+              <CustomDatePicker
                 onDateChange={handleCustomDateChange}
                 currentStartDate={customStartDate}
                 currentEndDate={customEndDate}
               />
-              <button className="reset-btn" onClick={handleReset}>Reset</button>
+              <button className="reset-btn" onClick={handleReset}>
+                Reset
+              </button>
             </div>
           </div>
 
-          {/* Loading Indicator */}
+          {/* Inline loading indicator for data updates */}
           {isUpdating && (
             <div className="updating-data">
               <div className="spinner"></div>
@@ -384,26 +379,28 @@ const PlayerOverview: React.FC = () => {
             </div>
           )}
 
-          {/* Two-Column Layout: Player Card and Physical Progress */}
+          {/* Two-Column Layout */}
           <div className="player-content-layout">
-            {/* Left Column: Player Card */}
+            {/* Left: Player Card */}
             <div className="player-card-column">
               <div className="player-card-section">
-                <h2 className="section-title1">Player Card <span className="active-dot"><span className="live-dot"></span> Active</span></h2>
+                <h2 className="section-title1">
+                  Player Card{' '}
+                  <span className="active-dot">
+                    <span className="live-dot"></span> Active
+                  </span>
+                </h2>
                 <div className="player-card-container">
-                  {/* Unified Background Container */}
                   <div className="player-card-background">
-                    {/* Player Card Component */}
                     <div className="player-card-wrapper">
                       <PlayerCard playerData={playerData} />
                     </div>
-                    
-                    {/* Player Card Footer */}
+
                     <div className="player-card-footer">
                       <div className="player-info-footer">
                         <div className="left-info">
-                          <div className="player-name-card">{playerData?.name}</div>
-                          <div className="team-name-card">{playerData?.team}</div>
+                          <div className="player-name-card">{playerData.name}</div>
+                          <div className="team-name-card">{playerData.team}</div>
                         </div>
                         <div className="live-status">
                           <span className="live-dot" />
@@ -416,15 +413,13 @@ const PlayerOverview: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Physical Progress */}
+            {/* Right: Physical Progress */}
             <div className="physical-progress-column">
               <div className="physical-progress">
                 <div className="section-header">
-                  <h2 className="section-title physical-progress-title">
-                    Physical Progress
-                  </h2>
+                  <h2 className="section-title physical-progress-title">Physical Progress</h2>
                 </div>
-                <div className="sub-sec" >
+                <div className="sub-sec">
                   <div className="test-tabs">
                     {physicalTests.map((test) => (
                       <button
@@ -438,113 +433,97 @@ const PlayerOverview: React.FC = () => {
                   </div>
 
                   <div className="progress-cards">
+                    {/* Current / Best */}
                     <div className="progress-card">
-                      <h3 className="card-title">{getCurrentTestData().title}</h3>
+                      <h3 className="card-title">{derived.title}</h3>
                       <div className="progress-circle-container">
                         <div className="progress-circle">
                           <svg className="progress-svg" viewBox="0 0 120 120">
-                            <circle
-                              className="progress-background"
-                              cx="60"
-                              cy="60"
-                              r="50"
-                              stroke="#333"
-                              strokeWidth="8"
-                              fill="none"
-                            />
+                            {/* outer ring = current */}
+                            <circle className="progress-background" cx="60" cy="60" r="50" stroke="#333" strokeWidth="8" fill="none" />
                             <circle
                               className="progress-fill"
-                              cx="60"
-                              cy="60"
-                              r="50"
-                              stroke="#6728f5"
-                              strokeWidth="8"
-                              fill="none"
-                              strokeDasharray={calculateCircleValues(getCurrentTestData().currentProgress, 50).strokeDasharray}
-                              strokeDashoffset={calculateCircleValues(getCurrentTestData().currentProgress, 50).strokeDashoffset}
+                              cx="60" cy="60" r="50"
+                              stroke="#6728f5" strokeWidth="8" fill="none"
+                              style={{
+                                // inline style to ensure it overrides any CSS default
+                                strokeDasharray: `${2*Math.PI*50}`,
+                                strokeDashoffset: `${2*Math.PI*50 - (derived.currentPct/100)*(2*Math.PI*50)}`
+                              }}
                               transform="rotate(-90 60 60)"
                               strokeLinecap="round"
                             />
 
-                            <circle
-                              className="progress-background"
-                              cx="60"
-                              cy="60"
-                              r="38"
-                              stroke="#333"
-                              strokeWidth="8"
-                              fill="none"
-                            />
+                            {/* inner ring = best */}
+                            <circle className="progress-background" cx="60" cy="60" r="38" stroke="#333" strokeWidth="8" fill="none" />
                             <circle
                               className="progress-fill2"
-                              cx="60"
-                              cy="60"
-                              r="38"
-                              stroke="#6728f5"
-                              strokeWidth="8"
-                              fill="none"
-                              strokeDasharray={calculateCircleValues(getCurrentTestData().bestProgress, 38).strokeDasharray}
-                              strokeDashoffset={calculateCircleValues(getCurrentTestData().bestProgress, 38).strokeDashoffset}
+                              cx="60" cy="60" r="38"
+                              stroke="#7BFFBA" strokeWidth="8" fill="none"
+                              style={{
+                                strokeDasharray: `${2*Math.PI*38}`,
+                                strokeDashoffset: `${2*Math.PI*38 - (derived.bestPct/100)*(2*Math.PI*38)}`
+                              }}
                               transform="rotate(-90 60 60)"
                               strokeLinecap="round"
                             />
                           </svg>
                           <div className="progress-text">
                             <div className="progress-label">Current</div>
-                            <div className="progress-value">{getCurrentTestData().current}{getCurrentTestData().unit}</div>
+                            <div className="progress-value">
+                              {Math.round(derived.current)}{derived.showUnit ? derived.unit : ''}
+                            </div>
                           </div>
                         </div>
                       </div>
                       <div className="progress-details">
                         <div className="detail-item">
                           <span className="detail-dot">•</span>
-                          <span>Current {getCurrentTestData().current}{getCurrentTestData().unit}</span>
+                          <span>
+                            Current {Math.round(derived.current)}{derived.showUnit ? derived.unit : ''}
+                          </span>
                         </div>
                         <div className="detail-item">
-                          <span className="detail-dot">•</span>
-                          <span>Best {getCurrentTestData().best}{getCurrentTestData().unit}</span>
+                          <span className="detail-dot last-best">•</span>
+                          <span>
+                            Best {Math.round(derived.best)}{derived.showUnit ? derived.unit : ''}
+                          </span>
                         </div>
                       </div>
                     </div>
 
+                    {/* Consistency */}
                     <div className="progress-card">
                       <h3 className="card-title">Consistency</h3>
                       <div className="progress-circle-container">
                         <div className="progress-circle">
                           <svg className="progress-svg" viewBox="0 0 120 120">
-                            <circle
-                              className="progress-background"
-                              cx="60"
-                              cy="60"
-                              r="50"
-                              stroke="#333"
-                              strokeWidth="8"
-                              fill="none"
-                            />
+                            <circle className="progress-background" cx="60" cy="60" r="50" stroke="#333" strokeWidth="8" fill="none" />
                             <circle
                               className="progress-fill2"
-                              cx="60"
-                              cy="60"
-                              r="50"
-                              stroke="#6728f5"
-                              strokeWidth="8"
-                              fill="none"
-                              strokeDasharray={calculateCircleValues(getCurrentTestData().consistencyProgress, 50).strokeDasharray}
-                              strokeDashoffset={calculateCircleValues(getCurrentTestData().consistencyProgress, 50).strokeDashoffset}
+                              cx="60" cy="60" r="50"
+                              stroke="#7BFFBA" strokeWidth="8" fill="none"
+                              style={{
+                                strokeDasharray: `${2*Math.PI*50}`,
+                                strokeDashoffset: `${2*Math.PI*50 - (derived.consistencyPct/100)*(2*Math.PI*50)}`
+                              }}
                               transform="rotate(-90 60 60)"
                               strokeLinecap="round"
                             />
                           </svg>
                           <div className="progress-text">
                             <div className="progress-label">Rate</div>
-                            <div className="progress-value">{getCurrentTestData().consistency}</div>
+                            <div className="progress-value">{derived.consistencyPct}</div>
                           </div>
                         </div>
                       </div>
                       <div className="progress-details">
                         <div className="improvement-item">
-                          <TrendingUp size={16} />
-                          <span>{getCurrentTestData().improvement}</span>
+                          {derived.trendLabel === 'Declining'
+                            ? <svg width="16" height="16"><path d="M2 4 L8 10 L14 4" stroke="#ff8080" strokeWidth="2" fill="none"/></svg>
+                            : <TrendingUp size={16} />
+                          }
+                          <span>{derived.trendLabel}</span>
                         </div>
                       </div>
                     </div>
@@ -569,4 +548,4 @@ const PlayerOverview: React.FC = () => {
   );
 };
 
-export default PlayerOverview; 
+export default PlayerOverview;

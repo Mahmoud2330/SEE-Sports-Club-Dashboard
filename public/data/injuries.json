@@ -2,6 +2,7 @@
     {
       "playerId": 12,
       "status": "at-risk",
+      "bodyPart": "Left-Thigh",
       "riskScore": 0.72,
       "confidence": 0.68,
       "expectedStart": "2025-08-21",
@@ -16,6 +17,7 @@
     {
       "playerId": 2,
       "status": "injured",
+      "bodyPart": "Right-Thigh",
       "riskScore": 1.0,
       "confidence": 0.82,
       "expectedStart": "2025-08-02",
@@ -31,12 +33,153 @@
     {
       "playerId": 3,
       "status": "healthy",
+      "bodyPart": null,
       "riskScore": 0.12,
       "confidence": 0.55,
       "expectedStart": null,
       "expectedEnd": null,
       "reasons": [],
       "notes": "Stable workload and good recovery metrics."
+    },
+    {
+      "playerId": 4,
+      "status": "injured",
+      "bodyPart": "Left-Foot",
+      "riskScore": 0.95,
+      "confidence": 0.91,
+      "expectedStart": "2025-07-28",
+      "expectedEnd": "2025-08-25",
+      "reasons": [
+        { "code": "impact", "label": "Contact/Impact", "weight": 0.65 },
+        { "code": "tackle", "label": "Tackle Injury", "weight": 0.35 }
+      ],
+      "notes": "Ankle sprain during match; Grade II ligament damage. Requires immobilization for 2 weeks."
+    },
+    {
+      "playerId": 5,
+      "status": "at-risk",
+      "bodyPart": "Right-Shoulder",
+      "riskScore": 0.68,
+      "confidence": 0.74,
+      "expectedStart": "2025-08-15",
+      "expectedEnd": "2025-08-30",
+      "reasons": [
+        { "code": "overload", "label": "Training Overload", "weight": 0.42 },
+        { "code": "repetitive", "label": "Repetitive Motion", "weight": 0.38 },
+        { "code": "recovery", "label": "Poor Recovery", "weight": 0.20 }
+      ],
+      "notes": "Increased throwing/shooting volume without adequate rest periods."
+    },
+    {
+      "playerId": 6,
+      "status": "injured",
+      "bodyPart": "Head",
+      "riskScore": 0.88,
+      "confidence": 0.95,
+      "expectedStart": "2025-08-10",
+      "expectedEnd": "2025-09-10",
+      "reasons": [
+        { "code": "impact", "label": "Contact/Impact", "weight": 0.78 },
+        { "code": "collision", "label": "Player Collision", "weight": 0.22 }
+      ],
+      "notes": "Concussion protocol; Grade I. No training until cleared by medical team."
+    },
+    {
+      "playerId": 7,
+      "status": "at-risk",
+      "bodyPart": "Back",
+      "riskScore": 0.55,
+      "confidence": 0.62,
+      "expectedStart": "2025-08-20",
+      "expectedEnd": "2025-09-05",
+      "reasons": [
+        { "code": "posture", "label": "Poor Posture", "weight": 0.45 },
+        { "code": "core", "label": "Weak Core", "weight": 0.35 },
+        { "code": "fatigue", "label": "Fatigue", "weight": 0.20 }
+      ],
+      "notes": "Lower back tightness; recommend core strengthening and posture correction."
+    },
+    {
+      "playerId": 8,
+      "status": "injured",
+      "bodyPart": "Right-Foot",
+      "riskScore": 0.92,
+      "confidence": 0.87,
+      "expectedStart": "2025-07-20",
+      "expectedEnd": "2025-08-15",
+      "reasons": [
+        { "code": "stress", "label": "Stress Fracture", "weight": 0.60 },
+        { "code": "overload", "label": "Training Overload", "weight": 0.25 },
+        { "code": "surface", "label": "Hard Surface Training", "weight": 0.15 }
+      ],
+      "notes": "Metatarsal stress fracture; 4-6 weeks recovery with gradual return to training."
+    },
+    {
+      "playerId": 9,
+      "status": "at-risk",
+      "bodyPart": "Left-Arm",
+      "riskScore": 0.73,
+      "confidence": 0.69,
+      "expectedStart": "2025-08-25",
+      "expectedEnd": "2025-09-10",
+      "reasons": [
+        { "code": "previous", "label": "Previous Injury", "weight": 0.40 },
+        { "code": "instability", "label": "Joint Instability", "weight": 0.33 },
+        { "code": "movement", "label": "Poor Movement Pattern", "weight": 0.27 }
+      ],
+      "notes": "ACL reconstruction 8 months ago; slight instability during cutting movements."
+    },
+    {
+      "playerId": 10,
+      "status": "healthy",
+      "bodyPart": null,
+      "riskScore": 0.08,
+      "confidence": 0.72,
+      "expectedStart": null,
+      "expectedEnd": null,
+      "reasons": [],
+      "notes": "Excellent recovery metrics and stable performance indicators."
+    },
+    {
+      "playerId": 11,
+      "status": "at-risk",
+      "bodyPart": "Neck",
+      "riskScore": 0.61,
+      "confidence": 0.58,
+      "expectedStart": "2025-08-18",
+      "expectedEnd": "2025-09-02",
+      "reasons": [
+        { "code": "whiplash", "label": "Whiplash Effect", "weight": 0.50 },
+        { "code": "tension", "label": "Muscle Tension", "weight": 0.30 },
+        { "code": "stress", "label": "Stress", "weight": 0.20 }
+      ],
+      "notes": "Neck stiffness and limited range of motion; recommend stretching and massage therapy."
+    },
+    {
+      "playerId": 3,
+      "status": "at-risk",
+      "bodyPart": "Right-Chest",
+      "riskScore": 0.49,
+      "confidence": 0.55,
+      "expectedStart": "2025-08-22",
+      "expectedEnd": "2025-09-07",
+      "reasons": [
+        { "code": "breathing", "label": "Breathing Pattern", "weight": 0.45 },
+        { "code": "fatigue", "label": "Fatigue", "weight": 0.35 },
+        { "code": "posture", "label": "Poor Posture", "weight": 0.20 }
+      ],
+      "notes": "Minor chest tightness; recommend breathing exercises and posture correction."
+    },
+    {
+      "playerId": 1,
+      "status": "healthy",
+      "bodyPart": null,
+      "riskScore": 0.15,
+      "confidence": 0.68,
+      "expectedStart": null,
+      "expectedEnd": null,
+      "reasons": [],
+      "notes": "Good overall fitness; minor fatigue indicators but within normal range."
     }
   ]
   

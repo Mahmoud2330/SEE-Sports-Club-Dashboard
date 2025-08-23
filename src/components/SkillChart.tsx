@@ -1,175 +1,161 @@
-import React, { useState, useId, useMemo } from 'react';
-import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area } from 'recharts';
-import { Filter, TrendingUp, Heart, Zap, Clock, Activity, TrendingDown } from 'lucide-react';
+import React, { useEffect, useMemo, useState, useId } from 'react';
+import {
+  ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Area
+} from 'recharts';
+import { Filter, TrendingUp, TrendingDown, Heart, Zap, Clock, Activity } from 'lucide-react';
+import type { Player } from '../services/dataService';
+import { dataService } from '../services/dataService';
 
 interface SkillChartProps {
-  playerName?: string;
+  player: Player;               // <-- pass the whole player (from players.json)
+  playerName?: string;          // optional label; defaults to player.name
 }
 
-const SkillChart: React.FC<SkillChartProps> = ({ playerName = 'Ahmed Mohamed' }) => {
-  const [selectedSkill, setSelectedSkill] = useState('Ball Control');
+type MetricLabel = 'Ball Control' | 'Passing' | 'Shooting' | 'Dribbling' | 'Defending';
 
-  // unique, safe id for the gradient (no spaces, no collisions)
+const LABEL_TO_JSON_KEY: Record<MetricLabel, string> = {
+  'Ball Control': 'Ball Control',
+  'Passing': 'passing',
+  'Shooting': 'shooting',
+  'Dribbling': 'Running with Ball', // map to JSON
+  'Defending': '1v1',               // map to JSON
+};
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] as const;
+
+const TABS: Array<{
+  name: MetricLabel;
+  icon: React.ReactNode;
+  color: string;
+  teamColor: string;
+  iconBgColor: string;
+}> = [
+  { name: 'Ball Control', icon: <TrendingUp size={16} />, color: '#7BFFBA', teamColor: '#6728f5', iconBgColor: '#283630' },
+  { name: 'Passing',      icon: <Heart size={16} />,      color: '#7BFFBA', teamColor: '#6728f5', iconBgColor: '#283630' },
+  { name: 'Shooting',     icon: <Zap size={16} />,        color: '#7BFFBA', teamColor: '#6728f5', iconBgColor: '#283630' },
+  { name: 'Dribbling',    icon: <Clock size={16} />,      color: '#7BFFBA', teamColor: '#6728f5', iconBgColor: '#283630' },
+  { name: 'Defending',    icon: <Activity size={16} />,   color: '#7BFFBA', teamColor: '#6728f5', iconBgColor: '#283630' },
+];
+
+const TITLE_MAP: Record<MetricLabel, { title: string; subtitle: string }> = {
+  'Ball Control': { title: 'Ball Control Mastery',     subtitle: 'Technical ball handling and control skills' },
+  'Passing':      { title: 'Passing Accuracy',         subtitle: 'Precision and timing in ball distribution' },
+  'Shooting':     { title: 'Shooting Precision',       subtitle: 'Accuracy and power in goal scoring' },
+  'Dribbling':    { title: 'Dribbling Skills',         subtitle: 'Ball control while moving at speed' },
+  'Defending':    { title: 'Defensive Mastery',        subtitle: 'Tackling, positioning, and defensive awareness' },
+};
+
+type Row = { month: string; ahmed: number; team: number };
+
+function avg(nums: number[]): number {
+  const v = nums.filter((n) => Number.isFinite(n));
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
+}
+
+function normalizeTo4to10(all: number[]): (v: number) => number {
+  const vals = all.filter((x) => Number.isFinite(x));
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  if (!isFinite(min) || !isFinite(max) || max === min) return () => 7;
+  return (v: number) => 4 + 6 * ((v - min) / (max - min));
+}
+
+function trend(values: number[]): 'Improving' | 'Declining' | 'Stable' {
+  const vals = values.filter((x) => Number.isFinite(x));
+  if (vals.length < 3) return 'Stable';
+  const last3 = vals.slice(-3);
+  const slope = (last3[2] - last3[0]) / 2;
+  if (slope > 0.05) return 'Improving';
+  if (slope < -0.05) return 'Declining';
+  return 'Stable';
+}
+
+const SkillChart: React.FC<SkillChartProps> = ({ player, playerName }) => {
+  const [selectedSkill, setSelectedSkill] = useState<MetricLabel>('Ball Control');
+  const [teamMonthly, setTeamMonthly] = useState<Record<string, Record<string, number>>>({}); // jsonKey -> month -> avg
+
   const uid = useId();
   const gradientId = useMemo(() => `skillAreaGradient-${uid}`, [uid]);
 
-  const skillMetrics = [
-    { 
-      name: 'Ball Control', 
-      icon: <TrendingUp size={16} />,
-      color: '#7BFFBA',
-      areaColor: '#7BFFBA',
-      teamColor: '#6728f5',
-      iconBgColor: '#283630'
-    },
-    { 
-      name: 'Passing', 
-      icon: <Heart size={16} />,
-      color: '#7BFFBA',
-      areaColor: '#7BFFBA',
-      teamColor: '#6728f5',
-      iconBgColor: '#283630'
-    },
-    { 
-      name: 'Shooting', 
-      icon: <Zap size={16} />,
-      color: '#7BFFBA',
-      areaColor: '#7BFFBA',
-      teamColor: '#6728f5',
-      iconBgColor: '#283630'
-    },
-    { 
-      name: 'Dribbling', 
-      icon: <Clock size={16} />,
-      color: '#7BFFBA',
-      areaColor: '#7BFFBA',
-      teamColor: '#6728f5',
-      iconBgColor: '#283630'
-    },
-    { 
-      name: 'Defending', 
-      icon: <Activity size={16} />,
-      color: '#7BFFBA',
-      areaColor: '#7BFFBA',
-      teamColor: '#6728f5',
-      iconBgColor: '#283630'
-    },
-  ];
+  // Preload team monthly averages per skill key
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const mates = await dataService.getPlayersByTeam(player.teamId);
+        const byKey: Record<string, Record<string, number>> = {};
+        Object.values(LABEL_TO_JSON_KEY).forEach((jsonKey) => {
+          const monthMap: Record<string, number> = {};
+          MONTHS.forEach((m) => {
+            const vals: number[] = [];
+            mates.forEach((pl) => {
+              const skillPerf = (pl as any)['Skill Performance'];
+              const series = skillPerf?.[jsonKey];
+              const v = series?.[m];
+              if (typeof v === 'number') vals.push(v);
+            });
+            monthMap[m] = vals.length ? avg(vals) : NaN;
+          });
+          byKey[jsonKey] = monthMap;
+        });
+        if (mounted) setTeamMonthly(byKey);
+      } catch {
+        // ignore: chart will still render player line
+      }
+    })();
+    return () => { mounted = false; };
+  }, [player.teamId]);
 
-  // Comprehensive data for each skill
-  const skillData = {
-    'Ball Control': {
-      title: 'Ball Control Mastery',
-      subtitle: 'Technical ball handling and control skills',
-      yourAverage: 8.15,
-      teamAverage: 7.89,
-      yourProgress: 82,
-      teamProgress: 79,
-      improvement: 'Improving',
-      improvementType: 'improving',
-      chartData: [
-        { month: 'Jan', ballControl: 9.2, passing: 6.8, shooting: 6.5 },
-        { month: 'Feb', ballControl: 8.0, passing: 6.9, shooting: 6.7 },
-        { month: 'Mar', ballControl: 6.4, passing: 7.1, shooting: 6.9 },
-        { month: 'Apr', ballControl: 5.6, passing: 7.3, shooting: 7.1 },
-        { month: 'May', ballControl: 4.8, passing: 7.5, shooting: 7.3 },
-        { month: 'Jun', ballControl: 6.0, passing: 7.7, shooting: 7.5 },
-        { month: 'Jul', ballControl: 8.2, passing: 7.9, shooting: 7.7 },
-      ]
-    },
-    'Passing': {
-      title: 'Passing Accuracy',
-      subtitle: 'Precision and timing in ball distribution',
-      yourAverage: 7.45,
-      teamAverage: 7.23,
-      yourProgress: 74,
-      teamProgress: 72,
-      improvement: 'Improving',
-      improvementType: 'improving',
-      chartData: [
-        { month: 'Jan', ballControl: 7.8, passing: 6.8, shooting: 6.5 },
-        { month: 'Feb', ballControl: 7.5, passing: 7.1, shooting: 6.7 },
-        { month: 'Mar', ballControl: 7.2, passing: 7.4, shooting: 6.9 },
-        { month: 'Apr', ballControl: 7.0, passing: 7.6, shooting: 7.1 },
-        { month: 'May', ballControl: 6.8, passing: 7.8, shooting: 7.3 },
-        { month: 'Jun', ballControl: 7.1, passing: 8.0, shooting: 7.5 },
-        { month: 'Jul', ballControl: 7.4, passing: 8.2, shooting: 7.7 },
-      ]
-    },
-    'Shooting': {
-      title: 'Shooting Precision',
-      subtitle: 'Accuracy and power in goal scoring',
-      yourAverage: 7.89,
-      teamAverage: 7.56,
-      yourProgress: 79,
-      teamProgress: 76,
-      improvement: 'Improving',
-      improvementType: 'improving',
-      chartData: [
-        { month: 'Jan', ballControl: 7.2, passing: 6.8, shooting: 6.5 },
-        { month: 'Feb', ballControl: 7.0, passing: 6.9, shooting: 6.8 },
-        { month: 'Mar', ballControl: 6.8, passing: 7.1, shooting: 7.1 },
-        { month: 'Apr', ballControl: 6.6, passing: 7.3, shooting: 7.4 },
-        { month: 'May', ballControl: 6.4, passing: 7.5, shooting: 7.7 },
-        { month: 'Jun', ballControl: 6.7, passing: 7.7, shooting: 8.0 },
-        { month: 'Jul', ballControl: 7.0, passing: 7.9, shooting: 8.3 },
-      ]
-    },
-    'Dribbling': {
-      title: 'Dribbling Skills',
-      subtitle: 'Ball control while moving at speed',
-      yourAverage: 7.23,
-      teamAverage: 7.01,
-      yourProgress: 72,
-      teamProgress: 70,
-      improvement: 'Improving',
-      improvementType: 'improving',
-      chartData: [
-        { month: 'Jan', ballControl: 7.5, passing: 6.8, shooting: 6.5 },
-        { month: 'Feb', ballControl: 7.3, passing: 6.9, shooting: 6.7 },
-        { month: 'Mar', ballControl: 7.1, passing: 7.1, shooting: 6.9 },
-        { month: 'Apr', ballControl: 6.9, passing: 7.3, shooting: 7.1 },
-        { month: 'May', ballControl: 6.7, passing: 7.5, shooting: 7.3 },
-        { month: 'Jun', ballControl: 7.0, passing: 7.7, shooting: 7.5 },
-        { month: 'Jul', ballControl: 7.3, passing: 7.9, shooting: 7.7 },
-      ]
-    },
-    'Defending': {
-      title: 'Defensive Mastery',
-      subtitle: 'Tackling, positioning, and defensive awareness',
-      yourAverage: 7.67,
-      teamAverage: 7.34,
-      yourProgress: 77,
-      teamProgress: 73,
-      improvement: 'Improving',
-      improvementType: 'improving',
-      chartData: [
-        { month: 'Jan', ballControl: 7.8, passing: 6.8, shooting: 6.5 },
-        { month: 'Feb', ballControl: 7.6, passing: 6.9, shooting: 6.7 },
-        { month: 'Mar', ballControl: 7.4, passing: 7.1, shooting: 6.9 },
-        { month: 'Apr', ballControl: 7.2, passing: 7.3, shooting: 7.1 },
-        { month: 'May', ballControl: 7.0, passing: 7.5, shooting: 7.3 },
-        { month: 'Jun', ballControl: 7.3, passing: 7.7, shooting: 7.5 },
-        { month: 'Jul', ballControl: 7.6, passing: 7.9, shooting: 7.7 },
-      ]
-    },
-  };
+  // Build chart rows for the selected skill (player + team) and normalize to 4..10
+  const chartData: Row[] = useMemo(() => {
+    const jsonKey = LABEL_TO_JSON_KEY[selectedSkill];
+    const skillPerf = (player as any)['Skill Performance'] as Record<string, Record<string, number>> | undefined;
+    const playerSeries = skillPerf?.[jsonKey] || {};
 
-  const getCurrentSkillData = () => {
-    return skillData[selectedSkill as keyof typeof skillData] || skillData['Ball Control'];
-  };
+    const months = MONTHS.filter((m) => playerSeries[m] != null || teamMonthly[jsonKey]?.[m] != null);
+    const last7 = months.slice(-7);
 
-  const getCurrentSkillColors = () => {
-    return skillMetrics.find(skill => skill.name === selectedSkill) || skillMetrics[0];
-  };
+    const allRaw: number[] = [];
+    last7.forEach((m) => {
+      const pv = playerSeries[m];
+      const tv = teamMonthly[jsonKey]?.[m];
+      if (typeof pv === 'number') allRaw.push(pv);
+      if (typeof tv === 'number') allRaw.push(tv);
+    });
+
+    const norm = normalizeTo4to10(allRaw.length ? allRaw : [0, 1]);
+
+    return last7.map((m) => ({
+      month: m,
+      ahmed: playerSeries[m] != null ? Number(norm(playerSeries[m]).toFixed(2)) : NaN,
+      team:  teamMonthly[jsonKey]?.[m] != null ? Number(norm(teamMonthly[jsonKey][m]).toFixed(2)) : NaN,
+    }));
+  }, [player, selectedSkill, teamMonthly]);
+
+  const yourAvg = useMemo(() => {
+    const vals = chartData.map((r) => r.ahmed).filter((v) => Number.isFinite(v));
+    return vals.length ? Number(avg(vals).toFixed(2)) : 0;
+  }, [chartData]);
+
+  const teamAvg = useMemo(() => {
+    const vals = chartData.map((r) => r.team).filter((v) => Number.isFinite(v));
+    return vals.length ? Number(avg(vals).toFixed(2)) : 0;
+  }, [chartData]);
+
+  const yourProgressPct = Math.max(0, Math.min(100, Math.round((yourAvg / 10) * 100)));
+  const teamProgressPct = Math.max(0, Math.min(100, Math.round((teamAvg / 10) * 100)));
+
+  const improvement = useMemo(() => trend(chartData.map((r) => r.ahmed)), [chartData]);
+  const improving = improvement === 'Improving';
+  const declining = improvement === 'Declining';
+
+  const tab = TABS.find((t) => t.name === selectedSkill) || TABS[0];
+  const title = TITLE_MAP[selectedSkill];
 
   return (
     <div className="skill-analytics">
-      {/* Skill Analytics Section */}
       <div className="skill-analytics-section">
-        
-
-        {/* Skill Assessment Section */}
         <div className="skill-assessment-section">
           <div className="assessment-header">
             <div className="assessment-title-section">
@@ -179,18 +165,15 @@ const SkillChart: React.FC<SkillChartProps> = ({ playerName = 'Ahmed Mohamed' })
               </p>
             </div>
             <div className="selected-metric" style={{ color: '#fff' }}>
-              <div style={{ color: getCurrentSkillColors().color }}>
-                {getCurrentSkillColors().icon}
-              </div>
-              <span>{getCurrentSkillData().title}</span>
+              <div style={{ color: tab.color }}>{tab.icon}</div>
+              <span>{title.title}</span>
             </div>
           </div>
 
-          {/* Skill Assessment Metrics */}
           <div className="assessment-metrics">
-            {skillMetrics.map((skill, index) => (
+            {TABS.map((skill) => (
               <button
-                key={index}
+                key={skill.name}
                 className={`assessment-metric-btn ${selectedSkill === skill.name ? 'active' : ''}`}
                 onClick={() => setSelectedSkill(skill.name)}
               >
@@ -202,125 +185,85 @@ const SkillChart: React.FC<SkillChartProps> = ({ playerName = 'Ahmed Mohamed' })
         </div>
       </div>
 
-      {/* Skill Chart Section */}
       <div className="skill-chart">
         <div className="chart-header">
           <div className="chart-title-container">
-            <div 
-              className="chart-icon" 
-              style={{ 
-                color: getCurrentSkillColors().color,
-                backgroundColor: getCurrentSkillColors().iconBgColor
-              }}
+            <div
+              className="chart-icon"
+              style={{ color: tab.color, backgroundColor: tab.iconBgColor }}
             >
-              {getCurrentSkillColors().icon}
+              {tab.icon}
             </div>
             <div className="chart-title-content">
-              <div className="chart-title-text">{getCurrentSkillData().title}</div>
-              <div className="chart-subtitle">{getCurrentSkillData().subtitle}</div>
+              <div className="chart-title-text">{title.title}</div>
+              <div className="chart-subtitle">{title.subtitle}</div>
             </div>
           </div>
           <div className="chart-legend">
             <div className="legend-item">
-              <div className="legend-color ball-control" style={{ backgroundColor: getCurrentSkillColors().color }}></div>
-              <span>{selectedSkill}</span>
+              <div className="legend-color ball-control" style={{ backgroundColor: tab.color }}></div>
+              <span>{playerName || player.name}</span>
             </div>
             <div className="legend-item">
-              <div className="legend-color passing" style={{ backgroundColor: getCurrentSkillColors().teamColor }}></div>
+              <div className="legend-color passing" style={{ backgroundColor: tab.teamColor }}></div>
               <span>Team</span>
             </div>
           </div>
         </div>
-        
+
         <div className="metrics-summary">
           <div className="metric-card">
-            <div className="metric-value" style={{ color: getCurrentSkillColors().color }}>
-              {getCurrentSkillData().yourAverage}
+            <div className="metric-value" style={{ color: tab.color }}>
+              {yourAvg.toFixed(2)}
             </div>
             <div className="metric-label">Your Average</div>
             <div className="progress-bar">
-              <div 
-                className="progress-fill your-average" 
-                style={{ 
-                  width: `${getCurrentSkillData().yourProgress}%`,
-                  backgroundColor: getCurrentSkillColors().color
-                }}
-              ></div>
+              <div
+                className="progress-fill your-average"
+                style={{ width: `${yourProgressPct}%`, backgroundColor: tab.color }}
+              />
             </div>
           </div>
           <div className="metric-card">
-            <div className="metric-value" style={{ color: getCurrentSkillColors().teamColor }}>
-              {getCurrentSkillData().teamAverage}
+            <div className="metric-value" style={{ color: tab.teamColor }}>
+              {teamAvg.toFixed(2)}
             </div>
             <div className="metric-label">Team Average</div>
             <div className="progress-bar">
-              <div 
-                className="progress-fill team-average" 
-                style={{ 
-                  width: `${getCurrentSkillData().teamProgress}%`,
-                  backgroundColor: getCurrentSkillColors().teamColor
-                }}
-              ></div>
+              <div
+                className="progress-fill team-average"
+                style={{ width: `${teamProgressPct}%`, backgroundColor: tab.teamColor }}
+              />
             </div>
           </div>
         </div>
 
-        {/* Improvement Indicator */}
         <div className="improvement-indicator-container" style={{ textAlign: 'right', marginBottom: '16px' }}>
-          <div className={`improvement-indicator ${getCurrentSkillData().improvementType === 'declining' ? 'declining' : 'improving'}`}>
-            {getCurrentSkillData().improvementType === 'declining' ? (
-              <TrendingDown size={16} />
-            ) : (
-              <TrendingUp size={16} />
-            )}
-            <span>{getCurrentSkillData().improvement}</span>
+          <div className={`improvement-indicator ${declining ? 'declining' : improving ? 'improving' : ''}`}>
+            {declining ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+            <span>{improvement}</span>
           </div>
         </div>
-        
+
         <div className="chart-container">
           <ResponsiveContainer width="100%" height={300}>
-            <ComposedChart data={getCurrentSkillData().chartData}>
+            <ComposedChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis 
-                dataKey="month" 
-                stroke="#666"
-                tick={{ fill: '#666' }}
-              />
-              <YAxis 
-                stroke="#666"
-                tick={{ fill: '#666' }}
-                domain={[4, 10]}
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1a1a1a', 
-                  border: '1px solid #333',
-                  borderRadius: '8px'
-                }}
+              <XAxis dataKey="month" stroke="#666" tick={{ fill: '#666' }} />
+              <YAxis stroke="#666" tick={{ fill: '#666' }} domain={[4, 10]} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
               />
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={getCurrentSkillColors().color} stopOpacity={0.3} />
-                  <stop offset="70%" stopColor={getCurrentSkillColors().color} stopOpacity={0.05} />
+                  <stop offset="0%"  stopColor={tab.color} stopOpacity={0.3} />
+                  <stop offset="70%" stopColor={tab.color} stopOpacity={0.05} />
                 </linearGradient>
               </defs>
-              
-
-              <Area 
-                type="monotone" 
-                dataKey="ballControl" 
-                stroke={getCurrentSkillColors().color} 
-                strokeWidth={2}
-                fill={`url(#${gradientId})`}
-                dot={{ fill: getCurrentSkillColors().color, strokeWidth: 2, r: 4 }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="passing" 
-                stroke={getCurrentSkillColors().teamColor} 
-                strokeWidth={2}
-                dot={{ fill: getCurrentSkillColors().teamColor, strokeWidth: 2, r: 4 }}
-              />
+              {/* Keep your visuals: area for player, line for team */}
+              <Area type="monotone" dataKey="ahmed" stroke="none" fill={`url(#${gradientId})`} stackId="1" />
+              <Line type="monotone" dataKey="ahmed" stroke={tab.color} strokeWidth={2} dot={{ fill: tab.color, strokeWidth: 2, r: 4 }} />
+              <Line type="monotone" dataKey="team"  stroke={tab.teamColor} strokeWidth={2} dot={{ fill: tab.teamColor, strokeWidth: 2, r: 4 }} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Share2, Filter, ChevronRight, User, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import PlayerOverview from './PlayerOverview';
-import PlayerCard from './PlayerCard';
 import SkillsDevelopmentAnalysis from './SkillsDevelopmentAnalysis';
 import PhysicalPerformance from './PhysicalPerformance';
 import PerformanceChart from './PerformanceChart';
@@ -16,12 +14,7 @@ import { dataService } from '../services/dataService';
 import type { Player, Team } from '../services/dataService';
 
 const PlayerPage: React.FC = () => {
-  const [activePeriod, setActivePeriod] = useState('3 Months');
-  const [activeTest, setActiveTest] = useState('Vertical Jump');
   const { id: playerId } = useParams<{ id: string }>();
-
-  const periods = ['Last Month', '3 Months', '6 Months', 'This Year'];
-  const physicalTests = ['Vertical Jump', 'Broad Jump', '10m Run', '5-10-5', 'T-Agility'];
 
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState<string | null>(null);
@@ -41,26 +34,20 @@ const PlayerPage: React.FC = () => {
         const shouldShow = await dataService.shouldShowAssessmentNotes(playerId);
         setShouldShowAssessmentNotes(shouldShow);
         
-        if (shouldShow) {
-          const playerData = await dataService.getPlayerById(playerId);
-          if (playerData) {
-            setPlayer(playerData);
-            const tier = await dataService.getTeamTier(playerData.teamId);
-            setTeamTier(tier);
-            
-            // Get team info for chat widget
-            const team = await dataService.getTeamById(playerData.teamId);
-            setCurrentTeam(team);
-          }
+        const playerData = await dataService.getPlayerById(playerId);
+        if (playerData) {
+          setPlayer(playerData);
+
+          const [tier, team] = await Promise.all([
+            dataService.getTeamTier(playerData.teamId),
+            dataService.getTeamById(playerData.teamId),
+          ]);
+          setTeamTier(tier);
+          setCurrentTeam(team);
         } else {
-          // Even if no assessment notes, get player and team for chat widget
-          const playerData = await dataService.getPlayerById(playerId);
-          if (playerData) {
-            setPlayer(playerData);
-            const team = await dataService.getTeamById(playerData.teamId);
-            setCurrentTeam(team);
-          }
+          setError('Player not found');
         }
+
         setLoading(false);
       } catch (err) {
         console.error('Error checking assessment notes:', err);
@@ -100,41 +87,41 @@ const PlayerPage: React.FC = () => {
 
   return (
     <div className="player-page">
-        {/* Top Bar */}
-        <PlayerOverview />
+      {/* Top Bar + header, uses its own data fetch internally (kept as-is) */}
+      <PlayerOverview   />
 
-        {/* Skills Development Analysis */}
-        <SkillsDevelopmentAnalysis />
+      {/* Skills Development Analysis (kept as-is) */}
+      <SkillsDevelopmentAnalysis player={player} />
 
-        {/* Physical Performance Section */}
-        <PhysicalPerformance />
-    
-        {/* Skill Development */}
-        <SkillDevelopment />
-        
-        {/* Performance Chart */}
-        <PerformanceChart playerName={player.name} />
-        
-        {/* Skill Chart */}
-        <SkillChart playerName={player.name} />
-    
-        {/* Video Analysis */}
-        <VideoAnalysis />
+      {/* Physical Performance Section (kept as-is) */}
+      <PhysicalPerformance player={player} />
 
-        {/* Injury Status */}
-        <InjuryStatus playerId={parseInt(playerId || '0', 10)} />
+      {/* Skill Development (kept as-is) */}
+      <SkillDevelopment player={player} />
+      
+      {/* Performance Chart (kept as-is) */}
+      <PerformanceChart player={player} playerName={player.name} />
+      
+      {/* Skill Chart (kept as-is) */}
+      <SkillChart player={player} playerName={player.name} />
+  
+      {/* Video Analysis (kept as-is) */}
+      <VideoAnalysis />
 
-        {/* Assessment Notes - Only for Platinum/Premium teams */}
-        {shouldShowAssessmentNotes && teamTier && (
-          <div style={{ marginTop: '24px' }}>
-            <AssessmentNotes teamTier={teamTier} />
-          </div>
-        )}
-        
-        {/* Floating chat bot */}
-        {canShowChat && <ChatWidget />}
+      {/* Injury Status (kept as-is) */}
+      <InjuryStatus playerId={parseInt(playerId || '0', 10)} />
+
+      {/* Assessment Notes - Only for Platinum/Premium teams */}
+      {shouldShowAssessmentNotes && teamTier && (
+        <div style={{ marginTop: '24px' }}>
+          <AssessmentNotes teamTier={teamTier} player={player} />
+        </div>
+      )}
+      
+      {/* Floating chat bot for Premium/Platinum only */}
+      {canShowChat && <ChatWidget />}
     </div>
   );
 };
 
-export default PlayerPage; 
+export default PlayerPage;

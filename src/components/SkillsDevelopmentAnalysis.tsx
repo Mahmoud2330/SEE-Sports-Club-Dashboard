@@ -1,74 +1,187 @@
 import React, { useState } from 'react';
 import { Filter, TrendingUp, TrendingDown } from 'lucide-react';
+import type { Player } from '../services/dataService';
 
-const SkillsDevelopmentAnalysis: React.FC = () => {
+interface Props {
+  player: Player;                 // <-- now required
+  periodLabel?: string;           // optional header label
+}
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] as const;
+
+function buildSkillDataFromPlayer(player: Player) {
+  // Your JSON uses a key with a space: "Skill Performance"
+  const skillPerf = (player as any)['Skill Performance'] as
+    | Record<string, Record<string, number>>
+    | undefined;
+
+  if (!skillPerf) {
+    // Fallback to your existing static values if player has no data
+    return {
+      'Ball Control': {
+        title: 'Ball Control',
+        current: 6.0,
+        lastBest: 6.0,
+        consistency: 6.0,
+        currentProgress: 60,
+        lastBestProgress: 60,
+        consistencyProgress: 60,
+        improvement: '0%',
+        improvementType: 'stable' as const,
+        summary: 'No data available'
+      },
+      'Passing': {
+        title: 'Passing',
+        current: 6.0,
+        lastBest: 6.0,
+        consistency: 6.0,
+        currentProgress: 60,
+        lastBestProgress: 60,
+        consistencyProgress: 60,
+        improvement: '0%',
+        improvementType: 'stable' as const,
+        summary: 'No data available'
+      },
+      '1v1': {
+        title: '1v1',
+        current: 6.0,
+        lastBest: 6.0,
+        consistency: 6.0,
+        currentProgress: 60,
+        lastBestProgress: 60,
+        consistencyProgress: 60,
+        improvement: '0%',
+        improvementType: 'stable' as const,
+        summary: 'No data available'
+      },
+      'Dribbling': {
+        title: 'Dribbling',
+        current: 6.0,
+        lastBest: 6.0,
+        consistency: 6.0,
+        currentProgress: 60,
+        lastBestProgress: 60,
+        consistencyProgress: 60,
+        improvement: '0%',
+        improvementType: 'stable' as const,
+        summary: 'No data available'
+      },
+      'Shooting': {
+        title: 'Shooting',
+        current: 6.0,
+        lastBest: 6.0,
+        consistency: 6.0,
+        currentProgress: 60,
+        lastBestProgress: 60,
+        consistencyProgress: 60,
+        improvement: '0%',
+        improvementType: 'stable' as const,
+        summary: 'No data available'
+      }
+    };
+  }
+
+  // Define the mapping from UI labels to JSON keys
+  const spec: Record<
+    string,
+    { jsonKey: string }
+  > = {
+    'Ball Control': { jsonKey: 'Ball Control' },
+    'Passing': { jsonKey: 'passing' },
+    '1v1': { jsonKey: '1v1' },
+    'Dribbling': { jsonKey: 'Running with Ball' },
+    'Shooting': { jsonKey: 'shooting' }
+  };
+
+  const skillData: Record<string, {
+    title: string;
+    current: number;
+    lastBest: number;
+    consistency: number;
+    currentProgress: number;
+    lastBestProgress: number;
+    consistencyProgress: number;
+    improvement: string;
+    improvementType: 'improving' | 'declining' | 'stable';
+    summary: string;
+  }> = {};
+
+  Object.entries(spec).forEach(([label, cfg]) => {
+    const series = skillPerf[cfg.jsonKey];
+    
+    if (!series) {
+      return;
+    }
+
+    // Get all values for the skill
+    const values = MONTHS.map((m) => series[m]).filter((v): v is number => typeof v === 'number');
+    
+    if (values.length === 0) {
+      return;
+    }
+
+    const current = values[values.length - 1];
+    const lastBest = Math.max(...values);
+    const avgRating = values.reduce((a, b) => a + b, 0) / values.length;
+
+    // Normalize from 80-100 range to 0-10 scale
+    const normalizedCurrent = Math.round((current / 10) * 10) / 10;
+    const normalizedLastBest = Math.round((lastBest / 10) * 10) / 10;
+
+    // Calculate consistency using normalized values (0-10 scale) for more accurate results
+    const normalizedValues = values.map(v => v / 10); // Convert all values to 0-10 scale
+    const normalizedMean = normalizedValues.reduce((a, b) => a + b, 0) / normalizedValues.length;
+    const normalizedVariance = normalizedValues.reduce((sum, val) => sum + Math.pow(val - normalizedMean, 2), 0) / normalizedValues.length;
+    const normalizedStdDev = Math.sqrt(normalizedVariance);
+    
+    // CV = standard deviation / mean (as percentage)
+    // We want to invert this so higher percentage = more consistent
+    const cv = normalizedMean > 0 ? (normalizedStdDev / normalizedMean) * 100 : 0;
+    
+    // Convert CV to consistency percentage (0-100)
+    // CV of 0% = perfect consistency (100%)
+    // CV of 50% = moderate consistency (50%)
+    // CV of 100%+ = poor consistency (0%)
+    const consistency = Math.max(0, Math.min(100, Math.round(100 - Math.min(cv, 100))));
+
+    // Alternative: Use range-based consistency for more varied scores
+    // Calculate how much the values vary relative to their range
+    const range = Math.max(...normalizedValues) - Math.min(...normalizedValues);
+    const rangeBasedConsistency = Math.max(0, Math.min(100, Math.round(100 - (range / 10) * 100)));
+    
+    // Use the more varied range-based consistency
+    const finalConsistency = rangeBasedConsistency;
+
+    // Calculate improvement percentage
+    const improvement = lastBest > current ? 
+      `-${Math.round(((lastBest - current) / lastBest) * 100)}%` : 
+      `+${Math.round(((current - lastBest) / lastBest) * 100)}%`;
+
+    const improvementType: 'improving' | 'declining' | 'stable' = 
+      current > lastBest ? 'improving' : current < lastBest ? 'declining' : 'stable';
+
+    skillData[label] = {
+      title: label,
+      current: normalizedCurrent,
+      lastBest: normalizedLastBest,
+      consistency: finalConsistency,
+      currentProgress: Math.round((normalizedCurrent / 10) * 100),
+      lastBestProgress: Math.round((normalizedLastBest / 10) * 100),
+      consistencyProgress: finalConsistency,
+      improvement,
+      improvementType,
+      summary: `${label} ${improvementType === 'improving' ? 'showing improvement' : improvementType === 'declining' ? 'needs attention' : 'stable'}`
+    };
+  });
+
+  return skillData;
+}
+
+const SkillsDevelopmentAnalysis: React.FC<Props> = ({ player, periodLabel }) => {
   const [activeSkill, setActiveSkill] = useState('Ball Control');
 
-  const skills = ['Ball Control', 'Passing', '1v1', 'Running w/ Ball', 'Shooting'];
-
-  // Comprehensive data for each skill
-  const skillData = {
-    'Ball Control': {
-      title: 'Ball Control',
-      current: 8.3,
-      lastBest: 7.4,
-      consistency: 7.7,
-      currentProgress: 83, // percentage for outer circle
-      lastBestProgress: 74, // percentage for inner circle
-      consistencyProgress: 77,
-      improvement: '+12.2%',
-      improvementType: 'improving',
-      summary: 'Ball control significantly improved'
-    },
-    'Passing': {
-      title: 'Passing',
-      current: 7.8,
-      lastBest: 8.1,
-      consistency: 8.0,
-      currentProgress: 78,
-      lastBestProgress: 81,
-      consistencyProgress: 80,
-      improvement: '-3.7%',
-      improvementType: 'declining',
-      summary: 'Passing accuracy slightly decreased'
-    },
-    '1v1': {
-      title: '1v1',
-      current: 8.9,
-      lastBest: 8.2,
-      consistency: 8.5,
-      currentProgress: 89,
-      lastBestProgress: 82,
-      consistencyProgress: 85,
-      improvement: '+8.5%',
-      improvementType: 'improving',
-      summary: '1v1 skills showing strong improvement'
-    },
-    'Running w/ Ball': {
-      title: 'Running w/ Ball',
-      current: 7.5,
-      lastBest: 7.8,
-      consistency: 7.6,
-      currentProgress: 75,
-      lastBestProgress: 78,
-      consistencyProgress: 76,
-      improvement: '-3.8%',
-      improvementType: 'declining',
-      summary: 'Ball carrying needs attention'
-    },
-    'Shooting': {
-      title: 'Shooting',
-      current: 8.6,
-      lastBest: 8.0,
-      consistency: 8.3,
-      currentProgress: 86,
-      lastBestProgress: 80,
-      consistencyProgress: 83,
-      improvement: '+7.5%',
-      improvementType: 'improving',
-      summary: 'Shooting accuracy on the rise'
-    }
-  };
+  const skills = ['Ball Control', 'Passing', '1v1', 'Dribbling', 'Shooting'];
+  const skillData = buildSkillDataFromPlayer(player);
 
   const getCurrentSkillData = () => {
     return skillData[activeSkill as keyof typeof skillData] || skillData['Ball Control'];
@@ -88,7 +201,7 @@ const SkillsDevelopmentAnalysis: React.FC = () => {
         <h2 className="section-title">Skills Progress</h2>
         <div className="analysis-filter">
           <Filter size={16} />
-          <span>Skills Analysis Period</span>
+          <span>{periodLabel || 'Skills Analysis Period'}</span>
         </div>
       </div>
 
@@ -149,32 +262,32 @@ const SkillsDevelopmentAnalysis: React.FC = () => {
                     fill="none"
                   />
 
-                  {/* Purple arc - Outer circle (Last Best) */}
-                  <circle
-                    className="progress-fill-last-best"
-                    cx="60"
-                    cy="60"
-                    r="50"
-                    stroke="#6728f5"
-                    strokeWidth="6"
-                    fill="none"
-                    strokeDasharray={calculateCircleValues(getCurrentSkillData().lastBestProgress, 50).strokeDasharray}
-                    strokeDashoffset={calculateCircleValues(getCurrentSkillData().lastBestProgress, 50).strokeDashoffset}
-                    transform="rotate(-90 60 60)"
-                    strokeLinecap="round"
-                  />
-                  
-                  {/* Green arc - Inner circle (Current) */}
+                  {/* Purple arc - Outer circle (Current) */}
                   <circle
                     className="progress-fill-current"
                     cx="60"
                     cy="60"
-                    r="38"
-                    stroke="#00ff88"
+                    r="50"
+                    stroke="var(--db-primary)"
                     strokeWidth="6"
                     fill="none"
-                    strokeDasharray={calculateCircleValues(getCurrentSkillData().currentProgress, 38).strokeDasharray}
-                    strokeDashoffset={calculateCircleValues(getCurrentSkillData().currentProgress, 38).strokeDashoffset}
+                    strokeDasharray={calculateCircleValues(getCurrentSkillData().currentProgress, 50).strokeDasharray}
+                    strokeDashoffset={calculateCircleValues(getCurrentSkillData().currentProgress, 50).strokeDashoffset}
+                    transform="rotate(-90 60 60)"
+                    strokeLinecap="round"
+                  />
+                  
+                  {/* Green arc - Inner circle (Best) */}
+                  <circle
+                    className="progress-fill-last-best"
+                    cx="60"
+                    cy="60"
+                    r="38"
+                    stroke="var(--db-success)"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeDasharray={calculateCircleValues(getCurrentSkillData().lastBestProgress, 38).strokeDasharray}
+                    strokeDashoffset={calculateCircleValues(getCurrentSkillData().lastBestProgress, 38).strokeDashoffset}
                     transform="rotate(-90 60 60)"
                     strokeLinecap="round"
                   />
@@ -189,11 +302,11 @@ const SkillsDevelopmentAnalysis: React.FC = () => {
             <div className="skill-progress-details">
               <div className="skill-detail-item">
                 <span className="skill-detail-dot current">•</span>
-                <span>Current: {getCurrentSkillData().current}/10</span>
+                <span>Current (Outer): {getCurrentSkillData().current}/10</span>
               </div>
               <div className="skill-detail-item">
                 <span className="skill-detail-dot last-best">•</span>
-                <span>Last Best: {getCurrentSkillData().lastBest}/10</span>
+                <span>Best (Inner): {getCurrentSkillData().lastBest}/10</span>
               </div>
             </div>
             <div className={`improvement-indicator ${getCurrentSkillData().improvementType === 'declining' ? 'declining' : 'improving'}`}>
@@ -231,7 +344,7 @@ const SkillsDevelopmentAnalysis: React.FC = () => {
                     cx="60"
                     cy="60"
                     r="50"
-                    stroke="#00ff88"
+                    stroke="var(--db-success)"
                     strokeWidth="6"
                     fill="none"
                     strokeDasharray={calculateCircleValues(getCurrentSkillData().consistencyProgress, 50).strokeDasharray}
@@ -252,7 +365,7 @@ const SkillsDevelopmentAnalysis: React.FC = () => {
               ) : (
                 <TrendingUp size={16} />
               )}
-              <span>{getCurrentSkillData().improvementType === 'declining' ? 'Declining' : 'Improving'}</span>
+              <span>Consistency: {getCurrentSkillData().consistency}%</span>
             </div>
           </div>
         </div>

@@ -1543,7 +1543,7 @@ body {
 }
 
 .progress-fill-last-best {
-  stroke: var(--db-primary);
+  stroke: var(--db-success);
   transition: stroke-dashoffset 0.5s ease;
 }
 
@@ -1587,6 +1587,11 @@ body {
 
 .detail-dot {
   color: var(--db-primary);
+  font-weight: bold;
+}
+
+.detail-dot.last-best {
+  color: var(--db-success);
   font-weight: bold;
 }
 
@@ -2533,11 +2538,11 @@ body {
 }
 
 .skill-detail-dot.current {
-  color: var(--db-success);
+  color: var(--db-primary);
 }
 
 .skill-detail-dot.last-best {
-  color: var(--db-primary);
+  color: var(--db-success);
 }
 
 .improvement-indicator {

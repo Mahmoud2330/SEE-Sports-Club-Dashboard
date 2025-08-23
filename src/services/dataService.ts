@@ -47,6 +47,24 @@ export interface Player {
   // Optional time‑series blocks used by charts/progress
   ['Physical Performance']?: SeriesByMonth;
   ['Skill Performance']?: SeriesByMonth;
+  
+  // Assessment notes for platinum/premium teams
+  ['Assessment Notes']?: {
+    'Physical Assessments': {
+      'Vertical Jump': string[];
+      'Broad Jump': string[];
+      '10 Meter Run': string[];
+      'Five Ten Five': string[];
+      'T-Agility': string[];
+    };
+    'Skills Assessments': {
+      'Ball Control': string[];
+      'Passing': string[];
+      '1v1': string[];
+      'Running with Ball': string[];
+      'Shooting': string[];
+    };
+  };
 }
 
 export interface Team {
