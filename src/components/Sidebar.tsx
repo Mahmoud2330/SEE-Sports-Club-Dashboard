@@ -111,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false, isOpen = false, onC
             </div>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/teams"
             className={({ isActive }) => cx("row", isActive && "row--active")}
             onClick={() => isMobile && onClose?.()}
@@ -135,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false, isOpen = false, onC
               <div className="row-sub">Player profiles and stats</div>
             </div>
             <span className="pill pill--active">67</span>
-          </NavLink>
+          </NavLink> */}
         </div>
 
         <div className="group pad-top">
