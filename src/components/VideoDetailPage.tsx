@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Play, Pause, Volume2, Maximize, Clock, Target, TrendingUp } from 'lucide-react';
+import VideoWithOverlays from './VideoWithOverlays';
 
 interface VideoMetrics {
   title: string;
@@ -38,6 +39,12 @@ const VideoDetailPage: React.FC = () => {
   const [testMetricsData, setTestMetricsData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Get video information from URL parameters
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const videoCategory = searchParams.get('category') as 'physical' | 'skills';
+  const videoTitle = searchParams.get('title') || 'Video Analysis';
+
   useEffect(() => {
     // Load both current video data and all test metrics
     const loadData = async () => {
@@ -45,9 +52,9 @@ const VideoDetailPage: React.FC = () => {
       try {
         // Load current video data
         const mockVideoData: VideoMetrics = {
-          title: 'Vertical Jump Test',
+          title: videoTitle,
           duration: '0:52',
-          category: 'physical',
+          category: videoCategory || 'physical',
           highlights: [
             'Excellent explosive power from legs',
             'Good arm swing coordination',
@@ -213,55 +220,18 @@ const VideoDetailPage: React.FC = () => {
       <div className="video-detail-content">
         {/* Video Player Section */}
         <div className="video-player-section">
-          <div className="video-container">
-            <div className="video-placeholder">
-              {/* This will be replaced with actual video player */}
-              <div className="video-placeholder-content">
-                <div className="play-icon-large">
-                  <Play size={48} />
-                </div>
-                <p>Video Player - {videoData.title}</p>
-                <p className="video-placeholder-note">Actual video content will be loaded here</p>
-              </div>
-            </div>
-            
-            {/* Video Controls */}
-            <div className="video-controls">
-              <button onClick={togglePlay} className="control-btn play-btn">
-                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-              </button>
-              
-              <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${(currentTime / duration) * 100}%` }}></div>
-              </div>
-              
-              <div className="time-display">
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </div>
-              
-              <div className="volume-control">
-                <Volume2 size={16} />
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  value={volume}
-                  onChange={handleVolumeChange}
-                  className="volume-slider"
-                />
-              </div>
-              
-              <button className="control-btn fullscreen-btn">
-                <Maximize size={20} />
-              </button>
-            </div>
-          </div>
+          <VideoWithOverlays
+            src="/videos/sample-video.mp4"
+            overlaySrc="/data/overlays/ahmed-run-01.json"
+            poster="/videos/sample-poster.jpg"
+            compact
+          />
         </div>
 
         {/* Test Metrics Sidebar */}
         <div className="test-metrics-sidebar">
           <div className="sidebar-header">
+            <h3 className="sidebar-title">Test Metrics</h3>
             {hiddenTests.size > 0 && (
               <button className="reset-btn" onClick={resetHiddenTests}>
                 Reset
@@ -269,104 +239,213 @@ const VideoDetailPage: React.FC = () => {
             )}
           </div>
           
-          {/* Vertical Jump - Current Test (Highlighted) */}
-          {!isTestHidden('vertical-jump') && testMetricsData && (
-            <div className="test-metric-item current-test">
-              <div className="test-metric-header" onClick={() => toggleTestExpansion('vertical-jump')}>
-                <div className="test-metric-info">
-                  <div className={`test-icon ${testMetricsData['vertical-jump']?.category === 'physical' ? 'physical-icon' : 'skills-icon'}`}>
-                    <Target size={20} />
-                  </div>
-                  <div className="test-details">
-                    <h4 className="test-name">{testMetricsData['vertical-jump']?.title || 'Vertical Jump'}</h4>
-                    {isTestExpanded('vertical-jump') && (
-                      <p className="test-description">{testMetricsData['vertical-jump']?.highlights?.join(', ') || 'No highlights available'}</p>
-                    )}
+          {/* Dynamic Test Metrics based on video category */}
+          {videoCategory === 'physical' ? (
+            // Physical Tests Sidebar
+            <>
+              {/* Vertical Jump - Current Test (Highlighted) */}
+              {!isTestHidden('vertical-jump') && testMetricsData && (
+                <div className="test-metric-item current-test">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('vertical-jump')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon physical-icon">
+                        <Target size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['vertical-jump']?.title || 'Vertical Jump'}</h4>
+                        {isTestExpanded('vertical-jump') && (
+                          <p className="test-description">{testMetricsData['vertical-jump']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('vertical-jump'); }}>Hide</button>
                   </div>
                 </div>
-                <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('vertical-jump'); }}>Hide</button>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* 10 Meter Run */}
-          {!isTestHidden('10-meter-run') && testMetricsData && (
-            <div className="test-metric-item">
-              <div className="test-metric-header" onClick={() => toggleTestExpansion('10-meter-run')}>
-                <div className="test-metric-info">
-                  <div className={`test-icon ${testMetricsData['10-meter-run']?.category === 'physical' ? 'physical-icon' : 'skills-icon'}`}>
-                    <Clock size={20} />
-                  </div>
-                  <div className="test-details">
-                    <h4 className="test-name">{testMetricsData['10-meter-run']?.title || '10 Meter Run'}</h4>
-                    {isTestExpanded('10-meter-run') && (
-                      <p className="test-description">{testMetricsData['10-meter-run']?.highlights?.join(', ') || 'No highlights available'}</p>
-                    )}
+              {/* 10 Meter Run */}
+              {!isTestHidden('10-meter-run') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('10-meter-run')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon physical-icon">
+                        <Clock size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['10-meter-run']?.title || '10 Meter Run'}</h4>
+                        {isTestExpanded('10-meter-run') && (
+                          <p className="test-description">{testMetricsData['10-meter-run']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('10-meter-run'); }}>Hide</button>
                   </div>
                 </div>
-                <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('10-meter-run'); }}>Hide</button>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* 5-10-5 */}
-          {!isTestHidden('5-10-5') && testMetricsData && (
-            <div className="test-metric-item">
-              <div className="test-metric-header" onClick={() => toggleTestExpansion('5-10-5')}>
-                <div className="test-metric-info">
-                  <div className={`test-icon ${testMetricsData['5-10-5']?.category === 'physical' ? 'physical-icon' : 'skills-icon'}`}>
-                    <TrendingUp size={20} />
-                  </div>
-                  <div className="test-details">
-                    <h4 className="test-name">{testMetricsData['5-10-5']?.title || '5-10-5'}</h4>
-                    {isTestExpanded('5-10-5') && (
-                      <p className="test-description">{testMetricsData['5-10-5']?.highlights?.join(', ') || 'No highlights available'}</p>
-                    )}
+              {/* 5-10-5 */}
+              {!isTestHidden('5-10-5') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('5-10-5')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon physical-icon">
+                        <TrendingUp size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['5-10-5']?.title || '5-10-5'}</h4>
+                        {isTestExpanded('5-10-5') && (
+                          <p className="test-description">{testMetricsData['5-10-5']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('5-10-5'); }}>Hide</button>
                   </div>
                 </div>
-                <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('5-10-5'); }}>Hide</button>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* Broad Jump */}
-          {!isTestHidden('broad-jump') && testMetricsData && (
-            <div className="test-metric-item">
-              <div className="test-metric-header" onClick={() => toggleTestExpansion('broad-jump')}>
-                <div className="test-metric-info">
-                  <div className={`test-icon ${testMetricsData['broad-jump']?.category === 'physical' ? 'physical-icon' : 'skills-icon'}`}>
-                    <Target size={20} />
-                  </div>
-                  <div className="test-details">
-                    <h4 className="test-name">{testMetricsData['broad-jump']?.title || 'Broad Jump'}</h4>
-                    {isTestExpanded('broad-jump') && (
-                      <p className="test-description">{testMetricsData['broad-jump']?.highlights?.join(', ') || 'No highlights available'}</p>
-                    )}
+              {/* Broad Jump */}
+              {!isTestHidden('broad-jump') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('broad-jump')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon physical-icon">
+                        <Target size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['broad-jump']?.title || 'Broad Jump'}</h4>
+                        {isTestExpanded('broad-jump') && (
+                          <p className="test-description">{testMetricsData['broad-jump']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('broad-jump'); }}>Hide</button>
                   </div>
                 </div>
-                <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('broad-jump'); }}>Hide</button>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* T-Agility */}
-          {!isTestHidden('t-agility') && testMetricsData && (
-            <div className="test-metric-item">
-              <div className="test-metric-header" onClick={() => toggleTestExpansion('t-agility')}>
-                <div className="test-metric-info">
-                  <div className={`test-icon ${testMetricsData['t-agility']?.category === 'physical' ? 'physical-icon' : 'skills-icon'}`}>
-                    <TrendingUp size={20} />
-                  </div>
-                  <div className="test-details">
-                    <h4 className="test-name">{testMetricsData['t-agility']?.title || 'T-Agility'}</h4>
-                    {isTestExpanded('t-agility') && (
-                      <p className="test-description">{testMetricsData['t-agility']?.highlights?.join(', ') || 'No highlights available'}</p>
-                    )}
+              {/* T-Agility */}
+              {!isTestHidden('t-agility') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('t-agility')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon physical-icon">
+                        <TrendingUp size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['t-agility']?.title || 'T-Agility'}</h4>
+                        {isTestExpanded('t-agility') && (
+                          <p className="test-description">{testMetricsData['t-agility']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('t-agility'); }}>Hide</button>
                   </div>
                 </div>
-                <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('t-agility'); }}>Hide</button>
-              </div>
-            </div>
+              )}
+            </>
+          ) : (
+            // Skills Tests Sidebar
+            <>
+              {/* Ball Control - Current Test (Highlighted) */}
+              {!isTestHidden('ball-control') && testMetricsData && (
+                <div className="test-metric-item current-test">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('ball-control')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon skills-icon">
+                        <Target size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['ball-control']?.title || 'Ball Control'}</h4>
+                        {isTestExpanded('ball-control') && (
+                          <p className="test-description">{testMetricsData['ball-control']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('ball-control'); }}>Hide</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Passing Accuracy */}
+              {!isTestHidden('passing-accuracy') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('passing-accuracy')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon skills-icon">
+                        <Clock size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['passing-accuracy']?.title || 'Passing Accuracy'}</h4>
+                        {isTestExpanded('passing-accuracy') && (
+                          <p className="test-description">{testMetricsData['passing-accuracy']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('passing-accuracy'); }}>Hide</button>
+                  </div>
+                </div>
+              )}
+
+              {/* 1v1 */}
+              {!isTestHidden('1v1') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('1v1')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon skills-icon">
+                        <TrendingUp size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['1v1']?.title || '1v1'}</h4>
+                        {isTestExpanded('1v1') && (
+                          <p className="test-description">{testMetricsData['1v1']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('1v1'); }}>Hide</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Running with Ball */}
+              {!isTestHidden('running-with-ball') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('running-with-ball')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon skills-icon">
+                        <Target size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['running-with-ball']?.title || 'Running with Ball'}</h4>
+                        {isTestExpanded('running-with-ball') && (
+                          <p className="test-description">{testMetricsData['running-with-ball']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('running-with-ball'); }}>Hide</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Shooting */}
+              {!isTestHidden('shooting') && testMetricsData && (
+                <div className="test-metric-item">
+                  <div className="test-metric-header" onClick={() => toggleTestExpansion('shooting')}>
+                    <div className="test-metric-info">
+                      <div className="test-icon skills-icon">
+                        <TrendingUp size={20} />
+                      </div>
+                      <div className="test-details">
+                        <h4 className="test-name">{testMetricsData['shooting']?.title || 'Shooting'}</h4>
+                        {isTestExpanded('shooting') && (
+                          <p className="test-description">{testMetricsData['shooting']?.highlights?.join(', ') || 'No highlights available'}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button className="hide-btn" onClick={(e) => { e.stopPropagation(); hideTest('shooting'); }}>Hide</button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

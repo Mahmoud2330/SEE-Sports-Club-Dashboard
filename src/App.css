@@ -7051,4 +7051,17 @@ body {
   }
 }
 
+/* ===== VIDEO OVERLAY STYLES ===== */
+.video-analytic .overlay-controls{
+  display:flex; flex-wrap:wrap; gap:10px; margin-bottom:8px;
+  color:var(--db-text-muted); font-size:12px; align-items:center;
+}
+.video-analytic .overlay-controls label{
+  display:flex; align-items:center; gap:6px; padding:6px 10px;
+  border:1px solid var(--db-border); border-radius:8px;
+  background:rgba(255,255,255,0.03);
+}
+.video-analytic .overlay-controls .slider{ gap:10px }
+.video-analytic--compact .overlay-controls { margin-bottom:6px; }
+
 

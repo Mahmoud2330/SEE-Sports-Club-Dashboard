@@ -200,13 +200,218 @@
       "timestamp": "2024-01-15",
       "coachNotes": "Good progress in T-agility. Continue working on speed and turn technique.",
       "tags": ["agility", "speed", "coordination"]
+    },
+    "ball-control": {
+      "id": "ball-control",
+      "title": "Ball Control",
+      "duration": "1:18",
+      "category": "skills",
+      "videoUrl": "/videos/ball-control.mp4",
+      "thumbnail": "/thumbnails/ball-control.jpg",
+      "highlights": [
+        "Excellent first touch under pressure",
+        "Good use of both feet",
+        "Maintains control in tight spaces",
+        "Quick ball manipulation"
+      ],
+      "performanceMetrics": {
+        "score": 88,
+        "maxScore": 100,
+        "unit": "points",
+        "trend": "up",
+        "previousScore": 82,
+        "improvement": "+6"
+      },
+      "analysis": {
+        "strengths": [
+          "Superior ball touch",
+          "Ambidextrous control",
+          "Good spatial awareness"
+        ],
+        "areasForImprovement": [
+          "Could improve under high pressure",
+          "Speed of control could be enhanced"
+        ],
+        "recommendations": [
+          "Practice under increased pressure",
+          "Focus on speed drills",
+          "Continue technical training"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Excellent ball control skills. Player shows natural talent in this area. Continue developing under pressure situations.",
+      "tags": ["ball control", "technique", "pressure handling"]
+    },
+    "passing-accuracy": {
+      "id": "passing-accuracy",
+      "title": "Passing Accuracy",
+      "duration": "1:56",
+      "category": "skills",
+      "videoUrl": "/videos/passing-accuracy.mp4",
+      "thumbnail": "/thumbnails/passing-accuracy.jpg",
+      "highlights": [
+        "Precise passing technique",
+        "Good vision and awareness",
+        "Consistent accuracy",
+        "Proper weight on passes"
+      ],
+      "performanceMetrics": {
+        "score": 85,
+        "maxScore": 100,
+        "unit": "points",
+        "trend": "stable",
+        "previousScore": 86,
+        "improvement": "-1"
+      },
+      "analysis": {
+        "strengths": [
+          "Excellent passing technique",
+          "Good decision making",
+          "Consistent performance"
+        ],
+        "areasForImprovement": [
+          "Could improve long-range passing",
+          "Speed of play could increase"
+        ],
+        "recommendations": [
+          "Practice long-range passing",
+          "Focus on quick decision making",
+          "Work on passing under pressure"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Strong passing performance. Good technique and decision making. Focus on increasing speed of play.",
+      "tags": ["passing", "technique", "decision making"]
+    },
+    "1v1": {
+      "id": "1v1",
+      "title": "1v1",
+      "duration": "1:34",
+      "category": "skills",
+      "videoUrl": "/videos/1v1.mp4",
+      "thumbnail": "/thumbnails/1v1.jpg",
+      "highlights": [
+        "Good dribbling skills",
+        "Effective use of body feints",
+        "Quick decision making",
+        "Good finishing ability"
+      ],
+      "performanceMetrics": {
+        "score": 82,
+        "maxScore": 100,
+        "unit": "points",
+        "trend": "up",
+        "previousScore": 78,
+        "improvement": "+4"
+      },
+      "analysis": {
+        "strengths": [
+          "Good dribbling technique",
+          "Effective body feints",
+          "Quick reactions"
+        ],
+        "areasForImprovement": [
+          "Could improve finishing",
+          "Decision making under pressure"
+        ],
+        "recommendations": [
+          "Practice finishing drills",
+          "Work on decision making",
+          "Focus on pressure situations"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Good 1v1 performance. Strong dribbling and body feints. Continue working on finishing and decision making.",
+      "tags": ["dribbling", "1v1", "finishing"]
+    },
+    "running-with-ball": {
+      "id": "running-with-ball",
+      "title": "Running with Ball",
+      "duration": "1:43",
+      "category": "skills",
+      "videoUrl": "/videos/running-with-ball.mp4",
+      "thumbnail": "/thumbnails/running-with-ball.jpg",
+      "highlights": [
+        "Good ball control at speed",
+        "Effective use of space",
+        "Maintains control under pressure",
+        "Good acceleration with ball"
+      ],
+      "performanceMetrics": {
+        "score": 80,
+        "maxScore": 100,
+        "unit": "points",
+        "trend": "up",
+        "previousScore": 76,
+        "improvement": "+4"
+      },
+      "analysis": {
+        "strengths": [
+          "Good ball control at speed",
+          "Effective use of space",
+          "Maintains control under pressure"
+        ],
+        "areasForImprovement": [
+          "Could improve top speed",
+          "Decision making at speed"
+        ],
+        "recommendations": [
+          "Practice speed drills with ball",
+          "Work on decision making at speed",
+          "Focus on maintaining control"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Good performance running with the ball. Strong control at speed. Continue working on decision making at high speeds.",
+      "tags": ["running", "ball control", "speed"]
+    },
+    "shooting": {
+      "id": "shooting",
+      "title": "Shooting",
+      "duration": "1:25",
+      "category": "skills",
+      "videoUrl": "/videos/shooting.mp4",
+      "thumbnail": "/thumbnails/shooting.jpg",
+      "highlights": [
+        "Good shooting technique",
+        "Accurate finishing",
+        "Proper body positioning",
+        "Good power and placement"
+      ],
+      "performanceMetrics": {
+        "score": 85,
+        "maxScore": 100,
+        "unit": "points",
+        "trend": "up",
+        "previousScore": 80,
+        "improvement": "+5"
+      },
+      "analysis": {
+        "strengths": [
+          "Good shooting technique",
+          "Accurate finishing",
+          "Proper body positioning"
+        ],
+        "areasForImprovement": [
+          "Could improve power",
+          "Decision making in front of goal"
+        ],
+        "recommendations": [
+          "Practice power shooting",
+          "Work on decision making",
+          "Focus on finishing under pressure"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Strong shooting performance. Good technique and accuracy. Continue working on power and decision making in front of goal.",
+      "tags": ["shooting", "finishing", "technique"]
     }
   },
   "metadata": {
     "lastUpdated": "2024-01-15T10:00:00Z",
     "version": "1.0.0",
-    "totalVideos": 5,
-    "categories": ["physical"],
+    "totalVideos": 10,
+    "categories": ["physical", "skills"],
     "dataSource": "SEE Sports Club Video Analysis"
   }
 }

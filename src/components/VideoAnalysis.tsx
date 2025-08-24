@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import VideoWithOverlays from './VideoWithOverlays';
 
 interface VideoItem {
   title: string;
@@ -90,6 +91,19 @@ const VideoAnalysis: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Example of using VideoWithOverlays with analysis data */}
+      {/* 
+      <div style={{ marginBottom: '2rem' }}>
+        <h3>Sample Video with Overlays</h3>
+        <VideoWithOverlays
+          src="/videos/sample-video.mp4"
+          overlaySrc="/data/overlays/ahmed-run-01.json"
+          poster="/videos/sample-poster.jpg"
+          compact
+        />
+      </div>
+      */}
       
       <VideoSection 
         title="Physical Tests" 
