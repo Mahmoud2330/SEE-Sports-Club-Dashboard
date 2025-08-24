@@ -221,9 +221,8 @@ const VideoDetailPage: React.FC = () => {
         {/* Video Player Section */}
         <div className="video-player-section">
           <VideoWithOverlays
-            src="/videos/sample-video.mp4"
-            overlaySrc="/data/overlays/ahmed-run-01.json"
-            poster="/videos/sample-poster.jpg"
+            src="/videos/youth-speed-agility.mp4"
+            overlaySrc="/data/overlays/test-simple.json"
             compact
           />
         </div>
@@ -231,7 +230,6 @@ const VideoDetailPage: React.FC = () => {
         {/* Test Metrics Sidebar */}
         <div className="test-metrics-sidebar">
           <div className="sidebar-header">
-            <h3 className="sidebar-title">Test Metrics</h3>
             {hiddenTests.size > 0 && (
               <button className="reset-btn" onClick={resetHiddenTests}>
                 Reset
@@ -365,7 +363,6 @@ const VideoDetailPage: React.FC = () => {
                   </div>
                 </div>
               )}
-
 
               {/* Passing Accuracy */}
               {!isTestHidden('passing-accuracy') && testMetricsData && (

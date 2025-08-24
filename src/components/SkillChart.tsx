@@ -261,8 +261,8 @@ const SkillChart: React.FC<SkillChartProps> = ({ player, playerName }) => {
                 </linearGradient>
               </defs>
               {/* Keep your visuals: area for player, line for team */}
-              {/* <Area type="monotone" dataKey="ahmed" stroke="none" fill={`url(#${gradientId})`} stackId="1" /> */}
-              <Area type="monotone" dataKey="ahmed" stroke={tab.color} strokeWidth={2} fill={`url(#${gradientId})`} dot={{ fill: tab.color, strokeWidth: 2, r: 4 }} />
+              <Area type="monotone" dataKey="ahmed" stroke="none" fill={`url(#${gradientId})`} stackId="1" />
+              <Line type="monotone" dataKey="ahmed" stroke={tab.color} strokeWidth={2} dot={{ fill: tab.color, strokeWidth: 2, r: 4 }} />
               <Line type="monotone" dataKey="team"  stroke={tab.teamColor} strokeWidth={2} dot={{ fill: tab.teamColor, strokeWidth: 2, r: 4 }} />
             </ComposedChart>
           </ResponsiveContainer>

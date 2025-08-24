@@ -7063,5 +7063,6 @@ body {
 }
 .video-analytic .overlay-controls .slider{ gap:10px }
 .video-analytic--compact .overlay-controls { margin-bottom:6px; }
+.video-stack { aspect-ratio: 16 / 9; } /* horizontal container, video is contained inside */
 
 
