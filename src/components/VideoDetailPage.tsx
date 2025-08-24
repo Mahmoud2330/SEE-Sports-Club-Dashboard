@@ -231,7 +231,6 @@ const VideoDetailPage: React.FC = () => {
         {/* Test Metrics Sidebar */}
         <div className="test-metrics-sidebar">
           <div className="sidebar-header">
-            <h3 className="sidebar-title">Test Metrics</h3>
             {hiddenTests.size > 0 && (
               <button className="reset-btn" onClick={resetHiddenTests}>
                 Reset
