@@ -366,6 +366,7 @@ const VideoDetailPage: React.FC = () => {
                 </div>
               )}
 
+
               {/* Passing Accuracy */}
               {!isTestHidden('passing-accuracy') && testMetricsData && (
                 <div className="test-metric-item">
