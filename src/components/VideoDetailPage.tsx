@@ -227,7 +227,7 @@ const VideoDetailPage: React.FC = () => {
           </div>
 
           {/* Analysis */}
-          <div className="metric-card analysis">
+          {/* <div className="metric-card analysis">
             <div className="metric-header">
               <TrendingUp size={20} />
               <h3>Performance Analysis</h3>
@@ -259,7 +259,7 @@ const VideoDetailPage: React.FC = () => {
                 ))}
               </ul>
             </div>
-          </div>
+          </div> */}
 
           {/* Coach Notes */}
           <div className="metric-card coach-notes">
