@@ -67,6 +67,22 @@ export interface Player {
   };
 }
 
+export interface InjuryData {
+  playerId: number;
+  status: 'healthy' | 'injured' | 'at-risk';
+  bodyPart: string | null;
+  riskScore: number;
+  confidence: number;
+  expectedStart: string | null;
+  expectedEnd: string | null;
+  reasons: Array<{
+    code: string;
+    label: string;
+    weight: number;
+  }>;
+  notes: string;
+}
+
 export interface Team {
   id: string;
   name: string;
@@ -74,7 +90,6 @@ export interface Team {
   color: string;
   totalPlayers: number;
   teamScore: string;
-  injuries: number;
   formation: string;
   manager: string;
   stadium: string;
@@ -98,6 +113,7 @@ class DataService {
   private data: DataResponse | null = null;
   private isLoading = false;
   private error: string | null = null;
+  private fetchPromise: Promise<DataResponse> | null = null;
 
   // Fetch data from JSON files
   async fetchData(): Promise<DataResponse> {
@@ -105,51 +121,58 @@ class DataService {
       return this.data;
     }
 
-    if (this.isLoading) {
-      throw new Error('Data fetch already in progress');
+    if (this.isLoading && this.fetchPromise) {
+      // If already loading, return the existing promise instead of throwing an error
+      return this.fetchPromise;
     }
 
     this.isLoading = true;
     this.error = null;
 
-    try {
-      // Fetch both players and teams data from the new location
-      const [playersResponse, teamsResponse] = await Promise.all([
-        fetch('/data/players.json'),
-        fetch('/data/teams.json'),
-      ]);
+    this.fetchPromise = (async () => {
+      try {
+        // Fetch both players and teams data from the new location
+        const [playersResponse, teamsResponse] = await Promise.all([
+          fetch('/data/players.json'),
+          fetch('/data/teams.json'),
+        ]);
 
-      if (!playersResponse.ok) {
-        throw new Error(`Failed to fetch players data: ${playersResponse.status} ${playersResponse.statusText}`);
+        if (!playersResponse.ok) {
+          throw new Error(`Failed to fetch players data: ${playersResponse.status} ${playersResponse.statusText}`);
+        }
+
+        if (!teamsResponse.ok) {
+          throw new Error(`Failed to fetch teams data: ${teamsResponse.status} ${teamsResponse.statusText}`);
+        }
+
+        const playersData = await playersResponse.json();
+        const teamsData = await teamsResponse.json();
+
+        // Combine the data
+        this.data = {
+          players: playersData,
+          teams: teamsData,
+          metadata: {
+            lastUpdated: new Date().toISOString(),
+            version: '1.0.0',
+            totalPlayers: playersData.length,
+            totalTeams: Object.keys(teamsData).length,
+            dataSource: 'SEE Sports Club Database',
+          },
+        };
+
+        this.isLoading = false;
+        this.fetchPromise = null;
+        return this.data;
+      } catch (err) {
+        this.isLoading = false;
+        this.fetchPromise = null;
+        this.error = err instanceof Error ? err.message : 'Unknown error occurred';
+        throw new Error(this.error);
       }
+    })();
 
-      if (!teamsResponse.ok) {
-        throw new Error(`Failed to fetch teams data: ${teamsResponse.status} ${teamsResponse.statusText}`);
-      }
-
-      const playersData = await playersResponse.json();
-      const teamsData = await teamsResponse.json();
-
-      // Combine the data
-      this.data = {
-        players: playersData,
-        teams: teamsData,
-        metadata: {
-          lastUpdated: new Date().toISOString(),
-          version: '1.0.0',
-          totalPlayers: playersData.length,
-          totalTeams: Object.keys(teamsData).length,
-          dataSource: 'SEE Sports Club Database',
-        },
-      };
-
-      this.isLoading = false;
-      return this.data;
-    } catch (err) {
-      this.isLoading = false;
-      this.error = err instanceof Error ? err.message : 'Unknown error occurred';
-      throw new Error(this.error);
-    }
+    return this.fetchPromise;
   }
 
   // Get all players
@@ -209,6 +232,47 @@ class DataService {
     return team?.tier;
   }
 
+  // Get injury count for a specific team
+  async getTeamInjuryCount(teamId: string): Promise<number> {
+    try {
+      const response = await fetch('/data/injuries.json');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch injuries data: ${response.status}`);
+      }
+      
+      const injuries: InjuryData[] = await response.json();
+      const teamPlayers = await this.getPlayersByTeam(teamId);
+      const teamPlayerIds = teamPlayers.map(player => player.id);
+      
+      // Count players with 'injured' or 'at-risk' status
+      const injuryCount = injuries.filter(injury => 
+        teamPlayerIds.includes(injury.playerId) && 
+        (injury.status === 'injured' || injury.status === 'at-risk')
+      ).length;
+      
+      return injuryCount;
+    } catch (error) {
+      console.error('Error calculating team injury count:', error);
+      return 0;
+    }
+  }
+
+  // Get all teams with dynamic injury counts
+  async getTeamsWithInjuries(): Promise<{ [key: string]: Team & { injuries: number } }> {
+    const teams = await this.getTeams();
+    const teamsWithInjuries: { [key: string]: Team & { injuries: number } } = {};
+    
+    for (const [teamId, team] of Object.entries(teams)) {
+      const injuryCount = await this.getTeamInjuryCount(teamId);
+      teamsWithInjuries[teamId] = {
+        ...team,
+        injuries: injuryCount
+      };
+    }
+    
+    return teamsWithInjuries;
+  }
+
   // Check if player should show assessment notes (Platinum or Premium tier)
   async shouldShowAssessmentNotes(playerId: string): Promise<boolean> {
     const player = await this.getPlayerById(playerId);
@@ -231,6 +295,8 @@ class DataService {
   clearCache() {
     this.data = null;
     this.error = null;
+    this.isLoading = false;
+    this.fetchPromise = null;
   }
 }
 

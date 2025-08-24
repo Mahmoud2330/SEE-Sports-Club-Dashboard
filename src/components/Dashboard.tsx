@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   User,
   Flag,
@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ChatWidget from "./ChatWidget";
+import { dataService } from "../services/dataService";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -34,68 +35,7 @@ interface Team {
   series: { physical: number; skill: number }[];
 }
 
-const TEAMS: Team[] = [
-  {
-    id: "team-a",
-    name: "Team A",
-    color: "#ef4444",
-    players: 23,
-    score: 78.5,
-    injuries: 1,
-    tier: "STANDARD",
-    trend: { kind: "up", value: "26.9" },
-    series: [
-      { physical: 5.2, skill: 6.8 },
-      { physical: 7.5, skill: 5.1 },
-      { physical: 6.8, skill: 7.8 },
-      { physical: 8.1, skill: 6.6 },
-      { physical: 7.4, skill: 8.9 },
-      { physical: 4.7, skill: 6.2 },
-      { physical: 6.0, skill: 8.5 },
-      { physical: 8.3, skill: 5.8 },
-    ],
-  },
-  {
-    id: "team-b",
-    name: "Team B",
-    color: "#3b82f6",
-    players: 21,
-    score: 82.3,
-    injuries: 0,
-    tier: "PREMIUM",
-    trend: { kind: "up", value: "18.2" },
-    series: [
-      { physical: 5.5, skill: 7.2 },
-      { physical: 7.8, skill: 6.5 },
-      { physical: 6.1, skill: 5.8 },
-      { physical: 8.4, skill: 4.1 },
-      { physical: 4.7, skill: 8.4 },
-      { physical: 5.0, skill: 6.7 },
-      { physical: 6.3, skill: 7.0 },
-      { physical: 7.6, skill: 5.3 },
-    ],
-  },
-  {
-    id: "team-c",
-    name: "Team C",
-    color: "#10b981",
-    players: 19,
-    score: 75.8,
-    injuries: 2,
-    tier: "PLATINUM",
-    trend: { kind: "down", value: "12.4" },
-    series: [
-      { physical: 5.8, skill: 6.5 },
-      { physical: 6.5, skill: 7.2 },
-      { physical: 7.2, skill: 8.9 },
-      { physical: 7.9, skill: 9.6 },
-      { physical: 5.6, skill: 7.3 },
-      { physical: 4.3, skill: 6.0 },
-      { physical: 3.0, skill: 8.7 },
-      { physical: 7.7, skill: 8.4 },
-    ],
-  },
-];
+
 
 /* --------------------------- Chart Component ---------------------------- */
 
@@ -259,22 +199,119 @@ const TeamCard: React.FC<{
 export default function Dashboard() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"name" | "score" | "players">("name");
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredTeams = useMemo(() => {
-    return TEAMS.filter((team) =>
-      team.name.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [query, sort]);
+  // Ensure we always have some data to render
+  const displayTeams = teams.length > 0 ? teams : [
+    {
+      id: "team-a",
+      name: "Team A",
+      color: "#ef4444",
+      players: 4,
+      score: 78.5,
+      injuries: 0,
+      tier: "STANDARD",
+      trend: { kind: "up" as TrendKind, value: "0" },
+      series: [
+        { physical: 5.2, skill: 6.8 },
+        { physical: 7.5, skill: 5.1 },
+        { physical: 6.8, skill: 7.8 },
+        { physical: 8.1, skill: 6.6 },
+        { physical: 7.4, skill: 8.9 },
+        { physical: 4.7, skill: 6.2 },
+        { physical: 6.0, skill: 8.5 },
+        { physical: 8.3, skill: 5.8 },
+      ],
+    }
+  ];
 
-  const metrics = useMemo(() => {
-    const active = TEAMS.length;
-    const players = TEAMS.reduce((s, t) => s + t.players, 0);
-    const injuries = TEAMS.reduce((s, t) => s + t.injuries, 0);
-    const avgScore = TEAMS.reduce((s, t) => s + t.score, 0) / active;
-    return { activeTeams: active, players, injuries, clubScore: avgScore };
+  // Fetch teams data with dynamic injury counts
+  useEffect(() => {
+    console.log('Dashboard useEffect triggered');
+    const fetchTeamsData = async () => {
+      try {
+        console.log('Starting to fetch teams data...');
+        setIsLoading(true);
+        const teamsWithInjuries = await dataService.getTeamsWithInjuries();
+        console.log('Teams with injuries fetched:', teamsWithInjuries);
+        
+        // Transform the data to match our Team interface
+        const transformedTeams: Team[] = Object.values(teamsWithInjuries).map(team => ({
+          id: team.id,
+          name: team.name,
+          color: team.color,
+          players: team.totalPlayers,
+          score: parseFloat(team.teamScore),
+          injuries: team.injuries,
+          tier: team.tier,
+          trend: { kind: "up" as TrendKind, value: "0" }, // Default trend
+          series: [
+            { physical: 5.2, skill: 6.8 },
+            { physical: 7.5, skill: 5.1 },
+            { physical: 6.8, skill: 7.8 },
+            { physical: 8.1, skill: 6.6 },
+            { physical: 7.4, skill: 8.9 },
+            { physical: 4.7, skill: 6.2 },
+            { physical: 6.0, skill: 8.5 },
+            { physical: 8.3, skill: 5.8 },
+          ],
+        }));
+        
+        console.log('Transformed teams:', transformedTeams);
+        setTeams(transformedTeams);
+      } catch (error) {
+        console.error('Error fetching teams data:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
+        // Fallback to empty array with default data to ensure rendering
+        setTeams([
+          {
+            id: "team-a",
+            name: "Team A",
+            color: "#ef4444",
+            players: 4,
+            score: 78.5,
+            injuries: 0,
+            tier: "STANDARD",
+            trend: { kind: "up" as TrendKind, value: "0" },
+            series: [
+              { physical: 5.2, skill: 6.8 },
+              { physical: 7.5, skill: 5.1 },
+              { physical: 6.8, skill: 7.8 },
+              { physical: 8.1, skill: 6.6 },
+              { physical: 7.4, skill: 8.9 },
+              { physical: 4.7, skill: 6.2 },
+              { physical: 6.0, skill: 8.5 },
+              { physical: 8.3, skill: 5.8 },
+          ],
+          }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTeamsData();
   }, []);
 
+  const filteredTeams = useMemo(() => {
+    return displayTeams.filter((team) =>
+      team.name.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [query, displayTeams]);
+
+  const metrics = useMemo(() => {
+    const active = displayTeams.length;
+    const players = displayTeams.reduce((s, t) => s + t.players, 0);
+    const injuries = displayTeams.reduce((s, t) => s + t.injuries, 0);
+    const avgScore = displayTeams.reduce((s, t) => s + t.score, 0) / active;
+    return { activeTeams: active, players, injuries, clubScore: avgScore };
+  }, [displayTeams]);
+
   const dateRangeLabel = "Jun 23 — Aug 11";
+
+  console.log('Dashboard rendering with teams:', displayTeams, 'isLoading:', isLoading, 'error:', error);
 
   return (
     <main className="dashboard">
@@ -288,16 +325,35 @@ export default function Dashboard() {
           </div>
         </header>
 
+        {error && (
+          <div className="error-message" style={{ 
+            background: 'var(--db-danger-10)', 
+            color: 'var(--db-danger)', 
+            padding: '1rem', 
+            borderRadius: '8px', 
+            marginBottom: '1rem',
+            border: '1px solid var(--db-danger)'
+          }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
         <section>
           <div className="section-head">
             <h2>Key Metrics</h2>
           </div>
-          <div className="metrics-grid">
-            <MetricCard tint="primary" icon={<Flag size={20} />} value={String(metrics.activeTeams)} delta={{ text: "↗ +1", kind: "up" }} label="Active Teams" />
-            <MetricCard tint="primary" icon={<User size={20} />} value={String(metrics.players)} delta={{ text: "↗ +8", kind: "up" }} label="Total Players" />
-            <MetricCard tint="danger" icon={<Heart size={20} />} value={String(metrics.injuries)} delta={{ text: "↘ -2", kind: "down" }} label="Current Injuries" />
-            <MetricCard tint="success" icon={<Trophy size={20} />} value={`${metrics.clubScore.toFixed(1)}/100`} delta={{ text: "↗ +3", kind: "up" }} label="Overall Club Score" />
-          </div>
+          {isLoading ? (
+            <div className="loading-state">
+              <p>Loading metrics...</p>
+            </div>
+          ) : (
+            <div className="metrics-grid">
+              <MetricCard tint="primary" icon={<Flag size={20} />} value={String(metrics.activeTeams)} delta={{ text: "↗ +1", kind: "up" }} label="Active Teams" />
+              <MetricCard tint="primary" icon={<User size={20} />} value={String(metrics.players)} delta={{ text: "↗ +8", kind: "up" }} label="Total Players" />
+              <MetricCard tint="danger" icon={<Heart size={20} />} value={String(metrics.injuries)} delta={{ text: "↘ -2", kind: "down" }} label="Current Injuries" />
+              <MetricCard tint="success" icon={<Trophy size={20} />} value={`${metrics.clubScore.toFixed(1)}/100`} delta={{ text: "↗ +3", kind: "up" }} label="Overall Club Score" />
+            </div>
+          )}
         </section>
 
         <section>
@@ -308,11 +364,17 @@ export default function Dashboard() {
               <input placeholder="Search teams..." value={query} onChange={(e) => setQuery(e.target.value)} />
             </div>
           </div>
-          <div className="team-grid">
-            {filteredTeams.map((team) => (
-              <TeamCard key={team.id} team={team} dateRangeLabel={dateRangeLabel} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="loading-state">
+              <p>Loading teams data...</p>
+            </div>
+          ) : (
+            <div className="team-grid">
+              {filteredTeams.map((team) => (
+                <TeamCard key={team.id} team={team} dateRangeLabel={dateRangeLabel} />
+              ))}
+            </div>
+          )}
         </section>
       </div>
       
