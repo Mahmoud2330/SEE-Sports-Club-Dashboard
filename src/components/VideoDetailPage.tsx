@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, Volume2, Maximize, Clock, Target, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Play, Pause, Volume2, Maximize, Clock, Target, TrendingUp, Zap, Activity, Circle, Users } from 'lucide-react';
 import VideoWithOverlays from './VideoWithOverlays';
 
 interface VideoMetrics {
@@ -247,7 +247,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('vertical-jump')}>
                     <div className="test-metric-info">
                       <div className="test-icon physical-icon">
-                        <Target size={20} />
+                        <TrendingUp size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['vertical-jump']?.title || 'Vertical Jump'}</h4>
@@ -287,7 +287,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('5-10-5')}>
                     <div className="test-metric-info">
                       <div className="test-icon physical-icon">
-                        <TrendingUp size={20} />
+                        <Zap size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['5-10-5']?.title || '5-10-5'}</h4>
@@ -327,7 +327,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('t-agility')}>
                     <div className="test-metric-info">
                       <div className="test-icon physical-icon">
-                        <TrendingUp size={20} />
+                        <Activity size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['t-agility']?.title || 'T-Agility'}</h4>
@@ -350,7 +350,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('ball-control')}>
                     <div className="test-metric-info">
                       <div className="test-icon skills-icon">
-                        <Target size={20} />
+                        <Circle size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['ball-control']?.title || 'Ball Control'}</h4>
@@ -370,7 +370,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('passing-accuracy')}>
                     <div className="test-metric-info">
                       <div className="test-icon skills-icon">
-                        <Clock size={20} />
+                        <Users size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['passing-accuracy']?.title || 'Passing Accuracy'}</h4>
@@ -390,7 +390,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('1v1')}>
                     <div className="test-metric-info">
                       <div className="test-icon skills-icon">
-                        <TrendingUp size={20} />
+                        <Activity size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['1v1']?.title || '1v1'}</h4>
@@ -410,7 +410,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('running-with-ball')}>
                     <div className="test-metric-info">
                       <div className="test-icon skills-icon">
-                        <Target size={20} />
+                        <Zap size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['running-with-ball']?.title || 'Running with Ball'}</h4>
@@ -430,7 +430,7 @@ const VideoDetailPage: React.FC = () => {
                   <div className="test-metric-header" onClick={() => toggleTestExpansion('shooting')}>
                     <div className="test-metric-info">
                       <div className="test-icon skills-icon">
-                        <TrendingUp size={20} />
+                        <Target size={20} />
                       </div>
                       <div className="test-details">
                         <h4 className="test-name">{testMetricsData['shooting']?.title || 'Shooting'}</h4>
