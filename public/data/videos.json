@@ -1,0 +1,134 @@
+{
+  "videos": {
+    "physical-vertical-jump": {
+      "id": "physical-vertical-jump",
+      "title": "Vertical Jump Test",
+      "duration": "0:52",
+      "category": "physical",
+      "videoUrl": "/videos/vertical-jump.mp4",
+      "thumbnail": "/thumbnails/vertical-jump.jpg",
+      "highlights": [
+        "Excellent explosive power from legs",
+        "Good arm swing coordination",
+        "Proper landing technique",
+        "Consistent jump height across attempts"
+      ],
+      "performanceMetrics": {
+        "score": 85,
+        "maxScore": 100,
+        "unit": "cm",
+        "trend": "up",
+        "previousScore": 78,
+        "improvement": "+7"
+      },
+      "analysis": {
+        "strengths": [
+          "Strong lower body power",
+          "Good technique execution",
+          "Consistent performance"
+        ],
+        "areasForImprovement": [
+          "Could improve arm swing timing",
+          "Landing could be more controlled"
+        ],
+        "recommendations": [
+          "Focus on arm swing coordination drills",
+          "Practice landing technique with soft surfaces",
+          "Continue explosive power training"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Player shows excellent progress in vertical jump performance. Technique has improved significantly over the past month. Continue with current training program.",
+      "tags": ["explosive power", "jumping", "technique"]
+    },
+    "physical-broad-jump": {
+      "id": "physical-broad-jump",
+      "title": "Broad Jump Test",
+      "duration": "0:45",
+      "category": "physical",
+      "videoUrl": "/videos/broad-jump.mp4",
+      "thumbnail": "/thumbnails/broad-jump.jpg",
+      "highlights": [
+        "Strong horizontal propulsion",
+        "Good arm coordination",
+        "Proper landing position",
+        "Excellent distance achieved"
+      ],
+      "performanceMetrics": {
+        "score": 92,
+        "maxScore": 100,
+        "unit": "cm",
+        "trend": "stable",
+        "previousScore": 91,
+        "improvement": "+1"
+      },
+      "analysis": {
+        "strengths": [
+          "Excellent horizontal power",
+          "Consistent technique",
+          "Good balance control"
+        ],
+        "areasForImprovement": [
+          "Could extend landing position",
+          "Arm swing could be more explosive"
+        ],
+        "recommendations": [
+          "Focus on landing extension drills",
+          "Practice explosive arm movements",
+          "Maintain current power training"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Outstanding broad jump performance. Player has reached elite level in this metric. Focus on maintaining consistency and slight improvements.",
+      "tags": ["horizontal power", "balance", "coordination"]
+    },
+    "skills-ball-control": {
+      "id": "skills-ball-control",
+      "title": "Ball Control Assessment",
+      "duration": "1:18",
+      "category": "skills",
+      "videoUrl": "/videos/ball-control.mp4",
+      "thumbnail": "/thumbnails/ball-control.jpg",
+      "highlights": [
+        "Excellent first touch under pressure",
+        "Good use of both feet",
+        "Maintains control in tight spaces",
+        "Quick ball manipulation"
+      ],
+      "performanceMetrics": {
+        "score": 88,
+        "maxScore": 100,
+        "unit": "points",
+        "trend": "up",
+        "previousScore": 82,
+        "improvement": "+6"
+      },
+      "analysis": {
+        "strengths": [
+          "Superior ball touch",
+          "Ambidextrous control",
+          "Good spatial awareness"
+        ],
+        "areasForImprovement": [
+          "Could improve under high pressure",
+          "Speed of control could be enhanced"
+        ],
+        "recommendations": [
+          "Practice under increased pressure",
+          "Focus on speed drills",
+          "Continue technical training"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Excellent ball control skills. Player shows natural talent in this area. Continue developing under pressure situations.",
+      "tags": ["ball control", "technique", "pressure handling"]
+    }
+  },
+  "metadata": {
+    "lastUpdated": "2024-01-15T10:00:00Z",
+    "version": "1.0.0",
+    "totalVideos": 3,
+    "categories": ["physical", "skills"],
+    "dataSource": "SEE Sports Club Video Analysis"
+  }
+}

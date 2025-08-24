@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface VideoItem {
   title: string;
@@ -24,8 +25,16 @@ const skillsAssessment: VideoItem[] = [
 ];
 
 const VideoCard: React.FC<{ video: VideoItem; sectionType: 'physical' | 'skills' }> = ({ video, sectionType }) => {
+  const navigate = useNavigate();
+
+  const handleVideoClick = () => {
+    // Create a unique video ID based on section type and title
+    const videoId = `${sectionType}-${video.title.toLowerCase().replace(/\s+/g, '-')}`;
+    navigate(`/video/${videoId}`);
+  };
+
   return (
-    <div className="video-card">
+    <div className="video-card" onClick={handleVideoClick}>
       <div className="video-thumbnail">
         <div className="play-button">
           <Play size={16} />
