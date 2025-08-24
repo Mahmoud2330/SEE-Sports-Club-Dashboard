@@ -1,8 +1,8 @@
 {
   "videos": {
-    "physical-vertical-jump": {
-      "id": "physical-vertical-jump",
-      "title": "Vertical Jump Test",
+    "vertical-jump": {
+      "id": "vertical-jump",
+      "title": "Vertical Jump",
       "duration": "0:52",
       "category": "physical",
       "videoUrl": "/videos/vertical-jump.mp4",
@@ -41,94 +41,172 @@
       "coachNotes": "Player shows excellent progress in vertical jump performance. Technique has improved significantly over the past month. Continue with current training program.",
       "tags": ["explosive power", "jumping", "technique"]
     },
-    "physical-broad-jump": {
-      "id": "physical-broad-jump",
-      "title": "Broad Jump Test",
+    "10-meter-run": {
+      "id": "10-meter-run",
+      "title": "10 Meter Run",
+      "duration": "0:38",
+      "category": "physical",
+      "videoUrl": "/videos/10-meter-run.mp4",
+      "thumbnail": "/thumbnails/10-meter-run.jpg",
+      "highlights": [
+        "Speed and acceleration test",
+        "Sprint performance measurement",
+        "Quick start technique",
+        "Maximum velocity assessment"
+      ],
+      "performanceMetrics": {
+        "score": 78,
+        "maxScore": 100,
+        "unit": "seconds",
+        "trend": "up",
+        "previousScore": 82,
+        "improvement": "+4"
+      },
+      "analysis": {
+        "strengths": [
+          "Good acceleration",
+          "Proper running form"
+        ],
+        "areasForImprovement": [
+          "Could improve top speed",
+          "Start technique needs work"
+        ],
+        "recommendations": [
+          "Focus on sprint drills",
+          "Practice explosive starts",
+          "Work on maximum velocity"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Good progress in sprint performance. Focus on improving start technique and maximum velocity.",
+      "tags": ["speed", "acceleration", "sprinting"]
+    },
+    "5-10-5": {
+      "id": "5-10-5",
+      "title": "5-10-5",
+      "duration": "1:12",
+      "category": "physical",
+      "videoUrl": "/videos/5-10-5.mp4",
+      "thumbnail": "/thumbnails/5-10-5.jpg",
+      "highlights": [
+        "Agility test",
+        "Change of direction speed",
+        "Lateral movement assessment",
+        "Quick feet coordination"
+      ],
+      "performanceMetrics": {
+        "score": 82,
+        "maxScore": 100,
+        "unit": "seconds",
+        "trend": "stable",
+        "previousScore": 81,
+        "improvement": "+1"
+      },
+      "analysis": {
+        "strengths": [
+          "Good lateral movement",
+          "Quick direction changes"
+        ],
+        "areasForImprovement": [
+          "Could improve footwork speed",
+          "Balance during turns"
+        ],
+        "recommendations": [
+          "Practice agility ladder drills",
+          "Focus on balance exercises",
+          "Work on quick direction changes"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Solid agility performance. Continue working on footwork speed and balance during direction changes.",
+      "tags": ["agility", "coordination", "footwork"]
+    },
+    "broad-jump": {
+      "id": "broad-jump",
+      "title": "Broad Jump",
       "duration": "0:45",
       "category": "physical",
       "videoUrl": "/videos/broad-jump.mp4",
       "thumbnail": "/thumbnails/broad-jump.jpg",
       "highlights": [
-        "Strong horizontal propulsion",
-        "Good arm coordination",
-        "Proper landing position",
-        "Excellent distance achieved"
-      ],
-      "performanceMetrics": {
-        "score": 92,
-        "maxScore": 100,
-        "unit": "cm",
-        "trend": "stable",
-        "previousScore": 91,
-        "improvement": "+1"
-      },
-      "analysis": {
-        "strengths": [
-          "Excellent horizontal power",
-          "Consistent technique",
-          "Good balance control"
-        ],
-        "areasForImprovement": [
-          "Could extend landing position",
-          "Arm swing could be more explosive"
-        ],
-        "recommendations": [
-          "Focus on landing extension drills",
-          "Practice explosive arm movements",
-          "Maintain current power training"
-        ]
-      },
-      "timestamp": "2024-01-15",
-      "coachNotes": "Outstanding broad jump performance. Player has reached elite level in this metric. Focus on maintaining consistency and slight improvements.",
-      "tags": ["horizontal power", "balance", "coordination"]
-    },
-    "skills-ball-control": {
-      "id": "skills-ball-control",
-      "title": "Ball Control Assessment",
-      "duration": "1:18",
-      "category": "skills",
-      "videoUrl": "/videos/ball-control.mp4",
-      "thumbnail": "/thumbnails/ball-control.jpg",
-      "highlights": [
-        "Excellent first touch under pressure",
-        "Good use of both feet",
-        "Maintains control in tight spaces",
-        "Quick ball manipulation"
+        "Horizontal jump test",
+        "Explosive power measurement",
+        "Leg strength assessment",
+        "Coordination evaluation"
       ],
       "performanceMetrics": {
         "score": 88,
         "maxScore": 100,
-        "unit": "points",
+        "unit": "cm",
         "trend": "up",
-        "previousScore": 82,
-        "improvement": "+6"
+        "previousScore": 85,
+        "improvement": "+3"
       },
       "analysis": {
         "strengths": [
-          "Superior ball touch",
-          "Ambidextrous control",
-          "Good spatial awareness"
+          "Good explosive power",
+          "Proper technique"
         ],
         "areasForImprovement": [
-          "Could improve under high pressure",
-          "Speed of control could be enhanced"
+          "Could extend landing position",
+          "Arm swing coordination"
         ],
         "recommendations": [
-          "Practice under increased pressure",
-          "Focus on speed drills",
-          "Continue technical training"
+          "Focus on landing extension",
+          "Practice arm swing drills",
+          "Continue power training"
         ]
       },
       "timestamp": "2024-01-15",
-      "coachNotes": "Excellent ball control skills. Player shows natural talent in this area. Continue developing under pressure situations.",
-      "tags": ["ball control", "technique", "pressure handling"]
+      "coachNotes": "Excellent broad jump performance. Good explosive power and technique. Focus on extending landing position.",
+      "tags": ["explosive power", "jumping", "coordination"]
+    },
+    "t-agility": {
+      "id": "t-agility",
+      "title": "T-Agility",
+      "duration": "0:58",
+      "category": "physical",
+      "videoUrl": "/videos/t-agility.mp4",
+      "thumbnail": "/thumbnails/t-agility.jpg",
+      "highlights": [
+        "T-shaped agility course",
+        "Lateral movement testing",
+        "Multi-directional speed",
+        "Coordination assessment"
+      ],
+      "performanceMetrics": {
+        "score": 75,
+        "maxScore": 100,
+        "unit": "seconds",
+        "trend": "up",
+        "previousScore": 79,
+        "improvement": "+4"
+      },
+      "analysis": {
+        "strengths": [
+          "Good lateral movement",
+          "Proper course navigation"
+        ],
+        "areasForImprovement": [
+          "Could improve speed",
+          "Turn technique needs work"
+        ],
+        "recommendations": [
+          "Focus on speed drills",
+          "Practice turn technique",
+          "Work on lateral movement"
+        ]
+      },
+      "timestamp": "2024-01-15",
+      "coachNotes": "Good progress in T-agility. Continue working on speed and turn technique.",
+      "tags": ["agility", "speed", "coordination"]
     }
   },
   "metadata": {
     "lastUpdated": "2024-01-15T10:00:00Z",
     "version": "1.0.0",
-    "totalVideos": 3,
-    "categories": ["physical", "skills"],
+    "totalVideos": 5,
+    "categories": ["physical"],
     "dataSource": "SEE Sports Club Video Analysis"
   }
 }

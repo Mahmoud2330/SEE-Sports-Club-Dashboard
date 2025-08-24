@@ -6,31 +6,37 @@ interface VideoItem {
   title: string;
   duration: string;
   thumbnail?: string;
+  category: 'physical' | 'skills';
+  videoId: string;
 }
 
 const physicalTests: VideoItem[] = [
-  { title: 'Vertical Jump', duration: '0:52' },
-  { title: 'Broad Jump', duration: '0:45' },
-  { title: '10 Meter Run', duration: '0:38' },
-  { title: 'Five Ten Five', duration: '1:12' },
-  { title: 'T-Agility', duration: '' },
+  { title: 'Vertical Jump', duration: '0:52', category: 'physical', videoId: 'vertical-jump' },
+  { title: 'Broad Jump', duration: '0:45', category: 'physical', videoId: 'broad-jump' },
+  { title: '10 Meter Run', duration: '0:38', category: 'physical', videoId: '10-meter-run' },
+  { title: 'Five Ten Five', duration: '1:12', category: 'physical', videoId: '5-10-5' },
+  { title: 'T-Agility', duration: '', category: 'physical', videoId: 't-agility' },
 ];
 
 const skillsAssessment: VideoItem[] = [
-  { title: 'Ball Control', duration: '1:18' },
-  { title: 'Passing Accuracy', duration: '1:56' },
-  { title: '1v1', duration: '1:34' },
-  { title: 'Running with Ball', duration: '1:43' },
-  { title: 'Shooting', duration: '' },
+  { title: 'Ball Control', duration: '1:18', category: 'skills', videoId: 'ball-control' },
+  { title: 'Passing Accuracy', duration: '1:56', category: 'skills', videoId: 'passing-accuracy' },
+  { title: '1v1', duration: '1:34', category: 'skills', videoId: '1v1' },
+  { title: 'Running with Ball', duration: '1:43', category: 'skills', videoId: 'running-with-ball' },
+  { title: 'Shooting', duration: '', category: 'skills', videoId: 'shooting' },
 ];
 
 const VideoCard: React.FC<{ video: VideoItem; sectionType: 'physical' | 'skills' }> = ({ video, sectionType }) => {
   const navigate = useNavigate();
 
   const handleVideoClick = () => {
-    // Create a unique video ID based on section type and title
-    const videoId = `${sectionType}-${video.title.toLowerCase().replace(/\s+/g, '-')}`;
-    navigate(`/video/${videoId}`);
+    // Pass video information through URL parameters
+    const params = new URLSearchParams({
+      category: video.category,
+      title: video.title,
+      videoId: video.videoId
+    });
+    navigate(`/video/${video.videoId}?${params.toString()}`);
   };
 
   return (
