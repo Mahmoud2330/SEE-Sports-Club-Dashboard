@@ -182,8 +182,8 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-            <button className="save-btn" onClick={handleSaveProfile}>
-              <Save size={16} />
+            <button className="save-btn" style={{ verticalAlign: 'middle' }} onClick={handleSaveProfile}>
+              {/* <Save size={16} /> */}
               Save 
             </button>
           </div>

@@ -6847,7 +6847,8 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   margin-top: 1rem;
-}
+  margin-left: auto;
+} 
 
 .settings-page .save-btn:hover {
   background: var(--db-primary);
