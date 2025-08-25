@@ -6672,24 +6672,17 @@ body {
   margin-bottom: 2rem;
 }
 
-.back-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  color: var(--db-text-muted);
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  margin-bottom: 1rem;
+.back-button{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:auto; max-width:320px;
+  color:#c9cad1; background:none;
+  border:2px solid transparent; border-radius:10px;
+  transition:border-color .15s ease, box-shadow .15s ease, opacity .15s ease;
+  padding:8px 12px; cursor:pointer; font-weight:600; opacity:.9;
+  box-shadow:0 0 0 1px #3d3d3d ;
+  margin-bottom: 2rem;
 }
-
-.back-button:hover {
-  background: var(--db-hover);
-  color: var(--db-text);
-}
+.back-button:hover{ border-color:#fff; box-shadow:0 0 0 1px #fff; }
 
 .video-detail-header h1 {
   font-size: 2rem;
@@ -6703,7 +6696,24 @@ body {
   flex-wrap: wrap;
 }
 
-.video-category,
+.video-category{
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+}
+
+.video-category.physical{
+  background: var(--db-success-10);
+  border: 0.5px solid var(--db-success);
+  color: var(--db-success);
+}
+
+.video-category.skills{
+  background: var(--db-primary-10);
+  border: 0.5px solid var(--db-primary);
+  color: var(--db-primary);
+}
+
 .video-duration,
 .video-date {
   background: var(--db-card);
@@ -6711,7 +6721,7 @@ body {
   border-radius: 20px;
   font-size: 0.875rem;
   color: var(--db-text-muted);
-  border: 1px solid var(--db-border);
+  border: 0.5px solid var(--db-border);
 }
 
 .video-detail-content {
@@ -6722,6 +6732,7 @@ body {
 }
 
 .video-player-section {
+  padding: 1rem;
   background: var(--db-card);
   border-radius: 12px;
   overflow: hidden;
@@ -7033,7 +7044,7 @@ body {
   }
   
   .video-meta {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
   }
   

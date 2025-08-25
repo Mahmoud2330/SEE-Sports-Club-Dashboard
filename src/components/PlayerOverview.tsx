@@ -123,7 +123,7 @@ const PlayerOverview: React.FC = () => {
   const breadcrumbs = playerData
     ? [
         { name: 'Club', path: '/dashboard' },
-        { name: 'Teams', path: '/teams' },
+        { name: 'Teams', path: '/dashboard' },
         { name: playerData.team, path: `/teams/${playerData.teamId}` },
         { name: playerData.name, path: `/players/${playerData.id}` },
       ]

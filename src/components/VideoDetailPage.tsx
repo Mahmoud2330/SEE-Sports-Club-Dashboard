@@ -211,7 +211,7 @@ const VideoDetailPage: React.FC = () => {
         </button>
         <h1>{videoData.title}</h1>
         <div className="video-meta">
-          <span className="video-category">{videoData.category.toUpperCase()}</span>
+          <span className={`video-category ${videoData.category}`}>{videoData.category.toUpperCase()}</span>
           <span className="video-duration">{videoData.duration}</span>
           <span className="video-date">{videoData.timestamp}</span>
         </div>
