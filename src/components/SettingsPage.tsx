@@ -117,6 +117,16 @@ const SettingsPage: React.FC = () => {
     console.log('Language changed to:', lang);
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <div className="settings-page">
       {/* Header */}
@@ -124,9 +134,43 @@ const SettingsPage: React.FC = () => {
         <h1>Settings</h1>
       </div>
 
+      {/* Breadcrumb Navigation */}
+      <div className="settings-breadcrumb">
+        <button 
+          className="breadcrumb-item"
+          onClick={() => scrollToSection('account')}
+        >
+          Account
+        </button>
+        <button 
+          className="breadcrumb-item"
+          onClick={() => scrollToSection('notifications')}
+        >
+          Notifications
+        </button>
+        <button 
+          className="breadcrumb-item"
+          onClick={() => scrollToSection('appearance')}
+        >
+          Appearance
+        </button>
+        <button 
+          className="breadcrumb-item"
+          onClick={() => scrollToSection('privacy')}
+        >
+          Privacy
+        </button>
+        <button 
+          className="breadcrumb-item"
+          onClick={() => scrollToSection('language')}
+        >
+          Language
+        </button>
+      </div>
+
       <div className="settings-content">
         {/* Account Section */}
-        <div className="settings-section">
+        <div id="account" className="settings-section">
           <div className="section-header">
             <h2>Account</h2>
             <div className="section-icon">
@@ -190,7 +234,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Notifications Section */}
-        <div className="settings-section">
+        <div id="notifications" className="settings-section">
           <div className="section-header">
             <h2>Notifications</h2>
             <div className="section-icon">
@@ -238,7 +282,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Appearance Section */}
-        <div className="settings-section">
+        <div id="appearance" className="settings-section">
           <div className="section-header">
             <h2>Appearance</h2>
             <div className="section-icon">
@@ -303,7 +347,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Privacy Section */}
-        <div className="settings-section">
+        <div id="privacy" className="settings-section">
           <div className="section-header">
             <h2>Privacy & Security</h2>
             <div className="section-icon">
@@ -380,7 +424,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Language Section */}
-        <div className="settings-section">
+        <div id="language" className="settings-section">
           <div className="section-header">
             <h2>Language</h2>
             <div className="section-icon">
