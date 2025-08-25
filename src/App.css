@@ -6521,6 +6521,359 @@ body {
   font-size: 1rem;
 }
 
+/* ===== SETTINGS PAGE ===== */
+.settings-page {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--db-base);
+  min-height: 100vh;
+}
+
+.settings-page .settings-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--db-border);
+}
+
+
+
+.settings-page .settings-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--db-text);
+  margin: 0;
+}
+
+.settings-page .settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-page .settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.settings-page .section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.settings-page .section-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--db-primary-10);
+  color: var(--db-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-page .section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--db-text);
+  margin: 0;
+}
+
+.settings-page .section-content {
+  padding: 1.5rem;
+  background: var(--db-card);
+  border-radius: 12px 12px 12px 12px;
+}
+
+/* Profile Image Section */
+.settings-page .profile-image-section {
+  margin-bottom: 1.5rem;
+}
+
+.settings-page .profile-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-page .profile-image,
+.settings-page .profile-image-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--db-border);
+}
+
+.settings-page .profile-image-placeholder {
+  background: var(--db-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--db-text-muted);
+}
+
+.settings-page .change-image-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--db-primary-10);
+  border: 1px solid var(--db-primary);
+  border-radius: 6px;
+  color: var(--db-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.settings-page .change-image-btn:hover {
+  background: var(--db-primary);
+  color: var(--db-white);
+}
+
+/* Form Styles */
+.settings-page .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.settings-page .form-group {
+  margin-bottom: 1rem;
+}
+
+.settings-page .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--db-text);
+  font-size: 0.875rem;
+}
+
+.settings-page .form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--db-base);
+  border: 1px solid var(--db-border);
+  border-radius: 6px;
+  color: var(--db-text);
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.settings-page .form-group input:focus {
+  outline: none;
+  border-color: var(--db-primary);
+}
+
+.settings-page .form-group input::placeholder {
+  color: var(--db-text-muted);
+}
+
+/* Password Input */
+.settings-page .password-input {
+  position: relative;
+}
+
+.settings-page .password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--db-text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.settings-page .password-toggle:hover {
+  color: var(--db-text);
+}
+
+/* Toggle Switch */
+.settings-page .toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--db-border);
+}
+
+.settings-page .toggle-row:last-child {
+  border-bottom: none;
+}
+
+.settings-page .toggle-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--db-text);
+  margin: 0 0 0.25rem 0;
+}
+
+.settings-page .toggle-info p {
+  font-size: 0.875rem;
+  color: var(--db-text-muted);
+  margin: 0;
+}
+
+.settings-page .toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.settings-page .toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-page .toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--db-border);
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.settings-page .toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--db-white);
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.settings-page .toggle-switch input:checked + .toggle-slider {
+  background-color: var(--db-primary);
+}
+
+.settings-page .toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* Radio button specific styling for theme toggles */
+.settings-page .toggle-switch input[type="radio"]:checked + .toggle-slider {
+  background-color: var(--db-primary);
+}
+
+.settings-page .toggle-switch input[type="radio"]:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* Theme Options */
+.settings-page .theme-options h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--db-text);
+  margin: 0 0 1rem 0;
+}
+
+.settings-page .theme-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Language Buttons */
+.settings-page .language-options h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--db-text);
+  margin: 0 0 1rem 0;
+}
+
+.settings-page .language-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.settings-page .language-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--db-base);
+  border: 1px solid var(--db-border);
+  border-radius: 6px;
+  color: var(--db-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  min-width: 100px;
+}
+
+.settings-page .language-btn:hover {
+  background: var(--db-hover);
+  border-color: var(--db-primary);
+}
+
+.settings-page .language-btn.active {
+  background: var(--db-primary);
+  border-color: var(--db-primary);
+  color: var(--db-white);
+}
+
+/* Save Button */
+.settings-page .save-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--db-primary);
+  border: 1px solid var(--db-primary);
+  border-radius: 6px;
+  color: var(--db-white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.settings-page .save-btn:hover {
+  background: var(--db-primary);
+  opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 1rem;
+  }
+  
+  .settings-page .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-page .theme-buttons,
+  .settings-page .language-buttons {
+    flex-direction: column;
+  }
+  
+  .settings-page .language-btn {
+    min-width: auto;
+  }
+}
+
 /* ===== VIDEO DETAIL PAGE ===== */
 .video-detail-page {
   padding: 2rem;
