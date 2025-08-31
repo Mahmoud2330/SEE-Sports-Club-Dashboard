@@ -23,13 +23,14 @@ function withinRange(d: Date | null, range?: DateRange) {
 }
 
 function statusColors(status: InjuryRow["status"]) {
+  // Use CSS custom properties that will adapt to theme
   switch (status) {
     case "injured":
-      return { accent: "#ff4d57", bg: "#2a1012", border: "#472025" };
+      return { accent: "#ff4d57", bg: "var(--db-danger-10, rgba(255, 75, 87, 0.1))", border: "var(--db-danger-20, rgba(255, 75, 87, 0.2))" };
     case "at-risk":
-      return { accent: "#f4c531", bg: "#2a230b", border: "#3c2f0a" };
+      return { accent: "#f4c531", bg: "var(--db-warning-10, rgba(245, 197, 49, 0.1))", border: "var(--db-warning-20, rgba(245, 197, 49, 0.2))" };
     default:
-      return { accent: "#33d17a", bg: "#0f2318", border: "#204634" };
+      return { accent: "#33d17a", bg: "var(--db-success-10, rgba(51, 209, 122, 0.1))", border: "var(--db-success-20, rgba(51, 209, 122, 0.2))" };
   }
 }
 

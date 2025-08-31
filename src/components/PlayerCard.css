@@ -67,7 +67,7 @@
 .image-gradient-overlay {
   width: calc(100% - 20px);
   height: 20%;
-  background: linear-gradient(to top, black, transparent);
+  background: linear-gradient(to top, var(--db-black), transparent);
   position: absolute;
   bottom: 0;
   left: 0;
@@ -95,6 +95,7 @@
   max-width: 100%;
   margin-bottom: 12px;
   line-height: 100%;
+  color: var(--db-white);
 }
 
 .player-name-display {
@@ -119,13 +120,14 @@
   font-weight: bold;
   font-style: italic;
   line-height: 100%;
-  border-bottom: 2px solid white;
+  border-bottom: 2px solid var(--db-white);
   width: fit-content;
   padding: 0 8px;
+  color: var(--db-white);
 }
 
 .stats-display {
-  color: white;
+  color: var(--db-white);
   text-transform: uppercase;
   font-size: 14px;
   text-align: left;
@@ -146,7 +148,7 @@
 }
 
 .stat-value {
-  color: white;
+  color: var(--db-white);
 }
 
 .sport-section {
@@ -161,7 +163,7 @@
 
 .sport-icon {
   border-radius: 50%;
-  background-color: black;
+  background-color: var(--db-black);
   width: 38px;
   height: 38px;
   margin-bottom: 4px;
@@ -244,7 +246,7 @@
     top: 0;
     z-index: 50;
     height: var(--hdr-h);
-    background: #000;
+    background: var(--db-black);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -268,7 +270,7 @@
     font-weight:700;
   }
   .top-header__title{
-    color:#fff; font-size:20px; font-weight:700;
+    color: var(--db-white); font-size:20px; font-weight:700;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   
@@ -283,7 +285,7 @@
     border:none; background:transparent; color:#cfcfcf;
     border-radius:8px; cursor:pointer;
   }
-  .notif-btn:hover{ background:#111; }
+  .notif-btn:hover{ background: var(--db-hover); }
   .notif-dot{
     position:absolute; top:4px; right:4px;
     width:10px; height:10px; background:#e11d48;

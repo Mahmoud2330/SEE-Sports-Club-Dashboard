@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   Bell, 
@@ -6,13 +6,12 @@ import {
   Shield, 
   Globe, 
   Camera, 
-  Edit3, 
   Eye, 
   EyeOff,
-  ArrowLeft,
   Save
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface UserProfile {
   firstName: string;
@@ -27,9 +26,7 @@ interface NotificationSettings {
   phoneNotifications: boolean;
 }
 
-interface AppearanceSettings {
-  theme: 'light' | 'dark' | 'auto';
-}
+// AppearanceSettings interface removed - theme is now managed by ThemeContext
 
 interface PrivacySettings {
   currentPassword: string;
@@ -43,25 +40,35 @@ interface LanguageSettings {
 }
 
 const SettingsPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { userData, updateUserData } = useUser();
+  const { theme, setTheme } = useTheme();
   
   // State for different sections
   const [profile, setProfile] = useState<UserProfile>({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    profileImage: null
+    firstName: userData.firstName,
+    lastName: userData.lastName,
+    email: userData.email,
+    phone: userData.phone,
+    profileImage: userData.profileImage
   });
+
+  // Update local state when global userData changes
+  useEffect(() => {
+    setProfile({
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      phone: userData.phone,
+      profileImage: userData.profileImage
+    });
+  }, [userData]);
 
   const [notifications, setNotifications] = useState<NotificationSettings>({
     emailNotifications: true,
     phoneNotifications: false
   });
 
-  const [appearance, setAppearance] = useState<AppearanceSettings>({
-    theme: 'auto'
-  });
+  // appearance state is now managed by ThemeContext
 
   const [privacy, setPrivacy] = useState<PrivacySettings>({
     currentPassword: '',
@@ -92,8 +99,20 @@ const SettingsPage: React.FC = () => {
   };
 
   const handleSaveProfile = () => {
-    // Handle profile save logic
+    // Update the global user context with the new profile data
+    updateUserData({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      email: profile.email,
+      phone: profile.phone,
+      profileImage: profile.profileImage
+    });
+    
+    // Handle profile save logic (could save to backend here)
     console.log('Profile saved:', profile);
+    
+    // Show success message (optional)
+    alert('Profile updated successfully!');
   };
 
   const handleSavePrivacy = () => {
@@ -101,14 +120,23 @@ const SettingsPage: React.FC = () => {
       alert('New passwords do not match');
       return;
     }
-    // Handle privacy save logic
+    
+    // Update the global user context with email and phone from the Privacy section
+    updateUserData({
+      email: profile.email,
+      phone: profile.phone
+    });
+    
+    // Handle privacy save logic (password changes would go to backend)
     console.log('Privacy settings saved:', privacy);
+    
+    // Show success message (optional)
+    alert('Privacy settings updated successfully!');
   };
 
-  const handleThemeChange = (theme: 'light' | 'dark' | 'auto') => {
-    setAppearance(prev => ({ ...prev, theme }));
-    // Here you would implement the actual theme change logic
-    console.log('Theme changed to:', theme);
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'auto') => {
+    setTheme(newTheme);
+    console.log('Theme changed to:', newTheme);
   };
 
   const handleLanguageChange = (lang: 'english' | 'arabic') => {
@@ -303,7 +331,7 @@ const SettingsPage: React.FC = () => {
                     <input
                       type="radio"
                       name="theme"
-                      checked={appearance.theme === 'light'}
+                      checked={theme === 'light'}
                       onChange={() => handleThemeChange('light')}
                     />
                     <span className="toggle-slider"></span>
@@ -319,7 +347,7 @@ const SettingsPage: React.FC = () => {
                     <input
                       type="radio"
                       name="theme"
-                      checked={appearance.theme === 'dark'}
+                      checked={theme === 'dark'}
                       onChange={() => handleThemeChange('dark')}
                     />
                     <span className="toggle-slider"></span>
@@ -335,7 +363,7 @@ const SettingsPage: React.FC = () => {
                     <input
                       type="radio"
                       name="theme"
-                      checked={appearance.theme === 'auto'}
+                      checked={theme === 'auto'}
                       onChange={() => handleThemeChange('auto')}
                     />
                     <span className="toggle-slider"></span>

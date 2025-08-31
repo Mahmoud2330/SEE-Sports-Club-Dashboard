@@ -339,7 +339,7 @@ export default function VideoWithOverlays({
             width:"100%",
             height:"100%",
             maxHeight:"420px",
-            background:"#000",
+            background:"var(--db-black)",
             objectFit:"contain"      // pillarbox/letterbox, we map to content rect
           }}
         />

@@ -77,7 +77,7 @@ const PlayerPage: React.FC = () => {
   if (error || !player) {
     return (
       <div className="player-page">
-        <div style={{ textAlign: 'center', padding: '2rem', color: '#ff9898' }}>
+        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--db-danger)' }}>
           <div>Error: {error || "Player not found"}</div>
           <button onClick={() => window.location.reload()}>Retry</button>
         </div>

@@ -440,7 +440,7 @@ const PlayerOverview: React.FC = () => {
                         <div className="progress-circle">
                           <svg className="progress-svg" viewBox="0 0 120 120">
                             {/* outer ring = current */}
-                            <circle className="progress-background" cx="60" cy="60" r="50" stroke="#333" strokeWidth="8" fill="none" />
+                            <circle className="progress-background" cx="60" cy="60" r="50" stroke="var(--db-border)" strokeWidth="8" fill="none" />
                             <circle
                               className="progress-fill"
                               cx="60" cy="60" r="50"
@@ -455,7 +455,7 @@ const PlayerOverview: React.FC = () => {
                             />
 
                             {/* inner ring = best */}
-                            <circle className="progress-background" cx="60" cy="60" r="38" stroke="#333" strokeWidth="8" fill="none" />
+                            <circle className="progress-background" cx="60" cy="60" r="38" stroke="var(--db-border)" strokeWidth="8" fill="none" />
                             <circle
                               className="progress-fill2"
                               cx="60" cy="60" r="38"
@@ -498,7 +498,7 @@ const PlayerOverview: React.FC = () => {
                       <div className="progress-circle-container">
                         <div className="progress-circle">
                           <svg className="progress-svg" viewBox="0 0 120 120">
-                            <circle className="progress-background" cx="60" cy="60" r="50" stroke="#333" strokeWidth="8" fill="none" />
+                            <circle className="progress-background" cx="60" cy="60" r="50" stroke="var(--db-border)" strokeWidth="8" fill="none" />
                             <circle
                               className="progress-fill2"
                               cx="60" cy="60" r="50"

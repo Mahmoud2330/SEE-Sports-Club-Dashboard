@@ -69,12 +69,19 @@ body {
   
   /* ===== BRAND COLORS ===== */
   --db-primary: #6728f5;
+  --db-primary-light: #8b5cf6;
   --db-primary-10: #6728f51a;
+  --db-primary-20: #6728f533;
+  --db-info: #74c0fc;
   --db-success: #7BFFBA;
   --db-success-10: #7bffba1a;
+  --db-success-20: #7bffba33;
   --db-danger: #ff6b6b;
   --db-danger-10: #ff6b6b1a;
+  --db-danger-20: #ff6b6b33;
   --db-warning: #f59e0b;
+  --db-warning-10: #f59e0b1a;
+  --db-warning-20: #f59e0b33;
   
   /* ===== ADDITIONAL COLORS ===== */
   --db-white: #ffffff;
@@ -92,6 +99,359 @@ body {
   --risk-yellow-10: #CECC301a;
   --healthy-green: #22c55e;
 }
+
+/* ===== THEME SUPPORT ===== */
+/* Light Theme Overrides */
+:root[data-theme="light"] {
+  /* ===== BASE COLORS - INVERTED ===== */
+  --db-base: #f8f8f8;
+  --db-card: #ffffff;
+  --db-hover: #f0f0f0;
+  --db-border: #d1d5db;
+  --border: #d1d5db;
+  
+  /* ===== TEXT COLORS - INVERTED ===== */
+  --db-text: #111827;
+  --db-text-muted: #6b7280;
+  
+  /* ===== BRAND COLORS - KEEP SAME ===== */
+  /* Primary, success, danger, warning colors remain unchanged for brand consistency */
+  
+  /* ===== BACKGROUND COLORS - BETTER CONTRAST ===== */
+  --db-white: #111827;  /* Dark text for light backgrounds */
+  --db-black: #ffffff;  /* Light backgrounds */
+  
+  /* ===== GRAY SCALE - BETTER CONTRAST ===== */
+  --db-gray-100: #1f2937;
+  --db-gray-200: #374151;
+  --db-gray-300: #4b5563;
+  --db-gray-400: #6b7280;
+  --db-gray-500: #9ca3af;
+  --db-gray-600: #d1d5db;
+  --db-gray-700: #e5e7eb;
+  --db-gray-800: #f3f4f6;
+  --db-gray-900: #f9fafb;
+}
+
+/* ===== BODY THEME SUPPORT ===== */
+body {
+  background-color: var(--db-black);
+  color: var(--db-text);
+}
+
+.app {
+  background-color: var(--db-black);
+}
+
+/* ===== PRIMARY BACKGROUND TEXT CONTRAST ===== */
+/* Ensure white text on primary backgrounds in both themes */
+[style*="background: var(--db-primary)"],
+[style*="background-color: var(--db-primary)"],
+.filter-btn.active,
+.btn--primary,
+.language-btn.active,
+button[style*="background: var(--db-primary)"],
+button[style*="background-color: var(--db-primary)"],
+.skill-tab.active {
+  color: #ffffff !important;
+}
+
+[style*="background: var(--db-primary)"]:hover,
+[style*="background-color: var(--db-primary)"]:hover,
+.filter-btn.active:hover,
+.btn--primary:hover,
+.language-btn.active:hover,
+button[style*="background: var(--db-primary)"]:hover,
+button[style*="background-color: var(--db-primary)"]:hover,
+.skill-tab.active:hover {
+  color: #ffffff !important;
+}
+
+/* Specific button overrides for primary backgrounds */
+button {
+  background-color: var(--db-card);
+  color: var(--db-text);
+}
+
+button[style*="--db-primary"],
+.btn--primary,
+.filter-btn.active,
+.language-btn.active {
+  background-color: var(--db-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--db-primary) !important;
+}
+
+button[style*="--db-primary"]:hover,
+.btn--primary:hover,
+.filter-btn.active:hover,
+.language-btn.active:hover {
+  background-color: var(--db-primary-light) !important;
+  color: #ffffff !important;
+  border-color: var(--db-primary-light) !important;
+}
+
+/* General primary background detection */
+*[style*="background-color: var(--db-primary)"],
+*[style*="background: var(--db-primary)"],
+*[class*="primary"] {
+  color: #ffffff !important;
+}
+
+*[style*="background-color: var(--db-primary)"]:hover,
+*[style*="background: var(--db-primary)"]:hover {
+  color: #ffffff !important;
+}
+
+/* ===== LIGHT MODE SPECIFIC TEXT OVERRIDES ===== */
+:root[data-theme="light"] .player-name {
+  color: #000000 !important;
+}
+
+:root[data-theme="light"] .injury-column__title {
+  color: #000000 !important;
+}
+
+:root[data-theme="light"] .injury-label {
+  color: #000000 !important;
+}
+
+:root[data-theme="light"] .injury-toggle {
+  color: #000000 !important;
+}
+
+:root[data-theme="light"] .injury-notes {
+  color: #000000 !important;
+}
+
+:root[data-theme="light"] .injury-notes p {
+  color: #000000 !important;
+}
+
+:root[data-theme="light"] .injury-meta {
+  color: #374151 !important;
+}
+
+:root[data-theme="light"] .injury-meta span {
+  color: #374151 !important;
+}
+
+/* ===== SKILL CHART THEMING ===== */
+.skill-chart {
+  background-color: var(--db-card);
+  border: 1px solid var(--db-border);
+  color: var(--db-text);
+}
+
+.chart-header {
+  background-color: transparent;
+  color: var(--db-text);
+}
+
+.chart-title-text,
+.chart-subtitle {
+  color: var(--db-text);
+}
+
+.metrics-summary {
+  background-color: transparent;
+  color: var(--db-text);
+}
+
+.chart-container {
+  background-color: transparent;
+}
+
+/* Override Teams.css hardcoded backgrounds */
+.scard {
+  background: var(--db-card) !important;
+  border: 1px solid var(--db-border) !important;
+}
+
+.donut {
+  background: var(--db-card) !important;
+  border: 1px solid var(--db-border) !important;
+}
+
+.skillchart__spark {
+  background: var(--db-card) !important;
+  border: 1px solid var(--db-border) !important;
+}
+
+.physchart__canvas {
+  background: var(--db-card) !important;
+  border: 1px solid var(--db-border) !important;
+}
+
+/* ===== SKILLS DEVELOPMENT ANALYSIS THEMING ===== */
+.skills-development-analysis {
+  background-color: transparent;
+  color: var(--db-text);
+}
+
+.skill-progress-card {
+  background-color: var(--db-card);
+  border: 1px solid var(--db-border);
+  color: var(--db-text);
+}
+
+.skills-content {
+  background-color: transparent;
+}
+
+.skills-tabs {
+  background-color: transparent;
+}
+
+.skill-tab {
+  background-color: var(--db-base);
+  border: 1px solid var(--db-border);
+  color: var(--db-text);
+}
+
+.skill-tab.active {
+  background-color: var(--db-primary);
+  color: #ffffff;
+  border-color: var(--db-primary);
+}
+
+.skills-progress-cards {
+  background-color: transparent;
+}
+
+.progress-circle-container {
+  background-color: transparent;
+}
+
+.section-title {
+  color: var(--db-text);
+}
+
+.card-title {
+  color: var(--db-text);
+}
+
+.progress-label,
+.progress-value {
+  color: var(--db-text);
+}
+
+.skill-detail-item {
+  color: var(--db-text);
+}
+
+/* Light theme specific overrides */
+:root[data-theme="light"] .skills-development-analysis {
+  background-color: var(--db-base);
+}
+
+:root[data-theme="light"] .skill-progress-card {
+  background-color: var(--db-card);
+  border-color: var(--db-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== ASSESSMENT NOTES STYLING ===== */
+.assessment-note-card {
+  background-color: var(--db-card);
+  border: 1px solid var(--db-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.assessment-note-title {
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--db-text);
+}
+
+.assessment-note-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.assessment-note-dot.success {
+  background-color: var(--db-success);
+}
+
+.assessment-note-dot.primary {
+  background-color: var(--db-primary);
+}
+
+.assessment-note-text {
+  font-size: 14px;
+  line-height: 1.5;
+  padding-left: 16px;
+  border-left: 2px solid;
+  color: var(--db-text);
+  margin-bottom: 8px;
+}
+
+.assessment-note-text.success {
+  border-color: var(--db-success);
+  opacity: 0.7;
+}
+
+.assessment-note-text.primary {
+  border-color: var(--db-primary);
+  opacity: 0.7;
+}
+
+/* Light theme assessment note card improvements */
+:root[data-theme="light"] .assessment-note-card {
+  background-color: var(--db-card);
+  border-color: var(--db-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="light"] .assessment-note-title {
+  color: var(--db-text) !important;
+}
+
+:root[data-theme="light"] .assessment-note-text {
+  color: var(--db-text) !important;
+}
+
+/* ===== TAILWIND-STYLE DASHBOARD CLASSES ===== */
+.text-dashboard-primary {
+  color: var(--db-primary) !important;
+}
+
+.text-dashboard-text-muted {
+  color: var(--db-text-muted) !important;
+}
+
+.text-dashboard-success {
+  color: var(--db-success) !important;
+}
+
+.bg-dashboard-primary\/20 {
+  background-color: var(--db-primary-20) !important;
+}
+
+.bg-dashboard-success\/20 {
+  background-color: var(--db-success-20) !important;
+}
+
+.bg-dashboard-card {
+  background-color: var(--db-card) !important;
+}
+
+.border-dashboard-border {
+  border-color: var(--db-border) !important;
+}
+
+.border-dashboard-border\/30 {
+  border-color: var(--db-border) !important;
+  opacity: 0.3;
+}
+
 /* Sidebar - Old styles removed, using new shell styles below */
 
 /* Old navigation styles removed - using new shell styles below */
@@ -490,11 +850,11 @@ body {
 }
 
 .skill-chart {
-  background-color: #1a1a1a;
+  background-color: var(--db-card);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 32px;
-  border: 1px solid #333;
+  border: 1px solid var(--db-border);
 }
 
 .metrics-summary {

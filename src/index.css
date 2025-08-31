@@ -93,8 +93,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color-scheme: dark;
-  background-color: #0a0a0a;
+  background-color: var(--db-base);
+  color: var(--db-text);
 }
 
 #root {
@@ -104,11 +104,11 @@ body {
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--db-primary);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--db-primary-light);
 }
 
 h1 {
@@ -123,31 +123,20 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
-  color: #ffffff;
+  background-color: var(--db-card);
+  color: var(--db-text);
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--db-primary);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
+/* Theme support is now handled via data-theme attribute in App.css */
 
 /* Teams Page Styles */
 .teams-page {
@@ -165,9 +154,9 @@ button:focus-visible {
 }
 
 .btn--secondary {
-  background: #1a1a1a;
-  border: 1px solid #333;
-  color: #fff;
+  background: var(--db-card);
+  border: 1px solid var(--db-border);
+  color: var(--db-text);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -175,8 +164,8 @@ button:focus-visible {
 }
 
 .btn--secondary:hover {
-  background: #2a2a2a;
-  border-color: #444;
+  background: var(--db-hover);
+  border-color: var(--db-gray-600);
 }
 
 .btn--icon {
@@ -189,11 +178,11 @@ button:focus-visible {
 }
 
 .team-overview {
-  background: #1a1a1a;
+  background: var(--db-card);
   border-radius: 12px;
   padding: 2rem;
   margin-bottom: 2rem;
-  border: 1px solid #333;
+  border: 1px solid var(--db-border);
 }
 
 .team-overview__header {
@@ -223,11 +212,11 @@ button:focus-visible {
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 0.25rem;
-  color: #fff;
+  color: var(--db-text);
 }
 
 .team-overview__info .muted {
-  color: #888;
+  color: var(--db-text-muted);
   font-size: 0.875rem;
 }
 
@@ -241,34 +230,34 @@ button:focus-visible {
   align-items: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: #0a0a0a;
+  background: var(--db-base);
   border-radius: 8px;
-  border: 1px solid #333;
+  border: 1px solid var(--db-border);
   min-width: 120px;
 }
 
 .stat-card__icon {
-  color: #9C70FA;
+  color: var(--db-primary);
 }
 
 .stat-card__value {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--db-text);
   display: block;
 }
 
 .stat-card__value.danger {
-  color: #ff6b6b;
+  color: var(--db-danger);
 }
 
 .stat-card__value.success {
-  color: #51cf66;
+  color: var(--db-success);
 }
 
 .stat-card__label {
   font-size: 0.75rem;
-  color: #888;
+  color: var(--db-text-muted);
   display: block;
 }
 
@@ -292,20 +281,20 @@ button:focus-visible {
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: #1a1a1a;
-  border: 1px solid #333;
+  background: var(--db-card);
+  border: 1px solid var(--db-border);
   border-radius: 8px;
-  color: #fff;
+  color: var(--db-text);
   font-size: 0.875rem;
 }
 
 .search-input::placeholder {
-  color: #666;
+  color: var(--db-text-muted);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #9C70FA;
+  border-color: var(--db-primary);
 }
 
 .filter-buttons {
@@ -316,23 +305,23 @@ button:focus-visible {
 
 .filter-btn {
   padding: 0.5rem 1rem;
-  background: #1a1a1a;
-  border: 1px solid #333;
+  background: var(--db-card);
+  border: 1px solid var(--db-border);
   border-radius: 6px;
-  color: #888;
+  color: var(--db-text-muted);
   font-size: 0.875rem;
   transition: all 0.2s ease;
 }
 
 .filter-btn:hover {
-  background: #2a2a2a;
-  border-color: #444;
+  background: var(--db-hover);
+  border-color: var(--db-gray-600);
 }
 
 .filter-btn.active {
-  background: #9C70FA;
-  border-color: #9C70FA;
-  color: #fff;
+  background: var(--db-primary);
+  border-color: var(--db-primary);
+  color: var(--db-white);
 }
 
 .players-section {
@@ -346,19 +335,19 @@ button:focus-visible {
 .section-head h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--db-text);
   margin-bottom: 0.25rem;
 }
 
 .section-head .muted {
-  color: #888;
+  color: var(--db-text-muted);
   font-size: 0.875rem;
 }
 
 .players-table-container {
-  background: #1a1a1a;
+  background: var(--db-card);
   border-radius: 12px;
-  border: 1px solid #333;
+  border: 1px solid var(--db-border);
   overflow: hidden;
 }
 
@@ -369,27 +358,27 @@ button:focus-visible {
 }
 
 .players-table thead {
-  background: #0a0a0a;
-  border-bottom: 1px solid #333;
+  background: var(--db-base);
+  border-bottom: 1px solid var(--db-border);
 }
 
 .players-table th {
   padding: 1rem 0.75rem;
   text-align: left;
   font-weight: 600;
-  color: #fff;
+  color: var(--db-text);
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .players-table tbody tr {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--db-border);
   transition: background-color 0.2s ease;
 }
 
 .players-table tbody tr:hover {
-  background: #2a2a2a;
+  background: var(--db-hover);
 }
 
 .players-table tbody tr:last-child {
@@ -398,13 +387,13 @@ button:focus-visible {
 
 .players-table td {
   padding: 1rem 0.75rem;
-  color: #fff;
+  color: var(--db-text);
   vertical-align: middle;
 }
 
 .rank-cell {
   font-weight: 600;
-  color: #9C70FA;
+  color: var(--db-primary);
   text-align: center;
   width: 60px;
 }
@@ -441,13 +430,13 @@ button:focus-visible {
 
 .player-info .player-name {
   font-weight: 600;
-  color: #fff;
+  color: var(--db-text);
   font-size: 0.875rem;
 }
 
 .player-info .player-position {
   font-size: 0.75rem;
-  color: #888;
+  color: var(--db-text-muted);
 }
 
 .year-cell,
@@ -461,21 +450,21 @@ button:focus-visible {
 }
 
 .team-cell {
-  color: #9C70FA;
+  color: var(--db-primary);
   font-weight: 600;
 }
 
 .height-cell,
 .weight-cell {
-  color: #51cf66;
+  color: var(--db-success);
 }
 
 .speed-cell {
-  color: #ffd43b;
+  color: var(--db-warning);
 }
 
 .endurance-cell {
-  color: #74c0fc;
+  color: var(--db-info);
 }
 
 /* Table responsive design */
@@ -524,16 +513,16 @@ button:focus-visible {
 }
 
 .btn--primary {
-  background: #9C70FA;
-  border-color: #9C70FA;
-  color: #fff;
+  background: var(--db-primary);
+  border-color: var(--db-primary);
+  color: #ffffff;
   width: 100%;
   transition: all 0.2s ease;
 }
 
 .btn--primary:hover {
-  background: #8b5cf6;
-  border-color: #8b5cf6;
+  background: var(--db-primary-light);
+  border-color: var(--db-primary-light);
 }
 
 /* Responsive Design */

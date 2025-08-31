@@ -4,8 +4,6 @@ import {
   User,
   Trophy,
   LayoutDashboard,
-  Users,
-  User as UserIcon,
   Settings,
   HelpCircle,
   ChevronLeft,
@@ -16,13 +14,23 @@ import { NavLink } from "react-router-dom";
 
 const cx = (...c: (string | false)[]) => c.filter(Boolean).join(" ");
 
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  profileImage: string | null;
+  role: string;
+}
+
 interface SidebarProps {
   isMobile?: boolean;
   isOpen?: boolean;
   onClose?: () => void;
+  userData: UserData;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isMobile = false, isOpen = false, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isMobile = false, isOpen = false, onClose, userData }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [expanding, setExpanding] = useState(false); // temp class for fade-in
   const t = useRef<number | null>(null);
@@ -171,11 +179,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false, isOpen = false, onC
       <div className="user-block">
         <div className="user-card">
           <div className="user-avatar-2">
-            <User size={16} />
+            {userData.profileImage ? (
+              <img src={userData.profileImage} alt="Profile" style={{width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover'}} />
+            ) : (
+              <User size={16} />
+            )}
           </div>
           <div className="user-meta-2">
-            <div className="user-name-2">Coach Admin</div>
-            <div className="user-mail-2">admin@sportsclub.com</div>
+            <div className="user-name-2">{`${userData.firstName} ${userData.lastName}`}</div>
+            <div className="user-mail-2">{userData.email}</div>
           </div>
         </div>
 

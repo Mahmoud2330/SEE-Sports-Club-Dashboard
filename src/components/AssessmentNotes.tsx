@@ -129,7 +129,7 @@ const AssessmentNotes: React.FC<AssessmentNotesProps> = ({ teamTier, player }) =
             {/* Physical Assessments */}
             <div className="space-y-6">
               <div className="flex items-center gap-3 pb-4 border-b border-dashboard-border/30">
-                <div className="w-8 h-8 rounded-lg bg-dashboard-success/20 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-dashboard-success flex items-center justify-center">
                   <Zap className="w-4 h-4 text-dashboard-success" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-dashboard-success">Physical Assessments</h3>
@@ -137,14 +137,14 @@ const AssessmentNotes: React.FC<AssessmentNotesProps> = ({ teamTier, player }) =
               
               <div className="space-y-4">
                 {Object.entries(notes['Physical Assessments']).map(([testName, testNotes]) => (
-                  <div key={testName} className="bg-dashboard-base/30 rounded-lg p-4 border border-dashboard-border/20">
-                    <h4 className="font-medium text-white text-sm mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-dashboard-success rounded-full"></div>
+                  <div key={testName} className="assessment-note-card">
+                    <h4 className="assessment-note-title">
+                      <div className="assessment-note-dot success"></div>
                       {testName}
                     </h4>
                     <div className="space-y-2">
                       {testNotes.map((note, index) => (
-                        <div key={index} className="text-dashboard-text text-sm leading-relaxed pl-4 border-l-2 border-dashboard-success/30">
+                        <div key={index} className="assessment-note-text success">
                           {note}
                         </div>
                       ))}
@@ -165,14 +165,14 @@ const AssessmentNotes: React.FC<AssessmentNotesProps> = ({ teamTier, player }) =
               
               <div className="space-y-4">
                 {Object.entries(notes['Skills Assessments']).map(([skillName, skillNotes]) => (
-                  <div key={skillName} className="bg-dashboard-base/30 rounded-lg p-4 border border-dashboard-border/20">
-                    <h4 className="font-medium text-white text-sm mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-dashboard-primary rounded-full"></div>
+                  <div key={skillName} className="assessment-note-card">
+                    <h4 className="assessment-note-title">
+                      <div className="assessment-note-dot primary"></div>
                       {skillName}
                     </h4>
                     <div className="space-y-2">
                       {skillNotes.map((note, index) => (
-                        <div key={index} className="text-dashboard-text text-sm leading-relaxed pl-4 border-l-2 border-dashboard-primary/30">
+                        <div key={index} className="assessment-note-text primary">
                           {note}
                         </div>
                       ))}

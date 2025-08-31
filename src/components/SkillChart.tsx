@@ -164,7 +164,7 @@ const SkillChart: React.FC<SkillChartProps> = ({ player, playerName }) => {
                 Track progress across technical skill performance indicators.
               </p>
             </div>
-            <div className="selected-metric" style={{ color: '#fff' }}>
+            <div className="selected-metric" style={{ color: 'var(--db-text)' }}>
               <div style={{ color: tab.color }}>{tab.icon}</div>
               <span>{title.title}</span>
             </div>
@@ -252,7 +252,7 @@ const SkillChart: React.FC<SkillChartProps> = ({ player, playerName }) => {
               <XAxis dataKey="month" stroke="#666" tick={{ fill: '#666' }} />
               <YAxis stroke="#666" tick={{ fill: '#666' }} domain={[4, 10]} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: 'var(--db-card)', border: '1px solid var(--db-border)', borderRadius: '8px', color: 'var(--db-text)' }}
               />
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">

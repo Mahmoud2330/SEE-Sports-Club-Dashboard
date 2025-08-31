@@ -722,7 +722,7 @@ const TeamsPage: React.FC = () => {
   const goNext = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
 
   if (loading) return <main className="teams-page"><div className="teams-page__inner"><p className="muted">Loading…</p></div></main>;
-  if (error || !currentTeam) return <main className="teams-page"><div className="teams-page__inner"><p className="muted" style={{color:"#ff9898"}}>Error: {error || "Team not found"}</p></div></main>;
+  if (error || !currentTeam) return <main className="teams-page"><div className="teams-page__inner"><p className="muted" style={{color:"var(--db-danger)"}}>Error: {error || "Team not found"}</p></div></main>;
 
   // Normalize the tier to avoid case/spacing issues
   const canShowChat =

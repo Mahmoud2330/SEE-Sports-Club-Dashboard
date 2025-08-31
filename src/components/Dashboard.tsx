@@ -66,16 +66,16 @@ const MiniDualSpark: React.FC<{ data: { label: string; physical: number; skill: 
         <Line type="monotone" dataKey="skill" stroke="#6728f5" strokeWidth={2.5} dot={false} />
         <Tooltip 
           contentStyle={{ 
-            background: "#1a1a1a", 
-            border: "1px solid #333",
+            background: "var(--db-card)", 
+            border: "1px solid var(--db-border)",
             borderRadius: "8px",
-            color: "#fff"
+            color: "var(--db-text)"
           }}
           formatter={(value: number, name: string) => [
             value.toFixed(1), 
             name === 'physical' ? 'Physical' : 'Skill'
           ]}
-          labelStyle={{ color: "#9e9e9e" }}
+          labelStyle={{ color: "var(--db-text-muted)" }}
         />
       </AreaChart>
     </ResponsiveContainer>

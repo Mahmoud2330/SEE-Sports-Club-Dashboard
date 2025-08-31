@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 import TopHeader from "../components/TopHeader";
 import Sidebar from "../components/Sidebar";
 
 export default function AppLayout() {
+  const { userData } = useUser();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
 
@@ -30,8 +32,9 @@ export default function AppLayout() {
   return (
     <div className="app">
       <TopHeader 
-        userName="Abdelrahman Ghareeb" 
-        userRole="Administrator" 
+        userName={`${userData.firstName} ${userData.lastName}`}
+        userRole={userData.role} 
+        avatarUrl={userData.profileImage || undefined}
         showHamburger={isMobileOrTablet}
         onMenuClick={toggleMobileSidebar}
       />
@@ -42,6 +45,7 @@ export default function AppLayout() {
             isMobile={isMobileOrTablet}
             isOpen={isMobileSidebarOpen}
             onClose={closeMobileSidebar}
+            userData={userData}
           />
         )}
         <main className="main-content">
