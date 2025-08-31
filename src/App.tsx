@@ -7,6 +7,7 @@ import PlayerPage from "./components/PlayerPage";
 import TeamsPage from "./components/TeamsPage";
 import VideoDetailPage from "./components/VideoDetailPage";
 import SettingsPage from "./components/SettingsPage";
+import HelpSupportPage from "./components/HelpSupportPage";
 
 export default function App() {
   return (
@@ -21,7 +22,7 @@ export default function App() {
           <Route path="/teams/:teamId" element={<TeamsPage />} />
           <Route path="/video/:videoId" element={<VideoDetailPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/help" element={<div>Help Page - Coming Soon</div>} />
+          <Route path="/help" element={<HelpSupportPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
